@@ -215,13 +215,15 @@ CONSTRAINTS:
 
 // Model waterfall — first available model for this API key wins
 const GEMINI_MODELS = [
-    'gemini-2.0-flash-exp', // Experimental 2.0 (High Quote usually)
-    'gemini-1.5-flash-002', // Stable Flash (Avoids 404 alias issues)
-    'gemini-1.5-flash',     // Default Flash
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-flash-8b',  // Compact Flash (often has separate quota)
-    'gemini-1.5-pro-latest',// Pro (Reliable fallback)
-    'gemini-1.0-pro',       // Legacy Pro
+    'gemini-3.1-pro-preview',       // Newest SOTA
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3-flash-preview',       // Intelligent speed
+    'gemini-2.5-pro',
+    'gemini-2.5-flash',             // Hybrid reasoning
+    'gemini-2.0-flash',             // Second gen multimodal
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash-002',         // Legacy 1.5 fallback
+    'gemini-1.5-flash',
 ];
 
 const isRetryableError = (error) => {
