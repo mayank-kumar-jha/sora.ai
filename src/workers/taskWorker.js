@@ -26,8 +26,13 @@ const taskWorker = new Worker('taskQueue', async (job) => {
         }
 
         // Logic to determine action and payload from task description or metadata
-        const action = task.type === 'RECURRING' ? 'SEND_WEEKLY_REPORT' : 'GENERIC_AUTOMATION';
-        await executeAutomation(userId, taskId, 'CREATE_TASK', { details: task.title });
+        if (task.title === 'SEND_WHATSAPP' && task.description) {
+            const payload = JSON.parse(task.description);
+            await executeAutomation(userId, taskId, 'SEND_WHATSAPP', payload);
+        } else {
+            const action = task.type === 'RECURRING' ? 'SEND_WEEKLY_REPORT' : 'GENERIC_AUTOMATION';
+            await executeAutomation(userId, taskId, 'CREATE_TASK', { details: task.title });
+        }
 
         logger.info(`Task ${taskId} executed successfully`);
     } catch (error) {

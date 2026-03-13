@@ -26,6 +26,11 @@ const executeAutomation = async (userId, taskId, action, payload) => {
             case 'UPLOAD_DRIVE_FILE':
                 result = await googleService.uploadDriveFile(userId, payload);
                 break;
+            case 'SEND_WHATSAPP':
+                const whatsappService = require('./whatsappService');
+                await whatsappService.waitUntilReady();
+                result = await whatsappService.sendWhatsAppMessage(payload.to, payload.message);
+                break;
             case 'CREATE_TASK':
                 // Sub-task creation or internal task logic
                 result = { message: 'Internal task executed' };

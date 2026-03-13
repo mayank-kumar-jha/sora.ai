@@ -64,6 +64,17 @@ const routeAction = async (userId, action, payload = {}) => {
             return await whatsappService.clearCache();
         case 'SEND_WHATSAPP':
             return await whatsappService.sendWhatsAppMessage(payload.to, payload.message);
+        case 'SCHEDULE_WHATSAPP':
+            return await prisma.task.create({
+                data: {
+                    userId,
+                    title: 'SEND_WHATSAPP',
+                    description: JSON.stringify({ to: payload.to, message: payload.message }),
+                    type: 'ONE_TIME',
+                    status: 'PENDING',
+                    scheduledTime: parseDateTime(payload.time)
+                }
+            });
 
         case 'LIST_DRIVE_FILES':
             return await googleService.listDriveFiles(userId, payload.pageSize);

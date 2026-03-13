@@ -452,6 +452,26 @@ const clearCache = () => {
     };
 };
 
+/**
+ * Wait for WhatsApp to be ready (useful for background workers)
+ */
+const waitUntilReady = async (timeoutMs = 30000) => {
+    if (isReady) return true;
+    
+    return new Promise((resolve, reject) => {
+        const start = Date.now();
+        const interval = setInterval(() => {
+            if (isReady) {
+                clearInterval(interval);
+                resolve(true);
+            } else if (Date.now() - start > timeoutMs) {
+                clearInterval(interval);
+                reject(new AppError('WhatsApp failed to become ready in time', 503, 'WHATSAPP_TIMEOUT'));
+            }
+        }, 1000);
+    });
+};
+
 module.exports = {
     initWhatsApp,
     getQrCode,
@@ -460,5 +480,6 @@ module.exports = {
     getContacts,
     clearCache,
     getLastReceivedMessage,
-    sendWhatsAppMessage
+    sendWhatsAppMessage,
+    waitUntilReady
 };

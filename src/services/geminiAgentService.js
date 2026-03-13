@@ -190,11 +190,16 @@ const coreFunctions = [
         }
     },
     {
-        name: 'clear_whatsapp_cache',
-        description: 'Clears the local WhatsApp contact and chat cache. Use this if Sora is showing the wrong contact names or if sync seems broken.',
+        name: 'schedule_whatsapp_message',
+        description: 'Schedules a WhatsApp message to be sent at a specific time in the future. Use this when the user says "after X minutes", "at 5pm", or "tomorrow".',
         parameters: {
             type: 'OBJECT',
-            properties: {}
+            properties: {
+                to: { type: 'STRING', description: 'The name or phone number of the recipient' },
+                message: { type: 'STRING', description: 'The message content to send' },
+                time: { type: 'STRING', description: 'The scheduled time in ISO 8601 format. IMPORTANT: Calculate this based on the LOCAL system time provided in the context. Do NOT use UTC unless specified.' }
+            },
+            required: ['to', 'message', 'time']
         }
     }
 ];
@@ -315,6 +320,8 @@ const runWithModel = async (ai, modelName, userId, userMessage, context, imageBa
                     toolResult = await actionRouter.routeAction(userId, 'OPEN_URL', call.args);
                 } else if (call.name === 'play_music') {
                     toolResult = await actionRouter.routeAction(userId, 'PLAY_MUSIC', call.args);
+                } else if (call.name === 'schedule_whatsapp_message') {
+                    toolResult = await actionRouter.routeAction(userId, 'SCHEDULE_WHATSAPP', call.args);
                 } else {
                     toolResult = { error: 'Unknown tool' };
                 }
