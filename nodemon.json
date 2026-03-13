@@ -1,0 +1,13 @@
+{
+    "watch": [
+        "src"
+    ],
+    "ext": "js,json",
+    "ignore": [
+        ".whatsapp_store.json",
+        ".baileys_auth",
+        "logs",
+        "node_modules"
+    ],
+    "delay": "2500"
+}

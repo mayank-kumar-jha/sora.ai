@@ -1,0 +1,74 @@
+{
+    "name": "super-ai-assistant",
+    "version": "1.0.0",
+    "description": "Production-grade AI SaaS Backend – Phase 1",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "node src/server.js",
+        "dev": "nodemon src/server.js",
+        "migrate": "prisma migrate dev",
+        "migrate:prod": "prisma migrate deploy",
+        "generate": "prisma generate",
+        "db:studio": "prisma studio"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.998.0",
+        "@aws-sdk/s3-request-presigner": "^3.998.0",
+        "@bull-board/express": "^6.20.3",
+        "@google-cloud/speech": "^7.2.1",
+        "@google/generative-ai": "^0.24.1",
+        "@pinecone-database/pinecone": "^7.1.0",
+        "@prisma/client": "^5.12.0",
+        "@whiskeysockets/baileys": "^7.0.0-rc.9",
+        "bcryptjs": "^2.4.3",
+        "bullmq": "^5.70.1",
+        "cors": "^2.8.5",
+        "cron-parser": "^5.5.0",
+        "crypto-js": "^4.2.0",
+        "dotenv": "^16.4.5",
+        "duck-duck-scrape": "^2.2.7",
+        "express": "^4.19.2",
+        "express-rate-limit": "^7.3.1",
+        "google-it": "^1.6.4",
+        "google-tts-api": "^2.0.2",
+        "googleapis": "^171.4.0",
+        "googlethis": "^1.8.0",
+        "groq-sdk": "^0.37.0",
+        "helmet": "^7.1.0",
+        "ioredis": "^5.3.2",
+        "jsonwebtoken": "^9.0.2",
+        "multer": "^2.0.2",
+        "node-cron": "^4.2.1",
+        "openai": "^6.25.0",
+        "pdf-parse": "^2.4.5",
+        "qrcode": "^1.5.4",
+        "qrcode-terminal": "^0.12.0",
+        "rate-limit-redis": "^4.2.0",
+        "socket.io": "^4.8.3",
+        "stripe": "^20.4.0",
+        "uuid": "^9.0.1",
+        "winston": "^3.13.0",
+        "winston-daily-rotate-file": "^5.0.0",
+        "ws": "^8.19.0",
+        "zod": "^4.3.6"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.0",
+        "prisma": "^5.12.0"
+    },
+    "nodemonConfig": {
+        "watch": [
+            "src"
+        ],
+        "ext": "js,json",
+        "ignore": [
+            "data",
+            "logs",
+            "node_modules"
+        ],
+        "delay": "2500"
+    }
+}

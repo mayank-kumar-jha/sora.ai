@@ -1,0 +1,190 @@
+'use strict';
+// Restarting to apply restored transcription keys
+
+// Must be first – validates & loads all env vars before anything else
+const config = require('./config/env');
+
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const logger = require('./config/logger');
+const { requestLogger } = require('./middleware/requestLogger');
+const { globalRateLimiter } = require('./middleware/rateLimiter');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const routes = require('./routes');
+const prisma = require('./config/database');
+const { getRedisClient, disconnectRedis } = require('./config/redis');
+const { initAiWebSocket } = require('./services/websocketService');
+const { handleWebhook } = require('./controllers/webhookController');
+const bullBoardAdapter = require('./config/bullBoard');
+const { schedulePendingTasks, schedulePendingReminders } = require('./services/schedulerService');
+const cron = require('node-cron');
+
+// Start Workers
+require('./workers');
+
+const app = express();
+
+// ─── Security Middleware ────────────────────────────────────────────────────
+app.use(helmet());
+
+app.use(
+    cors({
+        origin: config.isProduction
+            ? process.env.ALLOWED_ORIGINS?.split(',') ?? []
+            : '*',
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+);
+
+// ─── Webhooks (Must be before body parsers for raw body) ───────────────────
+app.post('/api/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+
+// ─── Body Parsing ───────────────────────────────────────────────────────────
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ─── Trust Proxy (for accurate IPs behind reverse proxy) ───────────────────
+app.set('trust proxy', 1);
+
+// ─── Request Logging ────────────────────────────────────────────────────────
+app.use(requestLogger);
+
+// ─── Global Rate Limiting ───────────────────────────────────────────────────
+app.use(globalRateLimiter);
+
+// ─── Health check ──────────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable' });
+});
+
+// ─── Routes ──────────────────────────────────────────────────────────────────
+// Bull Board Dashboard
+app.use('/admin/queues', bullBoardAdapter.getRouter());
+
+app.use('/api', routes);
+
+// ─── 404 Handler ────────────────────────────────────────────────────────────
+app.use(notFoundHandler);
+
+// ─── Global Error Handler ───────────────────────────────────────────────────
+app.use(errorHandler);
+
+// ─── Server Bootstrap ───────────────────────────────────────────────────────
+const startServer = async () => {
+    // Pre-flight: DB connection is REQUIRED – server cannot run without it
+    try {
+        await prisma.$connect();
+        logger.info('Database: Connected successfully');
+    } catch (err) {
+        logger.error(
+            '\n' +
+            '══════════════════════════════════════════════════════\n' +
+            '  DATABASE CONNECTION FAILED\n' +
+            '══════════════════════════════════════════════════════\n' +
+            '  PostgreSQL is not reachable at the configured URL.\n' +
+            '\n' +
+            '  Quick fix – start services with Docker:\n' +
+            '    docker compose up -d\n' +
+            '\n' +
+            '  Then run migrations:\n' +
+            '    npx prisma migrate dev --name init\n' +
+            '══════════════════════════════════════════════════════'
+        );
+        process.exit(1);
+    }
+
+    // Pre-flight: Redis is optional – rate limiter falls back to in-memory store
+    try {
+        const redis = getRedisClient();
+        await redis.ping();
+        logger.info('Redis: Connected successfully');
+    } catch (err) {
+        logger.warn('Redis: Unavailable at startup – rate limiting will use in-memory fallback', {
+            error: err.message,
+        });
+    }
+
+    const server = app.listen(config.port, '0.0.0.0', () => {
+        logger.info(`Server started`, {
+            host: '0.0.0.0',
+            port: config.port,
+            environment: config.nodeEnv,
+            pid: process.pid,
+        });
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            logger.error(`Port ${config.port} is already in use. Exiting so nodemon can retry...`);
+            process.exit(1);
+        } else {
+            throw err;
+        }
+    });
+
+    // Initialize AI WebSocket
+    initAiWebSocket(server);
+
+    // Initialize WhatsApp
+    const { initWhatsApp } = require('./services/whatsappService');
+    initWhatsApp();
+
+    // Initial Scheduler Scan
+    await schedulePendingTasks();
+    await schedulePendingReminders();
+
+    // Setup Cron for Scheduler (every 1 minute)
+    cron.schedule('* * * * *', async () => {
+        logger.info('Running scheduled task scan...');
+        await schedulePendingTasks();
+        await schedulePendingReminders();
+    });
+
+    // ─── Graceful Shutdown ────────────────────────────────────────────────────
+    const shutdown = async (signal) => {
+        logger.info(`${signal} received. Starting graceful shutdown...`);
+
+        server.close(async () => {
+            logger.info('HTTP server closed');
+
+            await prisma.$disconnect();
+            logger.info('Database: Disconnected');
+
+            await disconnectRedis();
+            logger.info('Redis: Disconnected');
+
+            logger.info('Graceful shutdown complete');
+            process.exit(0);
+        });
+
+        // Force exit if shutdown takes too long
+        setTimeout(() => {
+            logger.error('Graceful shutdown timed out. Forcing exit.');
+            process.exit(1);
+        }, 15_000);
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+
+    process.on('unhandledRejection', (reason) => {
+        logger.error('Unhandled Promise Rejection', { reason });
+        // In production, exit to let process manager restart cleanly
+        if (config.isProduction) process.exit(1);
+    });
+
+    process.on('uncaughtException', (err) => {
+        logger.error('Uncaught Exception', { error: err.message, stack: err.stack });
+        process.exit(1);
+    });
+};
+
+startServer().catch((err) => {
+    logger.error('Failed to start server', { error: err.message });
+    process.exit(1);
+});
+
+module.exports = app; // Export for testing
