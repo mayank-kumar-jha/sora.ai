@@ -8,8 +8,8 @@ let redisClient = null;
 
 const createRedisClient = () => {
     const client = new Redis(redisConfig.url, {
-        maxRetriesPerRequest: 3,
-        enableReadyCheck: true,
+        maxRetriesPerRequest: null, // Critical for BullMQ
+        enableReadyCheck: false,
         lazyConnect: false,
         retryStrategy(times) {
             if (times > 5) {
