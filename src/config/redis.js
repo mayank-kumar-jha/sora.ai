@@ -7,12 +7,14 @@ const { redis: redisConfig } = require('./env');
 let redisClient = null;
 
 const createRedisClient = () => {
+    const isSsl = redisConfig.url.startsWith('rediss://');
     const client = new Redis(redisConfig.url, {
+        tls: isSsl ? { rejectUnauthorized: false } : undefined, // Essential for most cloud providers
         maxRetriesPerRequest: null, // Critical for BullMQ
         enableReadyCheck: false,
         lazyConnect: false,
-        connectTimeout: 10000,
-        keepAlive: 10000,
+        connectTimeout: 15000,
+        keepAlive: 15000,
         retryStrategy(times) {
             const delay = Math.min(times * 1000, 30000);
             if (times % 5 === 0) {
@@ -28,6 +30,10 @@ const createRedisClient = () => {
             return false;
         },
     });
+
+    if (isSsl) {
+        logger.info('Redis: Initializing with SSL/TLS (rejectUnauthorized: false)');
+    }
 
     client.on('connect', () => logger.info('Redis: Connection established'));
     client.on('ready', () => logger.info('Redis: Client is ready'));

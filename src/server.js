@@ -1,5 +1,5 @@
 'use strict';
-// Restarting to apply restored transcription keys
+// Redeploying to force apply the new WhatsApp Status UI and Contact Counter
 
 // Must be first – validates & loads all env vars before anything else
 const config = require('./config/env');

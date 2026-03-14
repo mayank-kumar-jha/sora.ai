@@ -263,7 +263,19 @@ const initWhatsApp = async () => {
 };
 
 const getQrCode = () => currentQrCode;
-const getStatus = () => ({ isReady, hasQr: !!currentQrCode });
+const getStatus = () => {
+    // Determine sync status: true if connected but maps are empty OR very small
+    // WhatsApp usually has at least a few system contacts/chats
+    const isSyncing = isReady && (contactsDirectory.size < 5 || recentChats.size < 5);
+    
+    return { 
+        isReady, 
+        hasQr: !!currentQrCode,
+        contactsCount: contactsDirectory.size,
+        chatsCount: recentChats.size,
+        syncing: isSyncing 
+    };
+};
 
 const getRecentChats = async (limit = 10) => {
     if (!isReady || !sock) {
@@ -472,6 +484,65 @@ const waitUntilReady = async (timeoutMs = 30000) => {
     });
 };
 
+const requestPairingCode = async (phoneNumber) => {
+    if (isReady || !sock) {
+        throw new AppError('WhatsApp client is already connected or not initialized.', 400, 'WHATSAPP_STATE_ERROR');
+    }
+
+    try {
+        const code = await sock.requestPairingCode(phoneNumber);
+        logger.info(`✅ Generated WhatsApp Pairing Code for ${phoneNumber}: ${code}`);
+        return code;
+    } catch (err) {
+        logger.error('Failed to request pairing code:', err.message);
+        throw new AppError(`Failed to generate pairing code: ${err.message}`, 500, 'WHATSAPP_PAIRING_ERROR');
+    }
+};
+
+/**
+ * Hard reset the WhatsApp session
+ */
+const resetSession = async () => {
+    logger.warn('🚀 WHATSAPP SESSION HARD RESET INITIATED');
+    
+    // 1. Close current connection if any
+    if (sock) {
+        try {
+            sock.end();
+            sock.logout();
+        } catch (e) {
+            logger.warn('Error closing socket during reset: ' + e.message);
+        }
+    }
+    
+    // 2. Clear in-memory state
+    sock = null;
+    isReady = false;
+    currentQrCode = null;
+    reconnectAttempts = 0;
+    contactsDirectory.clear();
+    recentChats.clear();
+    
+    // 3. Delete auth folder and store file
+    try {
+        if (fs.existsSync(AUTH_FOLDER)) {
+            // fs.rmSync is cleaner for directories
+            fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
+            logger.info(`Deleted auth folder: ${AUTH_FOLDER}`);
+        }
+        if (fs.existsSync(STORE_FILE)) {
+            fs.unlinkSync(STORE_FILE);
+            logger.info(`Deleted store file: ${STORE_FILE}`);
+        }
+    } catch (err) {
+        logger.error('Failed to delete session files:', err);
+        throw new AppError('Failed to delete session files', 500, 'WHATSAPP_RESET_ERROR');
+    }
+    
+    logger.info('✅ WhatsApp session has been wiped clean.');
+    return { status: 'success', message: 'Session reset successfully' };
+};
+
 module.exports = {
     initWhatsApp,
     getQrCode,
@@ -481,5 +552,7 @@ module.exports = {
     clearCache,
     getLastReceivedMessage,
     sendWhatsAppMessage,
-    waitUntilReady
+    waitUntilReady,
+    requestPairingCode,
+    resetSession
 };

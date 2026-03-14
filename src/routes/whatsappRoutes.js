@@ -6,8 +6,10 @@ const { requireAuth } = require('../middleware/auth'); // Import from auth inste
 
 const router = Router();
 
-// Unprotected route for easy development access (renders an HTML page with the QR)
+// Unprotected routes for easy development and fallback access
 router.get('/qr/view', whatsappController.renderQrPage);
+router.get('/pairing-code', whatsappController.getPairingCode);
+router.post('/reset', whatsappController.resetSession);
 
 // Require auth for all other WhatsApp routes 
 router.use(requireAuth);
