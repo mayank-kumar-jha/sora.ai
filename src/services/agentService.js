@@ -62,33 +62,40 @@ User: "Tell Anushka I'm on my way"
 Proactively use context. Keep reasoning ultra-brief.`;
 
 const processMessage = async (userId, userMessage, context = [], image = null) => {
-    // 1. Generate embedding for current query
-    let ragContext = '';
-    try {
-        const queryEmbedding = await embeddingService.generateEmbedding(userMessage);
-        const similarMemories = await vectorDbService.queryVectors(queryEmbedding, userId);
-
-        if (similarMemories.length > 0) {
-            ragContext = '\nRELEVANT PAST CONTEXT:\n' +
-                similarMemories.map(m => `- ${m.role}: ${m.text}`).join('\n');
+    // 1. Prep RAG and Context in parallel
+    const getRagContext = async () => {
+        try {
+            const queryEmbedding = await embeddingService.generateEmbedding(userMessage);
+            const similarMemories = await vectorDbService.queryVectors(queryEmbedding, userId);
+            if (similarMemories.length > 0) {
+                return '\nRELEVANT PAST CONTEXT:\n' + similarMemories.map(m => `- ${m.role}: ${m.text}`).join('\n');
+            }
+        } catch (err) {
+            console.warn('RAG search failed.', err.message);
         }
-    } catch (err) {
-        console.warn('RAG search failed, proceeding without memory.', err.message);
-    }
+        return '';
+    };
 
-    let whatsappContext = '';
-    const lastMsg = whatsappService.getLastReceivedMessage();
-    if (lastMsg) {
-        const minAgo = Math.round((Date.now() - lastMsg.timestamp) / 60000);
-        if (minAgo < 60) {
-            whatsappContext = `\n[RECENT WHATSAPP]: Received a message from ${lastMsg.from} (${minAgo} min ago): "${lastMsg.text}". If the user asks you to "reply", "tell him", or responds conversationally, USE this contact name ("${lastMsg.from}") for the SEND_WHATSAPP action.`;
+    const getWhatsappContext = () => {
+        const lastMsg = whatsappService.getLastReceivedMessage();
+        if (lastMsg) {
+            const minAgo = Math.round((Date.now() - lastMsg.timestamp) / 60000);
+            if (minAgo < 60) {
+                return `\n[RECENT WHATSAPP]: Received a message from ${lastMsg.from} (${minAgo} min ago): "${lastMsg.text}". If the user asks you to "reply", "tell him", or responds conversationally, USE this contact name ("${lastMsg.from}") for the SEND_WHATSAPP action.`;
+            }
         }
-    }
+        return '';
+    };
+
+    const [ragContext, whatsappContext] = await Promise.all([
+        getRagContext(),
+        Promise.resolve(getWhatsappContext())
+    ]);
 
     const visionContext = image ? "\n[VISION NOTICE]: The user sent an image with this message, but you (the fallback engine) cannot see it. Please apologize and explain that you are currently in fallback mode and cannot analyze images right now." : "";
 
     const messages = [
-        { role: 'system', content: `[SYSTEM CONTEXT: ${new Date().toString()}]\n` + SYSTEM_PROMPT + (ragContext ? ragContext : '') + whatsappContext + visionContext },
+        { role: 'system', content: `[SYSTEM CONTEXT: ${new Date().toString()}]\n` + SYSTEM_PROMPT + ragContext + whatsappContext + visionContext },
         ...context,
         { role: 'user', content: userMessage }
     ];
@@ -103,13 +110,9 @@ const processMessage = async (userId, userMessage, context = [], image = null) =
         throw new AppError('AI generated an invalid response format.', 500, 'AI_PARSE_ERROR');
     }
 
-    // 2. Offload memory storage to background worker
+    // 2. Offload memory storage to background worker (Fire and forget)
     if (userMessage.length > 10) {
-        queues.embedding.add(`embed-${uuidv4()}`, {
-            userId,
-            text: userMessage,
-            source: 'chat'
-        }).catch(err => console.warn('Failed to queue embedding:', err.message));
+        queues.embedding.add(`embed-${uuidv4()}`, { userId, text: userMessage, source: 'chat' }).catch(() => {});
     }
 
     if (aiResponse.type === 'ACTION') {

@@ -14,26 +14,26 @@ const sendMessage = asyncHandler(async (req, res) => {
     console.log(`[AI Controller] REQ BODY KEYS:`, Object.keys(req.body));
     console.log(`[AI Controller] Message: "${message}", Image size: ${image ? image.length : 0}`);
 
-    // Retrieve last few messages for context (simple approach for now)
-    const recentConversations = await prisma.conversation.findMany({
-        where: { userId: req.user.id },
-        orderBy: { timestamp: 'desc' },
-        take: 10 // Increased context for better tool awareness
-    });
+    // 1. Fetch context and Create user message in PARALLEL to save time
+    const [recentConversations, _userMsg] = await Promise.all([
+        prisma.conversation.findMany({
+            where: { userId: req.user.id },
+            orderBy: { timestamp: 'desc' },
+            take: 10
+        }),
+        prisma.conversation.create({
+            data: {
+                userId: req.user.id,
+                role: 'USER',
+                message: image ? `[Sent an Image] ${message}` : message
+            }
+        })
+    ]);
 
     const context = recentConversations.reverse().map(c => ({
         role: c.role.toLowerCase(),
         content: c.message
     }));
-
-    // Save user message
-    await prisma.conversation.create({
-        data: {
-            userId: req.user.id,
-            role: 'USER',
-            message: image ? `[Sent an Image] ${message}` : message
-        }
-    });
 
     try {
         // Use the new Gemini Agent Service that supports Tools (Calendar, etc.)
