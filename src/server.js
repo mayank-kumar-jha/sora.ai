@@ -74,38 +74,20 @@ app.use(errorHandler);
 
 // ─── Server Bootstrap ───────────────────────────────────────────────────────
 const startServer = async () => {
-    // Pre-flight: DB connection is REQUIRED – server cannot run without it
-    try {
-        await prisma.$connect();
-        logger.info('Database: Connected successfully');
-    } catch (err) {
-        logger.error(
-            '\n' +
-            '══════════════════════════════════════════════════════\n' +
-            '  DATABASE CONNECTION FAILED\n' +
-            '══════════════════════════════════════════════════════\n' +
-            '  PostgreSQL is not reachable at the configured URL.\n' +
-            '\n' +
-            '  Quick fix – start services with Docker:\n' +
-            '    docker compose up -d\n' +
-            '\n' +
-            '  Then run migrations:\n' +
-            '    npx prisma migrate dev --name init\n' +
-            '══════════════════════════════════════════════════════'
-        );
-        process.exit(1);
-    }
-
-    // Pre-flight: Redis is optional – rate limiter falls back to in-memory store
-    try {
-        const redis = getRedisClient();
-        await redis.ping();
-        logger.info('Redis: Connected successfully');
-    } catch (err) {
-        logger.warn('Redis: Unavailable at startup – rate limiting will use in-memory fallback', {
-            error: err.message,
+    // Pre-flight: DB connection
+    prisma.$connect()
+        .then(() => logger.info('Database: Connected successfully'))
+        .catch((err) => {
+            logger.error('DATABASE CONNECTION FAILED', { error: err.message });
         });
-    }
+
+    // Pre-flight: Redis is optional
+    const redis = getRedisClient();
+    redis.ping()
+        .then(() => logger.info('Redis: Connected successfully'))
+        .catch((err) => {
+            logger.warn('Redis: Unavailable at startup', { error: err.message });
+        });
 
     const server = app.listen(config.port, '0.0.0.0', () => {
         logger.info(`Server started`, {
