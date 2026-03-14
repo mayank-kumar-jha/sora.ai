@@ -27,7 +27,8 @@ CONSTRAINTS:
 3. TOOL USAGE: If the user asks you to DO something (send message, set alarm, search web, etc.), you MUST set "type": "ACTION" and use the correct "action" key. DO NOT just reply with text if a tool is available.
 
 ACTIONS:
-- SEND_WHATSAPP: {to: "name", message: "text"} -> MUST use if user asks to "send a message", "tell someone", "reply", etc.
+- SEND_WHATSAPP: {to: "name", message: "text"} -> Use for IMMEDIATE messages.
+- SCHEDULE_WHATSAPP: {to: "name", message: "text", time: "ISO"} -> MUST use for any future messages ("after 5 min", "at 10pm", "tomorrow"). Use ISO 8601.
 - GET_WHATSAPP_MESSAGES: {limit: 10}
 - GET_WHATSAPP_CONTACTS: {limit: 20}
 - CLEAR_WHATSAPP_CACHE: {}

@@ -1,5 +1,5 @@
 'use strict';
-// Redeploying to force apply the new WhatsApp Status UI and Contact Counter
+// Redeploying to fix WhatsApp Scheduling and unify Tool Prompts
 
 // Must be first – validates & loads all env vars before anything else
 const config = require('./config/env');
