@@ -18,6 +18,11 @@ for (const key of requiredEnvVars) {
     }
 }
 
+if (process.env.NODE_ENV === 'production') {
+    const url = process.env.REDIS_URL || '';
+    console.log(`[DEBUG] Redis Config: URL length=${url.length}, Protocol=${url.startsWith('rediss://') ? 'rediss' : 'redis'}`);
+}
+
 // Optional warns for Phase 3-12 keys in development
 const phase3Vars = [
     'GEMINI_API_KEY',
