@@ -12,17 +12,18 @@ const createRedisClient = () => {
         enableReadyCheck: false,
         lazyConnect: false,
         connectTimeout: 10000,
+        keepAlive: 10000,
         retryStrategy(times) {
-            const delay = Math.min(times * 50, 2000);
-            if (times % 10 === 0) {
+            const delay = Math.min(times * 1000, 30000);
+            if (times % 5 === 0) {
                 logger.warn(`Redis: Reconnect attempt ${times}, delay ${delay}ms`);
             }
             return delay;
         },
         reconnectOnError(err) {
             const targetError = 'READONLY';
-            if (err.message.includes(targetError) || err.message.includes('ECONNRESET')) {
-                return true; // Reconnect for these specific errors
+            if (err.message.includes(targetError)) {
+                return true; 
             }
             return false;
         },

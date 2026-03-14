@@ -11,11 +11,12 @@ const connection = new Redis(redisConfig.url, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
     connectTimeout: 10000,
+    keepAlive: 10000,
     retryStrategy(times) {
-        return Math.min(times * 50, 2000);
+        return Math.min(times * 1000, 30000);
     },
     reconnectOnError(err) {
-        if (err.message.includes('ECONNRESET')) return true;
+        if (err.message.includes('READONLY')) return true;
         return false;
     }
 });

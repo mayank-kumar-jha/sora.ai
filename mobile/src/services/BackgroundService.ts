@@ -1,12 +1,12 @@
 import { Platform, DeviceEventEmitter, AppState } from 'react-native';
-import { getAccessToken, getServerIp } from '../utils/storage';
+import { getAccessToken, getServerUrl } from '../utils/storage';
 import { OverlayBridge } from '../native/OverlayBridge';
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import * as FileSystem from 'expo-file-system';
 import apiClient from '../api/client';
 import { Buffer } from 'buffer';
-import { DEFAULT_IP } from '../constants/settings';
+import { DEFAULT_BASE_URL } from '../constants/settings';
 
 const silenceAsset = require('../assets/silence.mp3');
 
@@ -151,14 +151,22 @@ export const connectWs = async () => {
     if (!token) return null;
 
     isConnecting = true;
-    const customIp = await getServerIp();
+    const customUrl = await getServerUrl();
     
-    // LOG IP source for debugging
-    console.log(`[WS] Custom IP from storage: ${customIp}, Default IP: ${DEFAULT_IP}`);
+    // Determine base URL: Custom URL > Default Production URL
+    const baseUrl = customUrl || DEFAULT_BASE_URL;
     
-    // Priority: customIp -> DEFAULT_IP (if custom fails, we'll try again with DEFAULT)
-    const ip = customIp || DEFAULT_IP;
-    const wsUrl = `ws://${ip}:3000/ws?token=${token}`;
+    // Construct WebSocket URL
+    // If it starts with https -> wss://. If http -> ws://. If no protocol -> ws://ip:3000
+    let wsUrl: string;
+    if (baseUrl.startsWith('http')) {
+        wsUrl = baseUrl.replace(/^http/, 'ws') + '/ws?token=' + token;
+    } else {
+        // Fallback for IP-only input
+        wsUrl = `ws://${baseUrl}:3000/ws?token=${token}`;
+    }
+
+    console.log(`[WS] Custom URL from storage: ${customUrl}, Final WebSocket URL: ${wsUrl}`);
 
     if (ws) {
         ws.onopen = null;
@@ -243,9 +251,9 @@ export const connectWs = async () => {
             const delay = Math.min(5000 * Math.pow(2, attempts), 30000);
             (ws as any).__reconnectAttempts = attempts + 1;
             
-            // If we've failed twice with a custom IP, maybe it's wrong -> log a tip
-            if (attempts >= 1 && customIp) {
-                console.warn(`[WS] Still failing with custom IP: ${customIp}. Verify your server is at this address.`);
+            // If we've failed twice with a custom URL, maybe it's wrong -> log a tip
+            if (attempts >= 1 && customUrl) {
+                console.warn(`[WS] Still failing with custom URL: ${customUrl}. Verify your server is at this address.`);
             }
 
             console.log(`[WS] Reconnecting in ${delay / 1000}s (attempt ${attempts + 1})...`);
