@@ -112,6 +112,8 @@ const startServer = async () => {
             host: '0.0.0.0',
             port: config.port,
             environment: config.nodeEnv,
+            redis_set: !!process.env.REDIS_URL,
+            redis_len: (process.env.REDIS_URL || '').length,
             pid: process.pid,
         });
     });

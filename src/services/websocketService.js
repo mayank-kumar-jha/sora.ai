@@ -26,7 +26,9 @@ const initAiWebSocket = (server) => {
     });
 
     wss.on('connection', async (ws, req) => {
-        const url = new URL(req.url, `http://${req.headers.host}`);
+        const host = req.headers.host || 'unknown-host';
+        const url = new URL(req.url, `http://${host}`);
+        if (host === 'host') logger.warn('DETECTED literal hostname "host" in request headers');
         const token = url.searchParams.get('token');
 
         if (!token) {
