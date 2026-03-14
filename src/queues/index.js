@@ -5,9 +5,7 @@ const { redis: redisConfig } = require('../config/env');
 const logger = require('../config/logger');
 
 // Shared Redis connection for BullMQ
-const connection = {
-    url: redisConfig.url
-};
+const connection = redisConfig.url;
 
 // Queue Definitions
 const aiQueue = new Queue('aiQueue', { connection });

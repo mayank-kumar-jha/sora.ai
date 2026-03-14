@@ -27,3 +27,8 @@ Thumbs.db
 
 # Coverage
 coverage/
+
+# WhatsApp Session Data
+data/
+.baileys_auth/
+whatsapp_store.json
