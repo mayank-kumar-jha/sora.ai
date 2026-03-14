@@ -1,0 +1,1389 @@
+› Building app...
+Configuration on demand is an incubating feature.
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :expo-updates-gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
+> Task :expo-updates-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :expo-updates-gradle-plugin:compileJava NO-SOURCE
+> Task :expo-updates-gradle-plugin:classes UP-TO-DATE
+> Task :expo-updates-gradle-plugin:jar UP-TO-DATE
+
+> Configure project :app
+ ℹ️  [33mApplying gradle plugin[0m '[32mexpo-updates-gradle-plugin[0m' (expo-updates@0.27.5)
+
+> Configure project :expo-av
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+
+> Configure project :expo-modules-core
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+
+> Configure project :expo-updates
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+ksp-1.9.24-1.0.20 is too old for kotlin-1.9.25. Please upgrade ksp or downgrade kotlin-gradle-plugin to 1.9.24.
+
+> Configure project :expo
+
+Using expo modules
+  - [32mexpo-application[0m (6.0.2)
+  - [32mexpo-asset[0m (11.0.5)
+  - [32mexpo-av[0m (15.0.2)
+  - [32mexpo-background-fetch[0m (13.0.6)
+  - [32mexpo-clipboard[0m (7.0.1)
+  - [32mexpo-constants[0m (17.0.8)
+  - [32mexpo-contacts[0m (14.0.5)
+  - [32mexpo-eas-client[0m (0.13.3)
+  - [32mexpo-file-system[0m (18.0.12)
+  - [32mexpo-font[0m (13.0.4)
+  - [32mexpo-json-utils[0m (0.14.0)
+  - [32mexpo-keep-awake[0m (14.0.3)
+  - [32mexpo-linear-gradient[0m (14.0.2)
+  - [32mexpo-linking[0m (7.0.5)
+  - [32mexpo-manifests[0m (0.15.8)
+  - [32mexpo-modules-core[0m (2.2.3)
+  - [32mexpo-notifications[0m (0.29.14)
+  - [32mexpo-secure-store[0m (14.0.1)
+  - [32mexpo-speech[0m (13.0.1)
+  - [32mexpo-splash-screen[0m (0.29.24)
+  - [32mexpo-structured-headers[0m (4.0.0)
+  - [32mexpo-task-manager[0m (12.0.6)
+  - [32mexpo-updates[0m (0.27.5)
+  - [32mexpo-web-browser[0m (14.0.2)
+  - [32munimodules-app-loader[0m (5.0.1)
+
+
+> Configure project :react-native-reanimated
+Android gradle plugin: 8.6.0
+Gradle: 8.10.2
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+
+> Configure project :react-native-screens
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+WARNING: [CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+[CXX5202] This app only has 32-bit [armeabi-v7a] native libraries. Beginning August 1, 2019 Google Play store requires that all apps that include native libraries must provide 64-bit versions. For more information, visit https://g.co/64-bit-requirement
+
+> Task :app:generateAutolinkingPackageList
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:generateDebugBuildConfig FROM-CACHE
+> Task :expo:generateExpoModulesPackageListTask
+> Task :expo:preBuild
+> Task :expo:preDebugBuild
+> Task :expo-application:preBuild UP-TO-DATE
+> Task :expo-application:preDebugBuild UP-TO-DATE
+> Task :expo:writeDebugAarMetadata
+> Task :expo-asset:preBuild UP-TO-DATE
+> Task :expo-asset:preDebugBuild UP-TO-DATE
+> Task :expo-application:writeDebugAarMetadata
+> Task :expo-av:preBuild UP-TO-DATE
+> Task :expo-av:preDebugBuild UP-TO-DATE
+> Task :expo-asset:writeDebugAarMetadata
+> Task :expo-background-fetch:preBuild UP-TO-DATE
+> Task :expo-background-fetch:preDebugBuild UP-TO-DATE
+> Task :expo-av:writeDebugAarMetadata
+> Task :expo-clipboard:preBuild UP-TO-DATE
+> Task :expo-clipboard:preDebugBuild UP-TO-DATE
+> Task :expo-background-fetch:writeDebugAarMetadata
+> Task :expo-clipboard:writeDebugAarMetadata
+> Task :expo-constants:createExpoConfig
+> Task :expo-constants:preBuild
+> Task :expo-constants:preDebugBuild
+> Task :expo-contacts:preBuild UP-TO-DATE
+> Task :expo-contacts:preDebugBuild UP-TO-DATE
+> Task :expo-constants:writeDebugAarMetadata
+> Task :expo-eas-client:preBuild UP-TO-DATE
+> Task :expo-eas-client:preDebugBuild UP-TO-DATE
+> Task :expo-contacts:writeDebugAarMetadata
+> Task :expo-file-system:preBuild UP-TO-DATE
+> Task :expo-file-system:preDebugBuild UP-TO-DATE
+> Task :expo-eas-client:writeDebugAarMetadata
+> Task :expo-font:preBuild UP-TO-DATE
+> Task :expo-font:preDebugBuild UP-TO-DATE
+> Task :expo-file-system:writeDebugAarMetadata
+> Task :expo-json-utils:preBuild UP-TO-DATE
+> Task :expo-json-utils:preDebugBuild UP-TO-DATE
+> Task :expo-font:writeDebugAarMetadata
+> Task :expo-keep-awake:preBuild UP-TO-DATE
+> Task :expo-keep-awake:preDebugBuild UP-TO-DATE
+> Task :expo-json-utils:writeDebugAarMetadata
+> Task :expo-linear-gradient:preBuild UP-TO-DATE
+> Task :expo-linear-gradient:preDebugBuild UP-TO-DATE
+> Task :expo-keep-awake:writeDebugAarMetadata
+> Task :expo-linking:preBuild UP-TO-DATE
+> Task :expo-linking:preDebugBuild UP-TO-DATE
+> Task :expo-linear-gradient:writeDebugAarMetadata
+> Task :expo-manifests:preBuild UP-TO-DATE
+> Task :expo-linking:writeDebugAarMetadata
+> Task :expo-manifests:preDebugBuild UP-TO-DATE
+> Task :expo-modules-core:preBuild UP-TO-DATE
+> Task :expo-modules-core:preDebugBuild UP-TO-DATE
+> Task :expo-manifests:writeDebugAarMetadata
+> Task :expo-notifications:preBuild UP-TO-DATE
+> Task :expo-notifications:preDebugBuild UP-TO-DATE
+> Task :expo-modules-core:writeDebugAarMetadata
+> Task :expo-secure-store:preBuild UP-TO-DATE
+> Task :expo-secure-store:preDebugBuild UP-TO-DATE
+> Task :expo-notifications:writeDebugAarMetadata
+> Task :expo-speech:preBuild UP-TO-DATE
+> Task :expo-speech:preDebugBuild UP-TO-DATE
+> Task :expo-secure-store:writeDebugAarMetadata
+> Task :expo-splash-screen:preBuild UP-TO-DATE
+> Task :expo-splash-screen:preDebugBuild UP-TO-DATE
+> Task :expo-speech:writeDebugAarMetadata
+> Task :expo-structured-headers:preBuild UP-TO-DATE
+> Task :expo-structured-headers:preDebugBuild UP-TO-DATE
+> Task :expo-splash-screen:writeDebugAarMetadata
+> Task :expo-task-manager:preBuild UP-TO-DATE
+> Task :expo-task-manager:preDebugBuild UP-TO-DATE
+> Task :expo-structured-headers:writeDebugAarMetadata
+> Task :expo-updates:preBuild UP-TO-DATE
+> Task :expo-updates:preDebugBuild UP-TO-DATE
+> Task :expo-task-manager:writeDebugAarMetadata
+> Task :expo-updates-interface:preBuild UP-TO-DATE
+> Task :expo-updates-interface:preDebugBuild UP-TO-DATE
+> Task :expo-updates:writeDebugAarMetadata
+> Task :expo-web-browser:preBuild UP-TO-DATE
+> Task :expo-web-browser:preDebugBuild UP-TO-DATE
+> Task :expo-updates-interface:writeDebugAarMetadata
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preDebugBuild UP-TO-DATE
+> Task :expo-web-browser:writeDebugAarMetadata
+> Task :react-native-reanimated:assertLatestReactNativeWithNewArchitectureTask SKIPPED
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask SKIPPED
+> Task :react-native-async-storage_async-storage:writeDebugAarMetadata
+> Task :react-native-reanimated:prepareReanimatedHeadersForPrefabs
+> Task :react-native-reanimated:prepareWorkletsHeadersForPrefabs
+> Task :react-native-reanimated:preBuild
+> Task :react-native-reanimated:preDebugBuild
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:preDebugBuild UP-TO-DATE
+> Task :react-native-reanimated:writeDebugAarMetadata
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-screens:preDebugBuild UP-TO-DATE
+> Task :react-native-safe-area-context:writeDebugAarMetadata
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :react-native-svg:preDebugBuild UP-TO-DATE
+> Task :react-native-screens:writeDebugAarMetadata
+> Task :react-native-view-shot:preBuild UP-TO-DATE
+> Task :react-native-view-shot:preDebugBuild UP-TO-DATE
+> Task :react-native-svg:writeDebugAarMetadata
+> Task :react-native-webview:preBuild UP-TO-DATE
+> Task :react-native-webview:preDebugBuild UP-TO-DATE
+> Task :react-native-view-shot:writeDebugAarMetadata
+> Task :unimodules-app-loader:preBuild UP-TO-DATE
+> Task :unimodules-app-loader:preDebugBuild UP-TO-DATE
+> Task :react-native-webview:writeDebugAarMetadata
+> Task :unimodules-app-loader:writeDebugAarMetadata
+> Task :app:generateDebugResValues FROM-CACHE
+> Task :expo:generateDebugResValues FROM-CACHE
+> Task :expo:generateDebugResources FROM-CACHE
+> Task :app:checkDebugAarMetadata
+> Task :expo:packageDebugResources FROM-CACHE
+> Task :expo-application:generateDebugResValues FROM-CACHE
+> Task :expo-application:generateDebugResources FROM-CACHE
+> Task :expo-application:packageDebugResources FROM-CACHE
+> Task :expo-asset:generateDebugResValues FROM-CACHE
+> Task :expo-asset:generateDebugResources FROM-CACHE
+> Task :expo-asset:packageDebugResources FROM-CACHE
+> Task :expo-av:generateDebugResValues FROM-CACHE
+> Task :expo-av:generateDebugResources FROM-CACHE
+> Task :expo-av:packageDebugResources FROM-CACHE
+> Task :expo-background-fetch:generateDebugResValues FROM-CACHE
+> Task :expo-background-fetch:generateDebugResources FROM-CACHE
+> Task :expo-background-fetch:packageDebugResources FROM-CACHE
+> Task :expo-clipboard:generateDebugResValues FROM-CACHE
+> Task :expo-clipboard:generateDebugResources FROM-CACHE
+> Task :expo-clipboard:packageDebugResources FROM-CACHE
+> Task :expo-constants:generateDebugResValues FROM-CACHE
+> Task :expo-constants:generateDebugResources FROM-CACHE
+> Task :expo-constants:packageDebugResources FROM-CACHE
+> Task :expo-contacts:generateDebugResValues FROM-CACHE
+> Task :expo-contacts:generateDebugResources FROM-CACHE
+> Task :expo-contacts:packageDebugResources FROM-CACHE
+> Task :expo-eas-client:generateDebugResValues FROM-CACHE
+> Task :expo-eas-client:generateDebugResources FROM-CACHE
+> Task :expo-eas-client:packageDebugResources FROM-CACHE
+> Task :expo-file-system:generateDebugResValues FROM-CACHE
+> Task :expo-file-system:generateDebugResources FROM-CACHE
+> Task :expo-file-system:packageDebugResources FROM-CACHE
+> Task :expo-font:generateDebugResValues FROM-CACHE
+> Task :expo-font:generateDebugResources FROM-CACHE
+> Task :expo-font:packageDebugResources FROM-CACHE
+> Task :expo-json-utils:generateDebugResValues FROM-CACHE
+> Task :expo-json-utils:generateDebugResources FROM-CACHE
+> Task :expo-json-utils:packageDebugResources FROM-CACHE
+> Task :expo-keep-awake:generateDebugResValues FROM-CACHE
+> Task :expo-keep-awake:generateDebugResources FROM-CACHE
+> Task :expo-keep-awake:packageDebugResources FROM-CACHE
+> Task :expo-linear-gradient:generateDebugResValues FROM-CACHE
+> Task :expo-linear-gradient:generateDebugResources FROM-CACHE
+> Task :expo-linear-gradient:packageDebugResources FROM-CACHE
+> Task :expo-linking:generateDebugResValues FROM-CACHE
+> Task :expo-linking:generateDebugResources FROM-CACHE
+> Task :expo-linking:packageDebugResources FROM-CACHE
+> Task :expo-manifests:generateDebugResValues FROM-CACHE
+> Task :expo-manifests:generateDebugResources FROM-CACHE
+> Task :expo-manifests:packageDebugResources FROM-CACHE
+> Task :expo-modules-core:generateDebugResValues FROM-CACHE
+> Task :expo-modules-core:generateDebugResources FROM-CACHE
+> Task :expo-modules-core:packageDebugResources FROM-CACHE
+> Task :expo-notifications:generateDebugResValues FROM-CACHE
+> Task :expo-notifications:generateDebugResources FROM-CACHE
+> Task :expo-notifications:packageDebugResources FROM-CACHE
+> Task :expo-secure-store:generateDebugResValues FROM-CACHE
+> Task :expo-secure-store:generateDebugResources FROM-CACHE
+> Task :expo-secure-store:packageDebugResources FROM-CACHE
+> Task :expo-speech:generateDebugResValues FROM-CACHE
+> Task :expo-speech:generateDebugResources FROM-CACHE
+> Task :expo-speech:packageDebugResources FROM-CACHE
+> Task :expo-splash-screen:generateDebugResValues FROM-CACHE
+> Task :expo-splash-screen:generateDebugResources FROM-CACHE
+> Task :expo-splash-screen:packageDebugResources FROM-CACHE
+> Task :expo-structured-headers:generateDebugResValues FROM-CACHE
+> Task :expo-structured-headers:generateDebugResources FROM-CACHE
+> Task :expo-structured-headers:packageDebugResources FROM-CACHE
+> Task :expo-task-manager:generateDebugResValues FROM-CACHE
+> Task :expo-task-manager:generateDebugResources FROM-CACHE
+> Task :expo-task-manager:packageDebugResources FROM-CACHE
+> Task :expo-updates:generateDebugResValues FROM-CACHE
+> Task :expo-updates:generateDebugResources FROM-CACHE
+> Task :expo-updates:packageDebugResources FROM-CACHE
+> Task :expo-updates-interface:generateDebugResValues FROM-CACHE
+> Task :expo-updates-interface:generateDebugResources FROM-CACHE
+> Task :expo-updates-interface:packageDebugResources FROM-CACHE
+> Task :expo-web-browser:generateDebugResValues FROM-CACHE
+> Task :expo-web-browser:generateDebugResources FROM-CACHE
+> Task :expo-web-browser:packageDebugResources FROM-CACHE
+> Task :react-native-async-storage_async-storage:generateDebugResValues FROM-CACHE
+> Task :react-native-async-storage_async-storage:generateDebugResources FROM-CACHE
+> Task :react-native-async-storage_async-storage:packageDebugResources
+> Task :react-native-reanimated:generateDebugResValues FROM-CACHE
+> Task :react-native-reanimated:generateDebugResources FROM-CACHE
+> Task :react-native-reanimated:packageDebugResources
+> Task :react-native-safe-area-context:generateDebugResValues FROM-CACHE
+> Task :react-native-safe-area-context:generateDebugResources FROM-CACHE
+> Task :react-native-safe-area-context:packageDebugResources
+> Task :react-native-screens:generateDebugResValues FROM-CACHE
+> Task :react-native-screens:generateDebugResources
+> Task :react-native-screens:packageDebugResources
+> Task :react-native-svg:generateDebugResValues FROM-CACHE
+> Task :react-native-svg:generateDebugResources FROM-CACHE
+> Task :react-native-svg:packageDebugResources
+> Task :react-native-view-shot:generateDebugResValues FROM-CACHE
+> Task :react-native-view-shot:generateDebugResources FROM-CACHE
+> Task :react-native-view-shot:packageDebugResources
+> Task :react-native-webview:generateDebugResValues FROM-CACHE
+> Task :react-native-webview:generateDebugResources
+> Task :react-native-webview:packageDebugResources
+> Task :unimodules-app-loader:generateDebugResValues FROM-CACHE
+> Task :unimodules-app-loader:generateDebugResources FROM-CACHE
+> Task :unimodules-app-loader:packageDebugResources FROM-CACHE
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources FROM-CACHE
+> Task :app:packageDebugResources FROM-CACHE
+> Task :app:parseDebugLocalResources FROM-CACHE
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug FROM-CACHE
+> Task :expo:extractDeepLinksDebug FROM-CACHE
+> Task :expo:processDebugManifest FROM-CACHE
+> Task :expo-application:extractDeepLinksDebug FROM-CACHE
+> Task :expo-application:processDebugManifest FROM-CACHE
+> Task :expo-asset:extractDeepLinksDebug FROM-CACHE
+> Task :expo-asset:processDebugManifest FROM-CACHE
+> Task :expo-av:extractDeepLinksDebug FROM-CACHE
+> Task :expo-av:processDebugManifest FROM-CACHE
+> Task :expo-background-fetch:extractDeepLinksDebug FROM-CACHE
+> Task :expo-background-fetch:processDebugManifest FROM-CACHE
+> Task :expo-clipboard:extractDeepLinksDebug FROM-CACHE
+> Task :expo-clipboard:processDebugManifest FROM-CACHE
+> Task :expo-constants:extractDeepLinksDebug FROM-CACHE
+> Task :expo-constants:processDebugManifest FROM-CACHE
+> Task :expo-contacts:extractDeepLinksDebug FROM-CACHE
+> Task :expo-contacts:processDebugManifest FROM-CACHE
+> Task :expo-eas-client:extractDeepLinksDebug FROM-CACHE
+> Task :expo-eas-client:processDebugManifest FROM-CACHE
+> Task :expo-file-system:extractDeepLinksDebug FROM-CACHE
+> Task :expo-file-system:processDebugManifest FROM-CACHE
+> Task :expo-font:extractDeepLinksDebug FROM-CACHE
+> Task :expo-font:processDebugManifest FROM-CACHE
+> Task :expo-json-utils:extractDeepLinksDebug FROM-CACHE
+> Task :expo-json-utils:processDebugManifest FROM-CACHE
+> Task :expo-keep-awake:extractDeepLinksDebug FROM-CACHE
+> Task :expo-keep-awake:processDebugManifest FROM-CACHE
+> Task :expo-linear-gradient:extractDeepLinksDebug FROM-CACHE
+> Task :expo-linear-gradient:processDebugManifest FROM-CACHE
+> Task :expo-linking:extractDeepLinksDebug FROM-CACHE
+> Task :expo-linking:processDebugManifest FROM-CACHE
+> Task :expo-manifests:extractDeepLinksDebug FROM-CACHE
+> Task :expo-manifests:processDebugManifest FROM-CACHE
+> Task :expo-modules-core:extractDeepLinksDebug FROM-CACHE
+> Task :expo-modules-core:processDebugManifest FROM-CACHE
+> Task :expo-notifications:extractDeepLinksDebug FROM-CACHE
+> Task :expo-notifications:processDebugManifest FROM-CACHE
+> Task :expo-secure-store:extractDeepLinksDebug FROM-CACHE
+> Task :expo-secure-store:processDebugManifest FROM-CACHE
+> Task :expo-speech:extractDeepLinksDebug FROM-CACHE
+> Task :expo-speech:processDebugManifest FROM-CACHE
+> Task :expo-splash-screen:extractDeepLinksDebug FROM-CACHE
+> Task :expo-splash-screen:processDebugManifest FROM-CACHE
+> Task :expo-structured-headers:extractDeepLinksDebug FROM-CACHE
+> Task :app:mergeDebugResources
+> Task :expo-structured-headers:processDebugManifest FROM-CACHE
+> Task :expo-task-manager:extractDeepLinksDebug FROM-CACHE
+> Task :expo-task-manager:processDebugManifest FROM-CACHE
+> Task :expo-updates:extractDeepLinksDebug FROM-CACHE
+> Task :expo-updates:processDebugManifest FROM-CACHE
+> Task :expo-updates-interface:extractDeepLinksDebug FROM-CACHE
+> Task :expo-updates-interface:processDebugManifest FROM-CACHE
+> Task :expo-web-browser:extractDeepLinksDebug FROM-CACHE
+> Task :expo-web-browser:processDebugManifest FROM-CACHE
+> Task :react-native-async-storage_async-storage:extractDeepLinksDebug FROM-CACHE
+> Task :react-native-reanimated:extractDeepLinksDebug FROM-CACHE
+
+> Task :react-native-async-storage_async-storage:processDebugManifest
+package="com.reactnativecommunity.asyncstorage" found in source AndroidManifest.xml: C:\sora\mobile\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.reactnativecommunity.asyncstorage" from the source AndroidManifest.xml: C:\sora\mobile\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-safe-area-context:extractDeepLinksDebug FROM-CACHE
+> Task :react-native-reanimated:processDebugManifest
+> Task :react-native-screens:extractDeepLinksDebug FROM-CACHE
+
+> Task :react-native-safe-area-context:processDebugManifest
+package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.th3rdwave.safeareacontext" from the source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-svg:extractDeepLinksDebug FROM-CACHE
+
+> Task :react-native-screens:processDebugManifest
+package="com.swmansion.rnscreens" found in source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-screens\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.swmansion.rnscreens" from the source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-screens\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-view-shot:extractDeepLinksDebug FROM-CACHE
+
+> Task :react-native-svg:processDebugManifest
+package="com.horcrux.svg" found in source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-svg\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.horcrux.svg" from the source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-svg\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-webview:extractDeepLinksDebug FROM-CACHE
+
+> Task :react-native-view-shot:processDebugManifest
+package="fr.greweb.reactnativeviewshot" found in source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-view-shot\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="fr.greweb.reactnativeviewshot" from the source AndroidManifest.xml: C:\sora\mobile\node_modules\react-native-view-shot\android\src\main\AndroidManifest.xml.
+
+> Task :unimodules-app-loader:extractDeepLinksDebug FROM-CACHE
+> Task :unimodules-app-loader:processDebugManifest FROM-CACHE
+> Task :react-native-webview:processDebugManifest
+> Task :expo:compileDebugLibraryResources FROM-CACHE
+
+> Task :app:processDebugMainManifest
+C:\sora\mobile\android\app\src\debug\AndroidManifest.xml Warning:
+	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:0 to replace other declarations but no other declaration present
+
+> Task :app:processDebugManifest
+> Task :expo:parseDebugLocalResources FROM-CACHE
+> Task :expo:generateDebugRFile FROM-CACHE
+> Task :expo-application:compileDebugLibraryResources FROM-CACHE
+> Task :expo-application:parseDebugLocalResources FROM-CACHE
+> Task :expo-application:generateDebugRFile FROM-CACHE
+> Task :expo-asset:compileDebugLibraryResources FROM-CACHE
+> Task :expo-asset:parseDebugLocalResources FROM-CACHE
+> Task :expo-asset:generateDebugRFile FROM-CACHE
+> Task :expo-av:compileDebugLibraryResources FROM-CACHE
+> Task :expo-av:parseDebugLocalResources FROM-CACHE
+> Task :expo-av:generateDebugRFile FROM-CACHE
+> Task :expo-background-fetch:compileDebugLibraryResources FROM-CACHE
+> Task :expo-background-fetch:parseDebugLocalResources FROM-CACHE
+> Task :expo-background-fetch:generateDebugRFile FROM-CACHE
+> Task :expo-clipboard:compileDebugLibraryResources FROM-CACHE
+> Task :expo-clipboard:parseDebugLocalResources FROM-CACHE
+> Task :expo-clipboard:generateDebugRFile FROM-CACHE
+> Task :expo-constants:compileDebugLibraryResources FROM-CACHE
+> Task :expo-constants:parseDebugLocalResources FROM-CACHE
+> Task :expo-constants:generateDebugRFile FROM-CACHE
+> Task :expo-contacts:compileDebugLibraryResources FROM-CACHE
+> Task :expo-contacts:parseDebugLocalResources FROM-CACHE
+> Task :expo-contacts:generateDebugRFile FROM-CACHE
+> Task :expo-eas-client:compileDebugLibraryResources FROM-CACHE
+> Task :expo-eas-client:parseDebugLocalResources FROM-CACHE
+> Task :expo-eas-client:generateDebugRFile FROM-CACHE
+> Task :expo-file-system:compileDebugLibraryResources FROM-CACHE
+> Task :expo-file-system:parseDebugLocalResources FROM-CACHE
+> Task :expo-file-system:generateDebugRFile FROM-CACHE
+> Task :expo-font:compileDebugLibraryResources FROM-CACHE
+> Task :expo-font:parseDebugLocalResources FROM-CACHE
+> Task :expo-font:generateDebugRFile FROM-CACHE
+> Task :expo-json-utils:compileDebugLibraryResources FROM-CACHE
+> Task :expo-json-utils:parseDebugLocalResources FROM-CACHE
+> Task :expo-json-utils:generateDebugRFile FROM-CACHE
+> Task :expo-keep-awake:compileDebugLibraryResources FROM-CACHE
+> Task :expo-keep-awake:parseDebugLocalResources FROM-CACHE
+> Task :expo-keep-awake:generateDebugRFile FROM-CACHE
+> Task :expo-linear-gradient:compileDebugLibraryResources FROM-CACHE
+> Task :app:processDebugManifestForPackage
+> Task :expo-linear-gradient:parseDebugLocalResources FROM-CACHE
+> Task :expo-linear-gradient:generateDebugRFile FROM-CACHE
+> Task :expo-linking:compileDebugLibraryResources FROM-CACHE
+> Task :expo-linking:parseDebugLocalResources FROM-CACHE
+> Task :expo-linking:generateDebugRFile FROM-CACHE
+> Task :expo-manifests:compileDebugLibraryResources FROM-CACHE
+> Task :expo-manifests:parseDebugLocalResources FROM-CACHE
+> Task :expo-manifests:generateDebugRFile FROM-CACHE
+> Task :expo-modules-core:compileDebugLibraryResources FROM-CACHE
+> Task :expo-modules-core:parseDebugLocalResources FROM-CACHE
+> Task :expo-modules-core:generateDebugRFile FROM-CACHE
+> Task :expo-notifications:compileDebugLibraryResources FROM-CACHE
+> Task :expo-notifications:parseDebugLocalResources FROM-CACHE
+> Task :expo-notifications:generateDebugRFile FROM-CACHE
+> Task :expo-secure-store:compileDebugLibraryResources FROM-CACHE
+> Task :expo-secure-store:parseDebugLocalResources FROM-CACHE
+> Task :expo-secure-store:generateDebugRFile FROM-CACHE
+> Task :expo-speech:compileDebugLibraryResources FROM-CACHE
+> Task :expo-speech:parseDebugLocalResources FROM-CACHE
+> Task :expo-speech:generateDebugRFile FROM-CACHE
+> Task :expo-splash-screen:compileDebugLibraryResources FROM-CACHE
+> Task :expo-splash-screen:parseDebugLocalResources FROM-CACHE
+> Task :expo-splash-screen:generateDebugRFile FROM-CACHE
+> Task :expo-structured-headers:compileDebugLibraryResources FROM-CACHE
+> Task :expo-structured-headers:parseDebugLocalResources FROM-CACHE
+> Task :expo-structured-headers:generateDebugRFile FROM-CACHE
+> Task :expo-task-manager:compileDebugLibraryResources FROM-CACHE
+> Task :expo-task-manager:parseDebugLocalResources FROM-CACHE
+> Task :expo-task-manager:generateDebugRFile FROM-CACHE
+> Task :expo-updates:compileDebugLibraryResources FROM-CACHE
+> Task :expo-updates:parseDebugLocalResources FROM-CACHE
+> Task :expo-updates:generateDebugRFile FROM-CACHE
+> Task :expo-updates-interface:compileDebugLibraryResources FROM-CACHE
+> Task :expo-updates-interface:parseDebugLocalResources FROM-CACHE
+> Task :expo-updates-interface:generateDebugRFile FROM-CACHE
+> Task :expo-web-browser:compileDebugLibraryResources FROM-CACHE
+> Task :expo-web-browser:parseDebugLocalResources FROM-CACHE
+> Task :expo-web-browser:generateDebugRFile FROM-CACHE
+> Task :react-native-async-storage_async-storage:compileDebugLibraryResources FROM-CACHE
+> Task :react-native-async-storage_async-storage:parseDebugLocalResources FROM-CACHE
+> Task :react-native-reanimated:compileDebugLibraryResources FROM-CACHE
+> Task :react-native-reanimated:parseDebugLocalResources FROM-CACHE
+> Task :react-native-async-storage_async-storage:generateDebugRFile
+> Task :react-native-safe-area-context:compileDebugLibraryResources FROM-CACHE
+> Task :react-native-reanimated:generateDebugRFile
+> Task :react-native-safe-area-context:parseDebugLocalResources FROM-CACHE
+> Task :react-native-safe-area-context:generateDebugRFile
+> Task :react-native-svg:compileDebugLibraryResources FROM-CACHE
+> Task :react-native-svg:parseDebugLocalResources FROM-CACHE
+> Task :react-native-screens:parseDebugLocalResources
+> Task :react-native-svg:generateDebugRFile
+> Task :react-native-view-shot:compileDebugLibraryResources FROM-CACHE
+> Task :react-native-screens:compileDebugLibraryResources
+> Task :react-native-screens:generateDebugRFile
+> Task :react-native-view-shot:parseDebugLocalResources FROM-CACHE
+> Task :react-native-view-shot:generateDebugRFile
+> Task :react-native-webview:compileDebugLibraryResources
+> Task :unimodules-app-loader:compileDebugLibraryResources FROM-CACHE
+> Task :react-native-webview:parseDebugLocalResources
+> Task :unimodules-app-loader:parseDebugLocalResources FROM-CACHE
+> Task :unimodules-app-loader:generateDebugRFile FROM-CACHE
+> Task :react-native-webview:generateDebugRFile
+> Task :expo:checkKotlinGradlePluginConfigurationErrors
+> Task :expo:generateDebugBuildConfig FROM-CACHE
+> Task :expo-application:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-application:generateDebugBuildConfig FROM-CACHE
+> Task :expo-modules-core:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-modules-core:generateDebugBuildConfig FROM-CACHE
+> Task :expo-modules-core:compileDebugKotlin FROM-CACHE
+> Task :expo-modules-core:javaPreCompileDebug FROM-CACHE
+> Task :expo-modules-core:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-application:javaPreCompileDebug FROM-CACHE
+> Task :expo-asset:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-asset:generateDebugBuildConfig FROM-CACHE
+> Task :expo-asset:javaPreCompileDebug FROM-CACHE
+> Task :expo-av:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-av:generateDebugBuildConfig FROM-CACHE
+> Task :expo-av:javaPreCompileDebug FROM-CACHE
+> Task :expo-background-fetch:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-background-fetch:generateDebugBuildConfig FROM-CACHE
+> Task :expo-background-fetch:javaPreCompileDebug FROM-CACHE
+> Task :expo-clipboard:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-clipboard:generateDebugBuildConfig FROM-CACHE
+> Task :expo-clipboard:javaPreCompileDebug FROM-CACHE
+> Task :expo-constants:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-constants:generateDebugBuildConfig FROM-CACHE
+> Task :expo-constants:javaPreCompileDebug FROM-CACHE
+> Task :expo-contacts:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-contacts:generateDebugBuildConfig FROM-CACHE
+> Task :expo-contacts:javaPreCompileDebug FROM-CACHE
+> Task :expo-eas-client:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-eas-client:generateDebugBuildConfig FROM-CACHE
+> Task :expo-eas-client:javaPreCompileDebug FROM-CACHE
+> Task :expo-file-system:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-file-system:generateDebugBuildConfig FROM-CACHE
+> Task :expo-file-system:javaPreCompileDebug FROM-CACHE
+> Task :expo-font:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-font:generateDebugBuildConfig FROM-CACHE
+> Task :expo-font:javaPreCompileDebug FROM-CACHE
+> Task :expo-json-utils:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-json-utils:generateDebugBuildConfig FROM-CACHE
+> Task :expo-json-utils:javaPreCompileDebug FROM-CACHE
+> Task :expo-keep-awake:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-modules-core:bundleLibCompileToJarDebug
+> Task :expo-keep-awake:generateDebugBuildConfig FROM-CACHE
+> Task :expo-application:compileDebugKotlin FROM-CACHE
+> Task :expo-application:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-application:bundleLibCompileToJarDebug
+> Task :expo-asset:compileDebugKotlin FROM-CACHE
+> Task :expo-asset:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-asset:bundleLibCompileToJarDebug
+> Task :expo-av:compileDebugKotlin FROM-CACHE
+> Task :expo-av:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-av:bundleLibCompileToJarDebug
+> Task :expo-background-fetch:compileDebugKotlin FROM-CACHE
+> Task :expo-background-fetch:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-background-fetch:bundleLibCompileToJarDebug
+> Task :expo-clipboard:compileDebugKotlin FROM-CACHE
+> Task :expo-clipboard:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-clipboard:bundleLibCompileToJarDebug
+> Task :expo-constants:compileDebugKotlin FROM-CACHE
+> Task :expo-constants:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-constants:bundleLibCompileToJarDebug
+> Task :expo-contacts:compileDebugKotlin FROM-CACHE
+> Task :expo-contacts:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-contacts:bundleLibCompileToJarDebug
+> Task :expo-eas-client:compileDebugKotlin FROM-CACHE
+> Task :expo-eas-client:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-eas-client:bundleLibCompileToJarDebug
+> Task :expo-file-system:compileDebugKotlin FROM-CACHE
+> Task :app:processDebugResources
+> Task :expo-file-system:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-file-system:bundleLibCompileToJarDebug
+> Task :expo-font:compileDebugKotlin FROM-CACHE
+> Task :expo-font:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-font:bundleLibCompileToJarDebug
+> Task :expo-json-utils:compileDebugKotlin FROM-CACHE
+> Task :expo-json-utils:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-json-utils:bundleLibCompileToJarDebug
+> Task :expo-keep-awake:compileDebugKotlin FROM-CACHE
+> Task :expo-keep-awake:javaPreCompileDebug FROM-CACHE
+> Task :expo-keep-awake:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-linear-gradient:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-keep-awake:bundleLibCompileToJarDebug
+> Task :expo-linear-gradient:generateDebugBuildConfig FROM-CACHE
+> Task :expo-linear-gradient:compileDebugKotlin FROM-CACHE
+> Task :expo-linear-gradient:javaPreCompileDebug FROM-CACHE
+> Task :expo-linear-gradient:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-linking:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-linking:generateDebugBuildConfig FROM-CACHE
+> Task :expo-linear-gradient:bundleLibCompileToJarDebug
+> Task :expo-linking:compileDebugKotlin FROM-CACHE
+> Task :expo-linking:javaPreCompileDebug FROM-CACHE
+> Task :expo-linking:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-manifests:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-linking:bundleLibCompileToJarDebug
+> Task :expo-manifests:generateDebugBuildConfig FROM-CACHE
+> Task :expo-manifests:compileDebugKotlin FROM-CACHE
+> Task :expo-manifests:javaPreCompileDebug FROM-CACHE
+> Task :expo-manifests:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-notifications:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-manifests:bundleLibCompileToJarDebug
+> Task :expo-notifications:generateDebugBuildConfig FROM-CACHE
+> Task :expo-notifications:compileDebugKotlin FROM-CACHE
+> Task :expo-notifications:javaPreCompileDebug FROM-CACHE
+> Task :expo-notifications:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-secure-store:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-secure-store:generateDebugBuildConfig FROM-CACHE
+> Task :expo-notifications:bundleLibCompileToJarDebug
+> Task :expo-secure-store:compileDebugKotlin FROM-CACHE
+> Task :expo-secure-store:javaPreCompileDebug FROM-CACHE
+> Task :expo-secure-store:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-speech:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-speech:generateDebugBuildConfig FROM-CACHE
+> Task :expo-secure-store:bundleLibCompileToJarDebug
+> Task :expo-speech:compileDebugKotlin FROM-CACHE
+> Task :expo-speech:javaPreCompileDebug FROM-CACHE
+> Task :expo-speech:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-splash-screen:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-speech:bundleLibCompileToJarDebug
+> Task :expo-splash-screen:generateDebugBuildConfig FROM-CACHE
+> Task :expo-splash-screen:compileDebugKotlin FROM-CACHE
+> Task :expo-splash-screen:javaPreCompileDebug FROM-CACHE
+> Task :expo-splash-screen:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-structured-headers:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-splash-screen:bundleLibCompileToJarDebug
+> Task :expo-structured-headers:generateDebugBuildConfig FROM-CACHE
+> Task :expo-structured-headers:compileDebugKotlin NO-SOURCE
+> Task :expo-structured-headers:javaPreCompileDebug FROM-CACHE
+> Task :expo-structured-headers:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-task-manager:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-structured-headers:bundleLibCompileToJarDebug
+> Task :expo-task-manager:generateDebugBuildConfig FROM-CACHE
+> Task :unimodules-app-loader:checkKotlinGradlePluginConfigurationErrors
+> Task :unimodules-app-loader:generateDebugBuildConfig FROM-CACHE
+> Task :unimodules-app-loader:compileDebugKotlin NO-SOURCE
+> Task :unimodules-app-loader:javaPreCompileDebug FROM-CACHE
+> Task :unimodules-app-loader:compileDebugJavaWithJavac FROM-CACHE
+> Task :unimodules-app-loader:bundleLibCompileToJarDebug
+> Task :expo-task-manager:javaPreCompileDebug FROM-CACHE
+> Task :expo-task-manager:compileDebugKotlin FROM-CACHE
+> Task :expo-task-manager:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-updates:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-task-manager:bundleLibCompileToJarDebug
+> Task :expo-updates:generateDebugBuildConfig FROM-CACHE
+> Task :expo-updates-interface:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-interface:generateDebugBuildConfig FROM-CACHE
+> Task :expo-updates-interface:compileDebugKotlin FROM-CACHE
+> Task :expo-updates-interface:javaPreCompileDebug FROM-CACHE
+> Task :expo-updates-interface:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-updates-interface:bundleLibCompileToJarDebug
+> Task :expo-updates:javaPreCompileDebug FROM-CACHE
+> Task :expo-updates:kspDebugKotlin FROM-CACHE
+> Task :expo-updates:compileDebugKotlin FROM-CACHE
+> Task :expo-updates:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo-web-browser:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-web-browser:generateDebugBuildConfig FROM-CACHE
+> Task :expo-updates:bundleLibCompileToJarDebug
+> Task :expo-web-browser:compileDebugKotlin FROM-CACHE
+> Task :expo-web-browser:javaPreCompileDebug FROM-CACHE
+> Task :expo-web-browser:compileDebugJavaWithJavac FROM-CACHE
+> Task :expo:javaPreCompileDebug FROM-CACHE
+> Task :expo-web-browser:bundleLibCompileToJarDebug
+> Task :react-native-async-storage_async-storage:generateDebugBuildConfig
+> Task :expo:compileDebugKotlin FROM-CACHE
+> Task :expo:compileDebugJavaWithJavac FROM-CACHE
+> Task :react-native-async-storage_async-storage:javaPreCompileDebug FROM-CACHE
+> Task :expo:bundleLibCompileToJarDebug
+
+> Task :react-native-async-storage_async-storage:compileDebugJavaWithJavac
+C:\sora\mobile\node_modules\@react-native-async-storage\async-storage\android\src\main\java\com\reactnativecommunity\asyncstorage\AsyncStorageModule.java:84: warning: [removal] onCatalystInstanceDestroy() in NativeModule has been deprecated and marked for removal
+  public void onCatalystInstanceDestroy() {
+              ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: C:\sora\mobile\node_modules\@react-native-async-storage\async-storage\android\src\javaPackage\java\com\reactnativecommunity\asyncstorage\AsyncStoragePackage.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarDebug
+> Task :react-native-reanimated:generateDebugBuildConfig
+> Task :react-native-reanimated:javaPreCompileDebug FROM-CACHE
+> Task :react-native-reanimated:packageNdkLibs NO-SOURCE
+
+> Task :react-native-reanimated:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-safe-area-context:generateDebugBuildConfig
+> Task :react-native-reanimated:bundleLibCompileToJarDebug
+> Task :react-native-safe-area-context:javaPreCompileDebug FROM-CACHE
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-screens:generateDebugBuildConfig
+> Task :react-native-screens:javaPreCompileDebug FROM-CACHE
+> Task :react-native-svg:generateDebugBuildConfig
+> Task :react-native-svg:javaPreCompileDebug FROM-CACHE
+
+> Task :react-native-safe-area-context:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:27:11 'constructor ReactModuleInfo(String, String, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)]
+w: file:///C:/sora/mobile/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:33:27 'getter for hasConstants: Boolean' is deprecated. This property is unused and it's planning to be removed in a future version of
+        React Native. Please refrain from using it.
+w: file:///C:/sora/mobile/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'getter for uiImplementation: UIImplementation!' is deprecated. Deprecated in Java
+
+> Task :react-native-svg:compileDebugJavaWithJavac
+C:\sora\mobile\node_modules\react-native-svg\android\src\main\java\com\horcrux\svg\RenderableViewManager.java:388: warning: [removal] processTransform(ReadableArray,double[]) in TransformHelper has been deprecated and marked for removal
+    TransformHelper.processTransform(transforms, sTransformDecompositionArray);
+                   ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+
+> Task :react-native-screens:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt:19:53 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt:20:38 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:64:17 'constructor ReactModuleInfo(String, String, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)]
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:45:77 Unchecked cast: CoordinatorLayout.Behavior<(raw) View!>? to BottomSheetBehavior<Screen>
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt:33:53 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt:34:38 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:252:9 Parameter 'changed' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:253:9 Parameter 'left' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:254:9 Parameter 'top' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:255:9 Parameter 'right' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:256:9 Parameter 'bottom' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:257:31 'setter for targetElevation: Float' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:260:13 'setHasOptionsMenu(Boolean): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:496:22 'onPrepareOptionsMenu(Menu): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:504:22 'onCreateOptionsMenu(Menu, MenuInflater): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt:100:38 'getter for systemWindowInsetTop: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:7:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:209:9 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:211:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:213:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:7:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:375:48 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:376:49 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:377:45 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:378:52 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:379:48 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:380:51 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:381:56 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:382:57 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:383:51 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:55:42 'replaceSystemWindowInsets(Int, Int, Int, Int): WindowInsetsCompat' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:56:39 'getter for systemWindowInsetLeft: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:58:39 'getter for systemWindowInsetRight: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:59:39 'getter for systemWindowInsetBottom: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:98:53 'getter for statusBarColor: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:109:48 'getter for statusBarColor: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:112:32 'setter for statusBarColor: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:208:72 'getter for navigationBarColor: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:214:16 'setter for navigationBarColor: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:5:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:138:66 Elvis operator (?:) always returns the left operand of non-nullable type Boolean
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:142:9 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:144:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:146:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:148:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:150:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:152:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:154:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarView.kt:153:43 Parameter 'flag' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:7:34 'ReactFeatureFlags' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:25:13 'ReactFeatureFlags' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledHeaderConfigViewGroup.kt:17:25 Parameter 'wrapper' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:10:25 Parameter 'wrapper' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:13:9 Parameter 'width' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:14:9 Parameter 'height' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:15:9 Parameter 'headerHeight' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:7:36 Parameter 'fabricUIManager' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:11:13 Parameter 'tag' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:12:13 Parameter 'view' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:15:33 Parameter 'tag' is never used
+
+> Task :react-native-safe-area-context:compileDebugJavaWithJavac
+Note: C:\sora\mobile\node_modules\react-native-safe-area-context\android\src\paper\java\com\th3rdwave\safeareacontext\NativeSafeAreaContextSpec.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-safe-area-context:bundleLibCompileToJarDebug
+
+> Task :react-native-screens:compileDebugJavaWithJavac
+Note: C:\sora\mobile\node_modules\react-native-screens\android\src\paper\java\com\swmansion\rnscreens\NativeScreensModuleSpec.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-view-shot:generateDebugBuildConfig
+> Task :react-native-screens:bundleLibCompileToJarDebug
+> Task :react-native-view-shot:javaPreCompileDebug FROM-CACHE
+> Task :react-native-svg:bundleLibCompileToJarDebug
+
+> Task :react-native-view-shot:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-webview:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-view-shot:bundleLibCompileToJarDebug
+> Task :react-native-webview:generateDebugBuildConfig
+> Task :react-native-webview:javaPreCompileDebug FROM-CACHE
+> Task :app:javaPreCompileDebug FROM-CACHE
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+
+> Task :react-native-webview:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:22:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:40:71 Parameter 'webView' is never used, could be renamed to _
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:82:18 'setter for allowFileAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:83:18 'setter for allowUniversalAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:94:102 Parameter 'contentLength' is never used, could be renamed to _
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:111:32 Variable 'urlObj' initializer is redundant
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:125:21 'allowScanningByMediaScanner(): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:162:36 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:301:14 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:344:15 Condition 'args == null' is always 'false'
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:353:34 Condition 'args != null' is always 'true'
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:372:38 'setter for allowUniversalAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:384:19 Parameter 'viewWrapper' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:433:51 Unchecked cast: Any to kotlin.collections.HashMap<String, String> /* = java.util.HashMap<String, String> */
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:489:23 'setter for savePassword: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:490:23 'setter for saveFormData: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:560:23 'setter for allowFileAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:661:65 Unchecked cast: ArrayList<Any> to List<Map<String, String>>
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:682:23 'setter for saveFormData: Boolean' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:717:36 Parameter 'viewWrapper' is never used
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:10:75 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:21:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:22:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:11:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:22:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:23:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:12:3 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:23:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:24:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:5:44 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:10:89 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:27:42 'RCTEventEmitter' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:28:21 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+
+> Task :app:createDebugUpdatesResources
+
+> Task :react-native-webview:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :expo:mergeDebugShaders
+> Task :expo:compileDebugShaders NO-SOURCE
+> Task :expo:generateDebugAssets UP-TO-DATE
+> Task :react-native-webview:bundleLibCompileToJarDebug
+> Task :expo:packageDebugAssets
+> Task :expo-application:mergeDebugShaders
+> Task :expo-application:compileDebugShaders NO-SOURCE
+> Task :expo-application:generateDebugAssets UP-TO-DATE
+> Task :expo-application:packageDebugAssets
+> Task :expo-asset:mergeDebugShaders
+> Task :expo-asset:compileDebugShaders NO-SOURCE
+> Task :expo-asset:generateDebugAssets UP-TO-DATE
+> Task :expo-asset:packageDebugAssets
+> Task :expo-av:mergeDebugShaders
+> Task :expo-av:compileDebugShaders NO-SOURCE
+> Task :expo-av:generateDebugAssets UP-TO-DATE
+> Task :expo-av:packageDebugAssets
+> Task :expo-background-fetch:mergeDebugShaders
+> Task :expo-background-fetch:compileDebugShaders NO-SOURCE
+> Task :expo-background-fetch:generateDebugAssets UP-TO-DATE
+> Task :expo-background-fetch:packageDebugAssets
+> Task :expo-clipboard:mergeDebugShaders
+> Task :expo-clipboard:compileDebugShaders NO-SOURCE
+> Task :expo-clipboard:generateDebugAssets UP-TO-DATE
+> Task :expo-clipboard:packageDebugAssets
+> Task :expo-constants:mergeDebugShaders
+> Task :expo-constants:compileDebugShaders NO-SOURCE
+> Task :expo-constants:generateDebugAssets UP-TO-DATE
+> Task :expo-constants:packageDebugAssets
+> Task :expo-contacts:mergeDebugShaders
+> Task :expo-contacts:compileDebugShaders NO-SOURCE
+> Task :expo-contacts:generateDebugAssets UP-TO-DATE
+> Task :expo-contacts:packageDebugAssets
+> Task :expo-eas-client:mergeDebugShaders
+> Task :expo-eas-client:compileDebugShaders NO-SOURCE
+> Task :expo-eas-client:generateDebugAssets UP-TO-DATE
+> Task :expo-eas-client:packageDebugAssets
+> Task :expo-file-system:mergeDebugShaders
+> Task :expo-file-system:compileDebugShaders NO-SOURCE
+> Task :expo-file-system:generateDebugAssets UP-TO-DATE
+> Task :expo-file-system:packageDebugAssets
+> Task :expo-font:mergeDebugShaders
+> Task :expo-font:compileDebugShaders NO-SOURCE
+> Task :expo-font:generateDebugAssets UP-TO-DATE
+> Task :expo-font:packageDebugAssets
+> Task :expo-json-utils:mergeDebugShaders
+> Task :expo-json-utils:compileDebugShaders NO-SOURCE
+> Task :expo-json-utils:generateDebugAssets UP-TO-DATE
+> Task :expo-json-utils:packageDebugAssets
+> Task :expo-keep-awake:mergeDebugShaders
+> Task :expo-keep-awake:compileDebugShaders NO-SOURCE
+> Task :expo-keep-awake:generateDebugAssets UP-TO-DATE
+> Task :expo-keep-awake:packageDebugAssets
+> Task :expo-linear-gradient:mergeDebugShaders
+> Task :expo-linear-gradient:compileDebugShaders NO-SOURCE
+> Task :expo-linear-gradient:generateDebugAssets UP-TO-DATE
+> Task :expo-linear-gradient:packageDebugAssets
+> Task :expo-linking:mergeDebugShaders
+> Task :expo-linking:compileDebugShaders NO-SOURCE
+> Task :expo-linking:generateDebugAssets UP-TO-DATE
+> Task :expo-linking:packageDebugAssets
+> Task :expo-manifests:mergeDebugShaders
+> Task :expo-manifests:compileDebugShaders NO-SOURCE
+> Task :expo-manifests:generateDebugAssets UP-TO-DATE
+> Task :expo-manifests:packageDebugAssets
+> Task :expo-modules-core:mergeDebugShaders
+> Task :expo-modules-core:compileDebugShaders NO-SOURCE
+> Task :expo-modules-core:generateDebugAssets UP-TO-DATE
+> Task :expo-modules-core:packageDebugAssets
+> Task :expo-notifications:mergeDebugShaders
+> Task :expo-notifications:compileDebugShaders NO-SOURCE
+> Task :expo-notifications:generateDebugAssets UP-TO-DATE
+> Task :expo-notifications:packageDebugAssets
+> Task :expo-secure-store:mergeDebugShaders
+> Task :expo-secure-store:compileDebugShaders NO-SOURCE
+> Task :expo-secure-store:generateDebugAssets UP-TO-DATE
+> Task :expo-secure-store:packageDebugAssets
+> Task :expo-speech:mergeDebugShaders
+> Task :expo-speech:compileDebugShaders NO-SOURCE
+> Task :expo-speech:generateDebugAssets UP-TO-DATE
+> Task :expo-speech:packageDebugAssets
+> Task :expo-splash-screen:mergeDebugShaders
+> Task :expo-splash-screen:compileDebugShaders NO-SOURCE
+> Task :expo-splash-screen:generateDebugAssets UP-TO-DATE
+> Task :expo-splash-screen:packageDebugAssets
+> Task :expo-structured-headers:mergeDebugShaders
+> Task :expo-structured-headers:compileDebugShaders NO-SOURCE
+> Task :expo-structured-headers:generateDebugAssets UP-TO-DATE
+> Task :expo-structured-headers:packageDebugAssets
+> Task :expo-task-manager:mergeDebugShaders
+> Task :expo-task-manager:compileDebugShaders NO-SOURCE
+> Task :expo-task-manager:generateDebugAssets UP-TO-DATE
+> Task :expo-task-manager:packageDebugAssets
+> Task :expo-updates:mergeDebugShaders
+> Task :expo-updates:compileDebugShaders NO-SOURCE
+> Task :expo-updates:generateDebugAssets UP-TO-DATE
+> Task :expo-updates:packageDebugAssets
+> Task :expo-updates-interface:mergeDebugShaders
+> Task :expo-updates-interface:compileDebugShaders NO-SOURCE
+> Task :expo-updates-interface:generateDebugAssets UP-TO-DATE
+> Task :expo-updates-interface:packageDebugAssets
+> Task :expo-web-browser:mergeDebugShaders
+> Task :expo-web-browser:compileDebugShaders NO-SOURCE
+> Task :expo-web-browser:generateDebugAssets UP-TO-DATE
+> Task :expo-web-browser:packageDebugAssets
+> Task :react-native-async-storage_async-storage:mergeDebugShaders
+> Task :react-native-async-storage_async-storage:compileDebugShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateDebugAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageDebugAssets
+> Task :react-native-reanimated:mergeDebugShaders
+> Task :react-native-reanimated:compileDebugShaders NO-SOURCE
+> Task :react-native-reanimated:generateDebugAssets UP-TO-DATE
+> Task :react-native-reanimated:packageDebugAssets
+> Task :react-native-safe-area-context:mergeDebugShaders
+> Task :react-native-safe-area-context:compileDebugShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateDebugAssets UP-TO-DATE
+> Task :react-native-safe-area-context:packageDebugAssets
+> Task :react-native-screens:mergeDebugShaders
+> Task :react-native-screens:compileDebugShaders NO-SOURCE
+> Task :react-native-screens:generateDebugAssets UP-TO-DATE
+> Task :react-native-screens:packageDebugAssets
+> Task :react-native-svg:mergeDebugShaders
+> Task :react-native-svg:compileDebugShaders NO-SOURCE
+> Task :react-native-svg:generateDebugAssets UP-TO-DATE
+> Task :react-native-svg:packageDebugAssets
+> Task :react-native-view-shot:mergeDebugShaders
+> Task :react-native-view-shot:compileDebugShaders NO-SOURCE
+> Task :react-native-view-shot:generateDebugAssets UP-TO-DATE
+> Task :react-native-view-shot:packageDebugAssets
+> Task :react-native-webview:mergeDebugShaders
+> Task :react-native-webview:compileDebugShaders NO-SOURCE
+> Task :react-native-webview:generateDebugAssets UP-TO-DATE
+> Task :react-native-webview:packageDebugAssets
+> Task :unimodules-app-loader:mergeDebugShaders
+> Task :unimodules-app-loader:compileDebugShaders NO-SOURCE
+> Task :unimodules-app-loader:generateDebugAssets UP-TO-DATE
+> Task :unimodules-app-loader:packageDebugAssets
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets FROM-CACHE
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarDebug
+> Task :expo:bundleLibRuntimeToJarDebug
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarDebug
+> Task :react-native-webview:bundleLibRuntimeToJarDebug
+> Task :react-native-view-shot:bundleLibRuntimeToJarDebug
+> Task :expo-application:bundleLibRuntimeToJarDebug
+> Task :react-native-reanimated:bundleLibRuntimeToJarDebug
+> Task :expo-asset:bundleLibRuntimeToJarDebug
+> Task :expo-constants:bundleLibRuntimeToJarDebug
+> Task :expo-background-fetch:bundleLibRuntimeToJarDebug
+> Task :expo-clipboard:bundleLibRuntimeToJarDebug
+> Task :react-native-screens:bundleLibRuntimeToJarDebug
+> Task :expo-contacts:bundleLibRuntimeToJarDebug
+> Task :react-native-svg:bundleLibRuntimeToJarDebug
+> Task :expo-eas-client:bundleLibRuntimeToJarDebug
+> Task :expo-manifests:bundleLibRuntimeToJarDebug
+> Task :expo-font:bundleLibRuntimeToJarDebug
+> Task :expo-av:bundleLibRuntimeToJarDebug
+> Task :expo-json-utils:bundleLibRuntimeToJarDebug
+> Task :expo-keep-awake:bundleLibRuntimeToJarDebug
+> Task :expo-linear-gradient:bundleLibRuntimeToJarDebug
+> Task :expo-linking:bundleLibRuntimeToJarDebug
+> Task :expo-file-system:bundleLibRuntimeToJarDebug
+> Task :expo-notifications:bundleLibRuntimeToJarDebug
+> Task :expo-speech:bundleLibRuntimeToJarDebug
+> Task :expo-secure-store:bundleLibRuntimeToJarDebug
+> Task :expo-structured-headers:bundleLibRuntimeToJarDebug
+> Task :expo-task-manager:bundleLibRuntimeToJarDebug
+> Task :expo-web-browser:bundleLibRuntimeToJarDebug
+> Task :expo-splash-screen:bundleLibRuntimeToJarDebug
+> Task :unimodules-app-loader:bundleLibRuntimeToJarDebug
+> Task :expo-updates:bundleLibRuntimeToJarDebug
+> Task :expo-updates-interface:bundleLibRuntimeToJarDebug
+> Task :app:desugarDebugFileDependencies FROM-CACHE
+> Task :expo:processDebugJavaRes
+> Task :expo-application:processDebugJavaRes
+> Task :expo-asset:processDebugJavaRes
+> Task :expo-av:processDebugJavaRes
+> Task :expo-background-fetch:processDebugJavaRes
+> Task :expo-clipboard:processDebugJavaRes
+> Task :expo-constants:processDebugJavaRes
+> Task :expo-contacts:processDebugJavaRes
+> Task :expo-eas-client:processDebugJavaRes
+> Task :expo-file-system:processDebugJavaRes
+> Task :expo-font:processDebugJavaRes
+> Task :expo-json-utils:processDebugJavaRes
+> Task :expo-keep-awake:processDebugJavaRes
+> Task :expo-linear-gradient:processDebugJavaRes
+> Task :expo-linking:processDebugJavaRes
+> Task :expo-manifests:processDebugJavaRes
+> Task :expo-modules-core:processDebugJavaRes
+> Task :expo-notifications:processDebugJavaRes
+> Task :expo-secure-store:processDebugJavaRes
+> Task :expo-speech:processDebugJavaRes
+> Task :expo-splash-screen:processDebugJavaRes
+> Task :expo-structured-headers:processDebugJavaRes NO-SOURCE
+> Task :expo-task-manager:processDebugJavaRes
+> Task :expo-updates:processDebugJavaRes
+> Task :expo-updates-interface:processDebugJavaRes
+> Task :expo-web-browser:processDebugJavaRes
+> Task :react-native-async-storage_async-storage:processDebugJavaRes NO-SOURCE
+> Task :react-native-reanimated:processDebugJavaRes NO-SOURCE
+> Task :react-native-safe-area-context:processDebugJavaRes
+> Task :expo-modules-core:bundleLibRuntimeToJarDebug
+> Task :react-native-screens:processDebugJavaRes
+> Task :react-native-svg:processDebugJavaRes NO-SOURCE
+> Task :react-native-view-shot:processDebugJavaRes NO-SOURCE
+> Task :react-native-webview:processDebugJavaRes
+> Task :unimodules-app-loader:processDebugJavaRes NO-SOURCE
+> Task :app:compileDebugKotlin
+> Task :expo-asset:bundleLibRuntimeToDirDebug
+> Task :expo-background-fetch:bundleLibRuntimeToDirDebug
+> Task :app:checkDebugDuplicateClasses
+> Task :react-native-view-shot:bundleLibRuntimeToDirDebug
+> Task :expo-application:bundleLibRuntimeToDirDebug
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToDirDebug
+> Task :react-native-safe-area-context:bundleLibRuntimeToDirDebug
+> Task :react-native-webview:bundleLibRuntimeToDirDebug
+> Task :react-native-reanimated:bundleLibRuntimeToDirDebug
+> Task :expo:bundleLibRuntimeToDirDebug
+> Task :react-native-screens:bundleLibRuntimeToDirDebug
+> Task :expo-av:bundleLibRuntimeToDirDebug
+> Task :react-native-svg:bundleLibRuntimeToDirDebug
+> Task :app:compileDebugJavaWithJavac
+> Task :app:dexBuilderDebug
+> Task :app:processDebugJavaRes
+> Task :app:mergeDebugGlobalSynthetics
+> Task :expo-eas-client:bundleLibRuntimeToDirDebug
+> Task :expo-json-utils:bundleLibRuntimeToDirDebug
+> Task :expo-constants:bundleLibRuntimeToDirDebug
+> Task :expo-keep-awake:bundleLibRuntimeToDirDebug
+> Task :expo-manifests:bundleLibRuntimeToDirDebug
+> Task :expo-linking:bundleLibRuntimeToDirDebug
+> Task :expo-linear-gradient:bundleLibRuntimeToDirDebug
+> Task :unimodules-app-loader:bundleLibRuntimeToDirDebug
+> Task :expo-font:bundleLibRuntimeToDirDebug
+> Task :expo-clipboard:bundleLibRuntimeToDirDebug
+> Task :expo-structured-headers:bundleLibRuntimeToDirDebug
+> Task :expo-updates-interface:bundleLibRuntimeToDirDebug
+> Task :expo-splash-screen:bundleLibRuntimeToDirDebug
+> Task :expo-contacts:bundleLibRuntimeToDirDebug
+> Task :app:mergeDebugJniLibFolders
+> Task :expo-secure-store:bundleLibRuntimeToDirDebug
+> Task :expo:mergeDebugJniLibFolders
+> Task :expo:mergeDebugNativeLibs NO-SOURCE
+> Task :expo:copyDebugJniLibsProjectOnly
+> Task :expo-web-browser:bundleLibRuntimeToDirDebug
+> Task :expo-application:mergeDebugJniLibFolders
+> Task :expo-application:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-application:copyDebugJniLibsProjectOnly
+> Task :expo-asset:mergeDebugJniLibFolders
+> Task :expo-asset:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-asset:copyDebugJniLibsProjectOnly
+> Task :expo-task-manager:bundleLibRuntimeToDirDebug
+> Task :expo-speech:bundleLibRuntimeToDirDebug
+> Task :app:mergeProjectDexDebug
+> Task :expo-av:configureCMakeDebug[armeabi-v7a]
+> Task :expo-notifications:bundleLibRuntimeToDirDebug
+> Task :expo-file-system:bundleLibRuntimeToDirDebug
+> Task :expo-updates:bundleLibRuntimeToDirDebug
+> Task :app:mergeDebugJavaResource
+> Task :expo-modules-core:bundleLibRuntimeToDirDebug
+> Task :expo-av:buildCMakeDebug[armeabi-v7a]
+> Task :expo-av:mergeDebugJniLibFolders
+> Task :expo-background-fetch:mergeDebugJniLibFolders
+> Task :expo-background-fetch:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-av:mergeDebugNativeLibs
+> Task :expo-background-fetch:copyDebugJniLibsProjectOnly
+> Task :expo-av:copyDebugJniLibsProjectOnly
+> Task :expo-clipboard:mergeDebugJniLibFolders
+> Task :expo-clipboard:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-clipboard:copyDebugJniLibsProjectOnly
+> Task :expo-constants:mergeDebugJniLibFolders
+> Task :expo-constants:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-constants:copyDebugJniLibsProjectOnly
+> Task :expo-contacts:mergeDebugJniLibFolders
+> Task :expo-contacts:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-contacts:copyDebugJniLibsProjectOnly
+> Task :expo-eas-client:mergeDebugJniLibFolders
+> Task :expo-eas-client:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-eas-client:copyDebugJniLibsProjectOnly
+> Task :expo-file-system:mergeDebugJniLibFolders
+> Task :expo-file-system:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-file-system:copyDebugJniLibsProjectOnly
+> Task :expo-font:mergeDebugJniLibFolders
+> Task :expo-font:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-font:copyDebugJniLibsProjectOnly
+> Task :expo-json-utils:mergeDebugJniLibFolders
+> Task :expo-json-utils:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-json-utils:copyDebugJniLibsProjectOnly
+> Task :expo-keep-awake:mergeDebugJniLibFolders
+> Task :expo-keep-awake:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-keep-awake:copyDebugJniLibsProjectOnly
+> Task :expo-linear-gradient:mergeDebugJniLibFolders
+> Task :expo-linear-gradient:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-linear-gradient:copyDebugJniLibsProjectOnly
+> Task :expo-linking:mergeDebugJniLibFolders
+> Task :expo-linking:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-linking:copyDebugJniLibsProjectOnly
+> Task :expo-manifests:mergeDebugJniLibFolders
+> Task :expo-manifests:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-manifests:copyDebugJniLibsProjectOnly
+> Task :expo-modules-core:configureCMakeDebug[armeabi-v7a]
+> Task :app:mergeExtDexDebug
+> Task :expo-modules-core:buildCMakeDebug[armeabi-v7a]
+> Task :expo-modules-core:mergeDebugJniLibFolders
+> Task :expo-notifications:mergeDebugJniLibFolders
+> Task :expo-notifications:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-notifications:copyDebugJniLibsProjectOnly
+> Task :expo-secure-store:mergeDebugJniLibFolders
+> Task :expo-secure-store:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-secure-store:copyDebugJniLibsProjectOnly
+> Task :expo-speech:mergeDebugJniLibFolders
+> Task :expo-speech:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-speech:copyDebugJniLibsProjectOnly
+> Task :expo-splash-screen:mergeDebugJniLibFolders
+> Task :expo-splash-screen:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-splash-screen:copyDebugJniLibsProjectOnly
+> Task :expo-structured-headers:mergeDebugJniLibFolders
+> Task :expo-structured-headers:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-structured-headers:copyDebugJniLibsProjectOnly
+> Task :expo-modules-core:mergeDebugNativeLibs
+> Task :expo-task-manager:mergeDebugJniLibFolders
+> Task :expo-task-manager:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-task-manager:copyDebugJniLibsProjectOnly
+> Task :expo-updates:mergeDebugJniLibFolders
+> Task :expo-updates:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-updates:copyDebugJniLibsProjectOnly
+> Task :expo-updates-interface:mergeDebugJniLibFolders
+> Task :expo-updates-interface:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-updates-interface:copyDebugJniLibsProjectOnly
+> Task :expo-web-browser:mergeDebugJniLibFolders
+> Task :expo-web-browser:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-web-browser:copyDebugJniLibsProjectOnly
+> Task :expo-modules-core:copyDebugJniLibsProjectOnly
+> Task :react-native-async-storage_async-storage:mergeDebugJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyDebugJniLibsProjectOnly
+> Task :app:mergeLibDexDebug
+> Task :react-native-reanimated:configureCMakeDebug[armeabi-v7a]
+> Task :react-native-reanimated:buildCMakeDebug[armeabi-v7a]
+> Task :react-native-reanimated:mergeDebugJniLibFolders
+> Task :react-native-safe-area-context:mergeDebugJniLibFolders
+> Task :react-native-safe-area-context:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:copyDebugJniLibsProjectOnly
+> Task :react-native-reanimated:mergeDebugNativeLibs
+> Task :react-native-screens:configureCMakeDebug[armeabi-v7a]
+> Task :react-native-reanimated:copyDebugJniLibsProjectOnly
+> Task :react-native-screens:buildCMakeDebug[armeabi-v7a]
+> Task :react-native-screens:mergeDebugJniLibFolders
+> Task :react-native-svg:mergeDebugJniLibFolders
+> Task :react-native-screens:mergeDebugNativeLibs
+> Task :react-native-svg:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-svg:copyDebugJniLibsProjectOnly
+> Task :react-native-screens:copyDebugJniLibsProjectOnly
+> Task :react-native-view-shot:mergeDebugJniLibFolders
+> Task :react-native-view-shot:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-view-shot:copyDebugJniLibsProjectOnly
+> Task :react-native-webview:mergeDebugJniLibFolders
+> Task :react-native-webview:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-webview:copyDebugJniLibsProjectOnly
+> Task :unimodules-app-loader:mergeDebugJniLibFolders
+> Task :unimodules-app-loader:mergeDebugNativeLibs NO-SOURCE
+> Task :unimodules-app-loader:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeDebugNativeLibs
+> Task :app:stripDebugDebugSymbols
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 2m 57s
+807 actionable tasks: 425 executed, 368 from cache, 14 up-to-date
+Starting Metro Bundler
+Waiting on http://localhost:8081
+› Installing C:\sora\mobile\android\app\build\outputs\apk\debug\app-debug.apk
+› Opening com.anonymous.mobile://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081 on SM_A135F
+
+› Logs for your project will appear below.
+Android Bundled 46938ms node_modules\expo-router\entry.js (3220 modules)
+Android Bundled 184ms node_modules\expo-router\entry.js (1 module)
+ INFO  
+[7m [1m💡 JavaScript logs will be removed from Metro in React Native 0.77![22m Please use React Native DevTools as your default tool. Tip: Type [1mj[22m in the terminal to open (requires Google Chrome or Microsoft Edge).[27m
+ ERROR  Error: Requiring unknown module "undefined". If you are sure the module exists, try restarting Metro. You may also want to run `yarn` or `npm install`., js engine: hermes
+ ERROR  Failed to start background silence: [Error: Cannot load an AV asset from a null playback source]
+Android Bundled 141ms node_modules\expo-router\entry.js (1 module)
+ INFO  
+[7m [1m💡 JavaScript logs will be removed from Metro in React Native 0.77![22m Please use React Native DevTools as your default tool. Tip: Type [1mj[22m in the terminal to open (requires Google Chrome or Microsoft Edge).[27m
+ ERROR  Error: Requiring unknown module "undefined". If you are sure the module exists, try restarting Metro. You may also want to run `yarn` or `npm install`., js engine: hermes
+ ERROR  Failed to start background silence: [Error: Cannot load an AV asset from a null playback source]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+Android Bundled 109ms node_modules\expo-router\entry.js (1 module)
+ INFO  
+[7m [1m💡 JavaScript logs will be removed from Metro in React Native 0.77![22m Please use React Native DevTools as your default tool. Tip: Type [1mj[22m in the terminal to open (requires Google Chrome or Microsoft Edge).[27m
+ ERROR  Error: Requiring unknown module "undefined". If you are sure the module exists, try restarting Metro. You may also want to run `yarn` or `npm install`., js engine: hermes
+ ERROR  Failed to start background silence: [Error: Cannot load an AV asset from a null playback source]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+Android Bundled 99ms node_modules\expo-router\entry.js (1 module)
+ INFO  
+[7m [1m💡 JavaScript logs will be removed from Metro in React Native 0.77![22m Please use React Native DevTools as your default tool. Tip: Type [1mj[22m in the terminal to open (requires Google Chrome or Microsoft Edge).[27m
+ ERROR  Error: Requiring unknown module "undefined". If you are sure the module exists, try restarting Metro. You may also want to run `yarn` or `npm install`., js engine: hermes
+ ERROR  Failed to start background silence: [Error: Cannot load an AV asset from a null playback source]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  Login Error: [AxiosError: Network Error]
+ ERROR  SyntaxError: C:\sora\mobile\src\services\BackgroundService.ts: Missing semicolon. (43:5)
+
+  41 |             });
+  42 |         }
+> 43 |     } catch (err) {
+     |      ^
+  44 |         console.error('Final TTS fallback failure:', err);
+  45 |     }
+  46 | };
+ ERROR  [Error: TransformError SyntaxError: C:\sora\mobile\src\services\BackgroundService.ts: Missing semicolon. (43:5)
+
+[0m [90m 41 |[39m             })[33m;[39m
+ [90m 42 |[39m         }
+[31m[1m>[22m[39m[90m 43 |[39m     } [36mcatch[39m (err) {
+ [90m    |[39m      [31m[1m^[22m[39m
+ [90m 44 |[39m         console[33m.[39merror([32m'Final TTS fallback failure:'[39m[33m,[39m err)[33m;[39m
+ [90m 45 |[39m     }
+ [90m 46 |[39m }[33m;[39m[0m]
+ ERROR  SyntaxError: C:\sora\mobile\src\services\BackgroundService.ts: Missing semicolon. (43:5)
+
+  41 |             });
+  42 |         }
+> 43 |     } catch (err) {
+     |      ^
+  44 |         console.error('Final TTS fallback failure:', err);
+  45 |     }
+  46 | };
+ ERROR  [Error: TransformError SyntaxError: C:\sora\mobile\src\services\BackgroundService.ts: Missing semicolon. (43:5)
+
+[0m [90m 41 |[39m             })[33m;[39m
+ [90m 42 |[39m         }
+[31m[1m>[22m[39m[90m 43 |[39m     } [36mcatch[39m (err) {
+ [90m    |[39m      [31m[1m^[22m[39m
+ [90m 44 |[39m         console[33m.[39merror([32m'Final TTS fallback failure:'[39m[33m,[39m err)[33m;[39m
+ [90m 45 |[39m     }
+ [90m 46 |[39m }[33m;[39m[0m]
+ ERROR  SyntaxError: C:\sora\mobile\src\services\BackgroundService.ts: Missing semicolon. (43:5)
+
+  41 |             });
+  42 |         }
+> 43 |     } catch (err) {
+     |      ^
+  44 |         console.error('Final TTS fallback failure:', err);
+  45 |     }
+  46 | };
+ ERROR  [Error: TransformError SyntaxError: C:\sora\mobile\src\services\BackgroundService.ts: Missing semicolon. (43:5)
+
+[0m [90m 41 |[39m             })[33m;[39m
+ [90m 42 |[39m         }
+[31m[1m>[22m[39m[90m 43 |[39m     } [36mcatch[39m (err) {
+ [90m    |[39m      [31m[1m^[22m[39m
+ [90m 44 |[39m         console[33m.[39merror([32m'Final TTS fallback failure:'[39m[33m,[39m err)[33m;[39m
+ [90m 45 |[39m     }
+ [90m 46 |[39m }[33m;[39m[0m]
+› Detected a change in metro.config.js. Restart the server to see the new results.
+Unable to resolve "../assets/silence.mp3" from "src\services\BackgroundService.ts"
+ ERROR  [Error: undefined Unable to resolve module ../assets/silence.mp3 from C:\sora\mobile\src\services\BackgroundService.ts: 
+
+None of these files exist:
+  * silence.mp3
+  * src\assets\silence.mp3
+[0m [90m  5 |[39m [36mimport[39m apiClient [36mfrom[39m [32m'../api/client'[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m { [33mBuffer[39m } [36mfrom[39m [32m'buffer'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m silenceAsset [36mfrom[39m [32m'../assets/silence.mp3'[39m[33m;[39m
+ [90m    |[39m                           [31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mconst[39m [33mDEFAULT_IP[39m [33m=[39m [32m'192.168.1.5'[39m[33m;[39m
+ [90m 10 |[39m[0m]
+Android Bundling failed 403ms node_modules\expo-router\entry.js (1 module)
+Unable to resolve "../assets/silence.mp3" from "src\services\BackgroundService.ts"
