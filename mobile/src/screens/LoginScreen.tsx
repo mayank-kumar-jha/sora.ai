@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
-import { getServerIp, saveServerIp } from '../utils/storage';
-import { DEFAULT_IP } from '../constants/settings';
+import { getServerUrl, saveServerUrl } from '../utils/storage';
+import { DEFAULT_BASE_URL } from '../constants/settings';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [serverIp, setServerIp] = useState(DEFAULT_IP);
+    const [serverUrl, setServerUrl] = useState(DEFAULT_BASE_URL);
     const [showSettings, setShowSettings] = useState(false);
     const { login } = useAuth();
 
@@ -18,22 +18,22 @@ export default function LoginScreen() {
     }, []);
 
     const loadSettings = async () => {
-        const storedIp = await getServerIp();
-        if (storedIp) setServerIp(storedIp);
+        const storedUrl = await getServerUrl();
+        if (storedUrl) setServerUrl(storedUrl);
     };
 
     const handleLogin = async () => {
         if (!email || !password) return;
         setLoading(true);
         try {
-            await saveServerIp(serverIp);
+            await saveServerUrl(serverUrl);
             await login(email, password);
         } catch (err: any) {
             console.error('Login Error:', err);
             let msg = 'Login failed. ';
             
             if (err.message === 'Network Error') {
-                msg += `Cannot reach the server at ${serverIp}. \n\n1. Ensure your PC and Phone are on the same Wi-Fi. \n2. Check your PC's IP using 'ipconfig'. \n3. Current default is ${DEFAULT_IP}.`;
+                msg += `Cannot reach the server at ${serverUrl}. \n\nPlease check your internet connection or server status.`;
             } else {
                 msg += err.response?.data?.message || err.message || 'Unknown error';
             }
@@ -43,7 +43,7 @@ export default function LoginScreen() {
         }
     };
 
-    const resetIp = () => setServerIp(DEFAULT_IP);
+    const resetUrl = () => setServerUrl(DEFAULT_BASE_URL);
 
     return (
         <KeyboardAvoidingView 
@@ -84,19 +84,20 @@ export default function LoginScreen() {
 
                 {showSettings && (
                     <View style={styles.settingsContainer}>
-                        <Text style={styles.settingsLabel}>Backend Server IP:</Text>
+                        <Text style={styles.settingsLabel}>Backend Server URL:</Text>
                         <TextInput
                             style={[styles.input, styles.settingsInput]}
-                            placeholder="e.g. 192.168.1.10"
-                            value={serverIp}
-                            onChangeText={setServerIp}
+                            placeholder="https://your-app.onrender.com"
+                            value={serverUrl}
+                            onChangeText={setServerUrl}
                             autoCapitalize="none"
+                            autoCorrect={false}
                         />
-                        <TouchableOpacity style={styles.resetButton} onPress={resetIp}>
-                            <Text style={styles.resetButtonText}>Reset to Default ({DEFAULT_IP})</Text>
+                        <TouchableOpacity style={styles.resetButton} onPress={resetUrl}>
+                            <Text style={styles.resetButtonText}>Reset to Default</Text>
                         </TouchableOpacity>
                         <Text style={styles.settingsHint}>
-                            Find this using 'ipconfig' on your PC.
+                            Paste your production URL or internal IP.
                         </Text>
                     </View>
                 )}

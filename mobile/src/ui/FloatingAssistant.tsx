@@ -6,8 +6,8 @@ import MiniChatPanel, { ChatMessage, UtilityEvent } from './MiniChatPanel';
 import { AssistantFaceState } from '../animations/AssistantFace';
 import apiClient from '../api/client';
 import { Audio } from 'expo-av';
-import { getAccessToken, getServerIp } from '../utils/storage';
-import { DEFAULT_IP } from '../constants/settings';
+import { getAccessToken, getServerUrl } from '../utils/storage';
+import { DEFAULT_BASE_URL } from '../constants/settings';
 import * as FileSystem from 'expo-file-system';
 import { useSoraSettings } from '../context/SoraSettingsContext';
 import { OverlayBridge } from '../native/OverlayBridge';
@@ -325,8 +325,13 @@ export default function FloatingAssistant() {
 
     try {
       const token = await getAccessToken();
-      const serverIp = await getServerIp() || DEFAULT_IP;
-      const uploadUrl = `http://${serverIp}:3000/api/voice/transcribe`;
+      const customUrl = await getServerUrl();
+      const baseUrl = customUrl || DEFAULT_BASE_URL;
+      
+      // Construct full upload URL
+      const uploadUrl = baseUrl.startsWith('http') 
+        ? `${baseUrl}/api/voice/transcribe` 
+        : `http://${baseUrl}:3000/api/voice/transcribe`;
 
       console.log(`[Mic] Sending native recording to ${uploadUrl} via uploadAsync...`);
       
