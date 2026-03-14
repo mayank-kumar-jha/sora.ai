@@ -9,7 +9,15 @@ const Redis = require('ioredis');
 // Dedicted Redis instance for BullMQ (Required to have maxRetriesPerRequest: null)
 const connection = new Redis(redisConfig.url, {
     maxRetriesPerRequest: null,
-    enableReadyCheck: false
+    enableReadyCheck: false,
+    connectTimeout: 10000,
+    retryStrategy(times) {
+        return Math.min(times * 50, 2000);
+    },
+    reconnectOnError(err) {
+        if (err.message.includes('ECONNRESET')) return true;
+        return false;
+    }
 });
 
 connection.on('error', (err) => {

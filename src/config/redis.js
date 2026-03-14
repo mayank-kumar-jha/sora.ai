@@ -11,14 +11,20 @@ const createRedisClient = () => {
         maxRetriesPerRequest: null, // Critical for BullMQ
         enableReadyCheck: false,
         lazyConnect: false,
+        connectTimeout: 10000,
         retryStrategy(times) {
-            if (times > 5) {
-                logger.error('Redis: Max reconnect attempts reached. Giving up.');
-                return null;
+            const delay = Math.min(times * 50, 2000);
+            if (times % 10 === 0) {
+                logger.warn(`Redis: Reconnect attempt ${times}, delay ${delay}ms`);
             }
-            const delay = Math.min(times * 200, 2000);
-            logger.warn(`Redis: Reconnecting in ${delay}ms (attempt ${times})`);
             return delay;
+        },
+        reconnectOnError(err) {
+            const targetError = 'READONLY';
+            if (err.message.includes(targetError) || err.message.includes('ECONNRESET')) {
+                return true; // Reconnect for these specific errors
+            }
+            return false;
         },
     });
 
