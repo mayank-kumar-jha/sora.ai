@@ -6,7 +6,7 @@ const voiceController = require('../controllers/voiceController');
 const { requireAuth } = require('../middleware/auth');
 const path = require('path');
 const AppError = require('../utils/AppError');
-const elevenLabsService = require('../services/elevenLabsService');
+const deepgramService = require('../services/deepgramService');
 
 const router = Router();
 
@@ -54,7 +54,7 @@ router.post('/synthesize', async (req, res, next) => {
         if (!text || !text.trim()) {
             throw new AppError('Text is required for speech synthesis.', 400, 'VALIDATION_ERROR');
         }
-        const audioBuffer = await elevenLabsService.synthesizeSpeech(text.trim(), voiceId);
+        const audioBuffer = await deepgramService.synthesizeSpeech(text.trim(), voiceId);
         res.set({
             'Content-Type': 'audio/mpeg',
             'Content-Length': audioBuffer.length,
