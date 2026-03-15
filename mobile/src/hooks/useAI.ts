@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Platform, Linking, Alert, DeviceEventEmitter } from 'react-native';
 import apiClient from '../api/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sendWsMessage } from '../services/BackgroundService';
 
 // ── Persona/Tone system prefixes ─────────────────────────────────────────────
 const PERSONA_PREFIXES: Record<string, string> = {
@@ -38,9 +39,7 @@ const handleClientAction = async (result: any) => {
 
     if (result.clientAction === 'MAKE_CALL') {
         const contactName = result.contactName;
-        if (Platform.OS === 'web') {
-            return; // Can't make calls from web
-        }
+        if (Platform.OS === 'web') return;
 
         try {
             const Contacts = require('expo-contacts');
@@ -50,7 +49,6 @@ const handleClientAction = async (result: any) => {
                 return;
             }
 
-            // Search contacts by name
             const { data } = await Contacts.getContactsAsync({
                 name: contactName,
                 fields: [Contacts.Fields.PhoneNumbers],
@@ -65,7 +63,6 @@ const handleClientAction = async (result: any) => {
             }
         } catch (err) {
             console.error('Call error:', err);
-            Alert.alert('Error', 'Failed to initiate call.');
         }
     }
 
@@ -82,7 +79,6 @@ const handleClientAction = async (result: any) => {
                         name: contactName,
                         fields: [Contacts.Fields.PhoneNumbers],
                     });
-
                     if (data.length > 0 && data[0].phoneNumbers && data[0].phoneNumbers.length > 0) {
                         targetPhone = data[0].phoneNumbers[0].number.replace(/[^0-9+]/g, '');
                     }
@@ -98,8 +94,7 @@ const handleClientAction = async (result: any) => {
                 message: result.messageContent
             });
         } catch (err) {
-            console.error('Failed to send WhatsApp message from client action:', err);
-            Alert.alert('Error', 'Failed to send WhatsApp message via background service.');
+            console.error('Failed to send WhatsApp message:', err);
         }
     }
 
@@ -123,17 +118,10 @@ const handleClientAction = async (result: any) => {
         };
 
         const scheme = appSchemes[appName] || `${appName}://`;
-
         try {
-            // Modern OS (Android 11+/iOS 9+) blocks `canOpenURL` due to package visibility rules.
-            // Bypassing the check and forcing the intent outright.
             await Linking.openURL(scheme);
         } catch (err) {
-            console.warn(`Direct linking to ${scheme} failed, trying browser fallback.`, err);
-            Alert.alert(
-                'Action Failed',
-                `Could not open "${result.appName}". It may not be installed or the OS blocked the system intent.`
-            );
+            console.warn(`Direct linking to ${scheme} failed.`, err);
         }
     }
 
@@ -142,31 +130,25 @@ const handleClientAction = async (result: any) => {
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
             url = `https://${url}`;
         }
-
         try {
             await Linking.openURL(url);
         } catch (err) {
             console.error('Failed to open URL:', err);
-            Alert.alert('Error', `Could not navigate to ${url}`);
         }
     }
 
     if (result.clientAction === 'PLAY_MUSIC') {
         const songName = result.songName;
-        // Search YouTube aggressively
         const query = encodeURIComponent(songName);
         const ytAppScheme = `youtube://results?search_query=${query}`;
         const ytWebUrl = `https://www.youtube.com/results?search_query=${query}`;
-
         try {
-            // Force the app intent first
             await Linking.openURL(ytAppScheme);
         } catch (appErr) {
-            // Fallback to web browser instantly if the YouTube app intent strictly fails
             try {
                 await Linking.openURL(ytWebUrl);
             } catch (webErr) {
-                Alert.alert('Error', `Could not play music. YouTube intent blocked.`);
+                console.error('YouTube failed.');
             }
         }
     }
@@ -174,14 +156,6 @@ const handleClientAction = async (result: any) => {
     if (result.clientAction === 'SET_ALARM') {
         try {
             const targetTime = new Date(result.time);
-            const now = new Date();
-            const delayMs = targetTime.getTime() - now.getTime();
-
-            if (delayMs <= 0) {
-                Alert.alert('Alarm Error', 'The alarm time is in the past. Please try again.');
-                return;
-            }
-
             const label = result.label || 'Sora Alarm';
             const hour = targetTime.getHours();
             const minute = targetTime.getMinutes();
@@ -190,25 +164,16 @@ const handleClientAction = async (result: any) => {
                 const { NativeModules } = require('react-native');
                 if (NativeModules.SoraOverlay) {
                     NativeModules.SoraOverlay.setAlarm(hour, minute, label);
-                    Alert.alert(
-                        '⏰ Alarm Set',
-                        `Native system alarm set for ${targetTime.toLocaleTimeString()} (${label}).`
-                    );
-                } else {
-                    throw new Error('Native SoraOverlay module not found');
                 }
             } else {
-                // Fallback for iOS/other (Expo Notifications)
                 const Notifications = require('expo-notifications');
                 await Notifications.scheduleNotificationAsync({
                     content: { title: '⏰ Sora Alarm', body: label, sound: true },
                     trigger: { date: targetTime },
                 });
-                Alert.alert('⏰ Alarm Set', `Alarm set for ${targetTime.toLocaleTimeString()}.`);
             }
         } catch (err) {
             console.error('Alarm error:', err);
-            Alert.alert('Error', 'Failed to set system alarm.');
         }
     }
 };
@@ -216,48 +181,97 @@ const handleClientAction = async (result: any) => {
 export const useAI = () => {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
+    const streamBuffer = useRef<string>('');
 
-    const sendMessage = useCallback(async (text: string) => {
-        setMessages(prev => [...prev, { role: 'user', content: text }]);
-        setLoading(true);
-
-        try {
-            // Prepend persona/tone settings as invisible system context
-            const prefix = await getSettingsPrefix();
-            const messageWithSettings = text.startsWith('[SYSTEM:') || text.startsWith('[PERSONA:')
-                ? text  // Don't double-prefix system messages
-                : `${prefix}${text}`;
-
-            const response = await apiClient.post('/ai/message', { message: messageWithSettings });
-            const data = response.data.data;
-
-            // Handle the new Smart Router format (with thought and message)
-            const aiMessage = data.message || data.result?.message || 'Action executed';
-            const thought = data.thought || data.result?.thought;
-
-            if (thought) {
-                console.log('[Sora Thought]:', thought);
+    useEffect(() => {
+        const wsListener = DeviceEventEmitter.addListener('WS_EVENT', (data: any) => {
+            if (data.type === 'AI_TOKEN') {
+                setIsStreaming(true);
+                streamBuffer.current += data.content;
+                setMessages(prev => {
+                    const newMsgs = [...prev];
+                    if (newMsgs.length === 0) return newMsgs;
+                    const lastMsg = newMsgs[newMsgs.length - 1];
+                    if (lastMsg && lastMsg.role === 'assistant' && !lastMsg.isComplete) {
+                        return [...newMsgs.slice(0, -1), { ...lastMsg, content: streamBuffer.current }];
+                    } else {
+                        return [...newMsgs, { role: 'assistant', content: data.content, isComplete: false }];
+                    }
+                });
             }
 
-            // Check for client-side actions
-            const clientResult = data.result?.clientAction ? data.result : (data.clientAction ? data : null);
-
-            if (clientResult) {
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: aiMessage
-                }]);
-                await handleClientAction(clientResult);
-            } else {
-                setMessages(prev => [...prev, { role: 'assistant', content: aiMessage }]);
+            if (data.type === 'AI_COMPLETE') {
+                setIsStreaming(false);
+                setLoading(false);
+                setMessages(prev => {
+                    if (prev.length === 0) return prev;
+                    const newMsgs = [...prev];
+                    const lastMsg = newMsgs[newMsgs.length - 1];
+                    if (lastMsg.role === 'assistant') {
+                        lastMsg.isComplete = true;
+                    }
+                    return newMsgs;
+                });
+                streamBuffer.current = '';
+                
+                // Handle client-side actions if any (though usually they are in complete responses)
+                if (data.result?.clientAction) {
+                    handleClientAction(data.result);
+                }
             }
-        } catch (err) {
-            console.error('AI Error', err);
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I hit a snag while processing that.' }]);
-        } finally {
-            setLoading(false);
-        }
+
+            if (data.type === 'AI_THOUGHT') {
+                console.log('[Sora Thought]:', data.content);
+            }
+
+            if (data.type === 'ERROR') {
+                Alert.alert('AI Error', data.message);
+                setLoading(false);
+            }
+        });
+
+        return () => wsListener.remove();
     }, []);
 
-    return { messages, sendMessage, loading };
+    const sendMessage = useCallback(async (text: string, image?: string) => {
+        setMessages(prev => [...prev, { role: 'user', content: text }]);
+        setLoading(true);
+        streamBuffer.current = '';
+
+        const prefix = await getSettingsPrefix();
+        const messageWithSettings = text.startsWith('[SYSTEM:') || text.startsWith('[PERSONA:')
+            ? text
+            : `${prefix}${text}`;
+
+        const payload = {
+            type: 'AI_CHAT',
+            payload: {
+                message: messageWithSettings,
+                context: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+                image,
+                voiceId: await AsyncStorage.getItem('sora_voice') || 'aura-asteria-en'
+            }
+        };
+
+        const success = sendWsMessage(payload);
+        if (!success) {
+            try {
+                const response = await apiClient.post('/ai/message', { message: messageWithSettings, image });
+                const aiData = response.data.data;
+                const aiMessage = aiData.message || aiData.result?.message;
+                setMessages(prev => [...prev, { role: 'assistant', content: aiMessage, isComplete: true }]);
+                
+                const clientResult = aiData.result?.clientAction ? aiData.result : (aiData.clientAction ? aiData : null);
+                if (clientResult) handleClientAction(clientResult);
+                
+                setLoading(false);
+            } catch (err) {
+                setLoading(false);
+                setMessages(prev => [...prev, { role: 'assistant', content: 'Connection lost.' }]);
+            }
+        }
+    }, [messages]);
+
+    return { messages, sendMessage, loading, isStreaming };
 };

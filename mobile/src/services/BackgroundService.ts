@@ -142,6 +142,76 @@ export const stopBackgroundSilence = async () => {
 
 export const getWsState = () => ws?.readyState;
 
+export const sendWsMessage = (payload: any) => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(payload));
+        return true;
+    }
+    return false;
+};
+
+const audioQueue: string[] = [];
+let isAudioPlaying = false;
+let isGlobalMuted = false;
+
+export const setGlobalMuted = (muted: boolean) => {
+    isGlobalMuted = muted;
+    if (muted && isAudioPlaying) {
+        // Stop current playback if muted
+        Audio.setAudioModeAsync({ allowsRecordingIOS: false, staysActiveInBackground: true });
+    }
+};
+
+export const playAudioChunk = async (base64: string) => {
+    if (isGlobalMuted) return;
+    audioQueue.push(base64);
+    if (!isAudioPlaying) {
+        processAudioQueue();
+    }
+};
+
+const processAudioQueue = async () => {
+    if (audioQueue.length === 0) {
+        isAudioPlaying = false;
+        return;
+    }
+
+    isAudioPlaying = true;
+    const chunk = audioQueue.shift();
+    if (!chunk) {
+        processAudioQueue();
+        return;
+    }
+
+    try {
+        const audioUri = `data:audio/mp3;base64,${chunk}`;
+        
+        // Ensure audio mode is correct
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            staysActiveInBackground: true,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: true,
+            playThroughEarpieceAndroid: false,
+        });
+
+        const { sound } = await Audio.Sound.createAsync(
+            { uri: audioUri },
+            { shouldPlay: true }
+        );
+
+        sound.setOnPlaybackStatusUpdate(async (status) => {
+            if (status.isLoaded && status.didJustFinish) {
+                await sound.unloadAsync();
+                processAudioQueue();
+            }
+        });
+    } catch (err) {
+        console.error('[BackgroundService] Chunk playback failed:', err);
+        processAudioQueue();
+    }
+};
+
 export const connectWs = async () => {
     if (isConnecting || (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING))) {
         return ws;
@@ -153,20 +223,14 @@ export const connectWs = async () => {
     isConnecting = true;
     const customUrl = await getServerUrl();
     
-    // Determine base URL: Custom URL > Default Production URL
     const baseUrl = customUrl || DEFAULT_BASE_URL;
     
-    // Construct WebSocket URL
-    // If it starts with https -> wss://. If http -> ws://. If no protocol -> ws://ip:3000
     let wsUrl: string;
     if (baseUrl.startsWith('http')) {
         wsUrl = baseUrl.replace(/^http/, 'ws') + '/ws?token=' + token;
     } else {
-        // Fallback for IP-only input
         wsUrl = `ws://${baseUrl}:3000/ws?token=${token}`;
     }
-
-    console.log(`[WS] Custom URL from storage: ${customUrl}, Final WebSocket URL: ${wsUrl}`);
 
     if (ws) {
         ws.onopen = null;
@@ -176,11 +240,9 @@ export const connectWs = async () => {
         ws.close();
     }
 
-    console.log(`[WS] Attempting connection to: ${wsUrl}`);
     ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
-        console.log(`[WS] Connected successfully.`);
         isConnecting = false;
         if (reconnectTimer) {
             clearInterval(reconnectTimer);
@@ -190,12 +252,15 @@ export const connectWs = async () => {
         DeviceEventEmitter.emit('WS_CONNECTED');
     };
 
-    ws.onmessage = async (e) => {
+    ws.onmessage = async (e: MessageEvent) => {
         try {
             const event = JSON.parse(e.data);
             
-            // Forward all events to local listeners (like ChatScreen)
             DeviceEventEmitter.emit('WS_EVENT', event);
+
+            if (event.type === 'AI_AUDIO' && event.payload) {
+                playAudioChunk(event.payload);
+            }
 
             if (event.type === 'PING') {
                 if (ws && ws.readyState === WebSocket.OPEN) {
@@ -204,14 +269,10 @@ export const connectWs = async () => {
                 return;
             }
 
-            // Only perform background auto-response if APP IS NOT ACTIVE
-            // If app is active, ChatScreen or FloatingAssistant should handle it visually
             const isAppActive = AppState.currentState === 'active';
 
             if (event.type === 'WHATSAPP_MESSAGE') {
                 const { from, text } = event.payload;
-                console.log(`[WS] Received WhatsApp from ${from}: ${text.substring(0, 20)}...`);
-
                 if (!isAppActive) {
                     const ping = `[SYSTEM: Incoming WhatsApp message from ${from}: "${text}". Please summarize it briefly.]`;
                     try {
@@ -229,15 +290,12 @@ export const connectWs = async () => {
 
             if (event.type === 'TRIGGER_ALARM') {
                 const { label } = event.payload;
-                console.log(`[WS] Alarm Triggered: ${label}`);
                 const msg = `Wake up! Your alarm for ${label} is going off now.`;
-                
                 if (!isAppActive) {
                     DeviceEventEmitter.emit('PROACTIVE_ALERT', { text: msg });
                     await speakText(msg);
                 }
             }
-
         } catch (err) {
             console.error('[WS] Message parse error:', err);
         }
@@ -245,18 +303,11 @@ export const connectWs = async () => {
 
     ws.onclose = () => {
         isConnecting = false;
-        console.log('[WS] Disconnected, retrying...');
         if (!reconnectTimer) {
             const attempts = (ws as any)?.__reconnectAttempts || 0;
             const delay = Math.min(5000 * Math.pow(2, attempts), 30000);
             (ws as any).__reconnectAttempts = attempts + 1;
             
-            // If we've failed twice with a custom URL, maybe it's wrong -> log a tip
-            if (attempts >= 1 && customUrl) {
-                console.warn(`[WS] Still failing with custom URL: ${customUrl}. Verify your server is at this address.`);
-            }
-
-            console.log(`[WS] Reconnecting in ${delay / 1000}s (attempt ${attempts + 1})...`);
             reconnectTimer = setTimeout(() => {
                 reconnectTimer = null;
                 connectWs();

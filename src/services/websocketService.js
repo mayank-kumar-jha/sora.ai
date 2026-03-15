@@ -76,22 +76,87 @@ const initAiWebSocket = (server) => {
     return wss;
 };
 
+const geminiAgentService = require('./geminiAgentService');
+const deepgramService = require('./deepgramService');
+const { v4: uuidv4 } = require('uuid');
+
 const handleAiChat = async (ws, payload) => {
-    const { message, context = [] } = payload;
+    const { message, context = [], image, voiceId = 'aura-asteria-en' } = payload;
+    const userId = ws.userId;
+    let fullResponse = '';
+    let sentenceBuffer = '';
+
     try {
-        const stream = await aiService.getStreamingCompletion([
-            ...context,
-            { role: 'user', content: message }
-        ]);
+        const stream = await geminiAgentService.streamMessageWithTools(userId, message, context, image);
 
         for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content || '';
-            if (content) {
-                ws.send(JSON.stringify({ type: 'AI_TOKEN', content }));
+            if (chunk.type === 'THOUGHT') {
+                ws.send(JSON.stringify({ type: 'AI_THOUGHT', content: chunk.text }));
+                continue;
+            }
+
+            const token = chunk.text;
+            fullResponse += token;
+            sentenceBuffer += token;
+            
+            // Send token to UI immediately
+            ws.send(JSON.stringify({ type: 'AI_TOKEN', content: token }));
+
+            // If we have a complete sentence, trigger TTS in parallel
+            if (/[.!?]\s*$/.test(sentenceBuffer) && sentenceBuffer.trim().length > 15) {
+                const sentenceToSpeak = sentenceBuffer.trim();
+                sentenceBuffer = ''; // Reset buffer for next sentence
+
+                // Generate TTS in background and push to client as soon as ready
+                (async () => {
+                    try {
+                        const audioBuffer = await deepgramService.synthesizeSpeech(sentenceToSpeak, voiceId);
+                        if (ws.readyState === 1) {
+                            ws.send(JSON.stringify({
+                                type: 'AI_AUDIO',
+                                payload: audioBuffer.toString('base64'),
+                                text: sentenceToSpeak
+                            }));
+                        }
+                    } catch (ttsErr) {
+                        logger.warn(`Background TTS failed for sentence: ${ttsErr.message}`);
+                    }
+                })();
             }
         }
+
+        // Handle any remaining text in the buffer
+        if (sentenceBuffer.trim().length > 0) {
+            const sentenceToSpeak = sentenceBuffer.trim();
+            (async () => {
+                try {
+                    const audioBuffer = await deepgramService.synthesizeSpeech(sentenceToSpeak, voiceId);
+                    if (ws.readyState === 1) {
+                        ws.send(JSON.stringify({
+                            type: 'AI_AUDIO',
+                            payload: audioBuffer.toString('base64'),
+                            text: sentenceToSpeak
+                        }));
+                    }
+                } catch (ttsErr) {
+                    logger.warn(`Background TTS remaining failed: ${ttsErr.message}`);
+                }
+            })();
+        }
+
         ws.send(JSON.stringify({ type: 'AI_COMPLETE' }));
+
+        // Save AI response to database in background
+        prisma.conversation.create({
+            data: {
+                userId,
+                role: 'ASSISTANT',
+                message: fullResponse || '[Action Executed]'
+            }
+        }).catch(err => logger.error(`Failed to save AI response to DB: ${err.message}`));
+
     } catch (err) {
+        logger.error(`WebSocket AI Chat Error: ${err.message}`);
         ws.send(JSON.stringify({ type: 'ERROR', message: err.message }));
     }
 };

@@ -338,13 +338,11 @@ const runWithModel = async (ai, modelName, userId, userMessage, context, imageBa
 };
 
 /**
- * Process a user message using Gemini with Function Calling.
- * Automatically tries multiple models before falling back to Groq.
+ * Process a user message using Gemini with Function Calling and return a stream.
  */
-const processMessageWithTools = async (userId, userMessage, context = [], imageBase64 = null) => {
-    console.log(`[GeminiAgent] Processing message. Text: "${userMessage}", Image received: ${!!imageBase64}`);
+const streamMessageWithTools = async (userId, userMessage, context = [], imageBase64 = null) => {
+    console.log(`[GeminiAgent] Streaming message. Text: "${userMessage}"`);
 
-    // Build model list: configured model first, then the waterfall
     const preferredModel = config.gemini.model;
     const modelQueue = [preferredModel, ...GEMINI_MODELS.filter(m => m !== preferredModel)];
 
@@ -364,26 +362,131 @@ const processMessageWithTools = async (userId, userMessage, context = [], imageB
             const ai = getGenAI();
             if (!ai) break;
 
-            console.log(`[GeminiAgent] Trying model: ${modelName}. Google Linked: ${isGoogleLinked}`);
-            const result = await runWithModel(ai, modelName, userId, userMessage, context, imageBase64, effectiveTools);
-            console.log(`[GeminiAgent] Success with model: ${modelName}`);
-            return result;
-        } catch (error) {
-            const status = error.status || error.code;
-            console.warn(`[GeminiAgent] Model ${modelName} failed (${status}): ${error.message?.slice(0, 120)}`);
-            if (!isRetryableError(error)) {
-                // Fatal non-quota error — don't try more models
-                break;
+            const model = ai.getGenerativeModel({
+                model: modelName,
+                tools: [effectiveTools],
+                safetySettings,
+                systemInstruction: {
+                    role: 'system',
+                    parts: [{ text: `[SYSTEM CONTEXT: ${new Date().toString()}]\n${SYSTEM_PROMPT}` }]
+                }
+            });
+
+            let history = context.map(c => ({
+                role: c.role === 'assistant' ? 'model' : c.role,
+                parts: [{ text: c.content }]
+            }));
+            const firstUserIndex = history.findIndex(h => h.role === 'user');
+            if (firstUserIndex !== -1) {
+                history = history.slice(firstUserIndex);
+            } else if (history.length > 0) {
+                history = [];
             }
-            // Continue to next model in waterfall
+
+            const chat = model.startChat({ history });
+
+            const messageParts = [];
+            if (imageBase64) {
+                const cleanBase64 = imageBase64.includes('base64,')
+                    ? imageBase64.split('base64,')[1]
+                    : imageBase64;
+                messageParts.push({ inlineData: { data: cleanBase64, mimeType: 'image/jpeg' } });
+            }
+            messageParts.push({ text: userMessage });
+
+            const result = await chat.sendMessageStream(messageParts);
+
+            // Create a generator that yields tokens and handles function calls
+            return (async function* () {
+                let response = await result.response; // Wait for the first part to ensure no immediate tool calls
+                let functionCalls = response.functionCalls();
+
+                // If no tool calls, just yield the stream tokens
+                if (!functionCalls || functionCalls.length === 0) {
+                    for await (const chunk of result.stream) {
+                        const token = chunk.text();
+                        if (token) yield { type: 'TOKEN', text: token };
+                    }
+                    return;
+                }
+
+                // Tool call loop
+                while (functionCalls && functionCalls.length > 0) {
+                    const toolResponses = [];
+                    for (const call of functionCalls) {
+                        let toolResult;
+                        let actionName = call.name.toUpperCase();
+                        yield { type: 'THOUGHT', text: `Executing ${call.name}...` };
+                        
+                        try {
+                            if (call.name === 'create_calendar_event' || call.name === 'list_calendar_events') {
+                                const args = call.name === 'list_calendar_events' ? { maxResults: call.args.maxResults || 5 } : call.args;
+                                toolResult = await actionRouter.routeAction(userId, actionName, args);
+                            } else if (call.name === 'perform_web_search') {
+                                toolResult = await webSearchService.performWebSearch(call.args.query);
+                            } else if (call.name === 'query_knowledge_base') {
+                                const queryEmbedding = await require('./embeddingService').generateEmbedding(call.args.query);
+                                const matches = queryEmbedding ? await vectorDbService.queryVectors(queryEmbedding, userId) : [];
+                                toolResult = matches.length > 0 ? matches.map(m => m.text).join('\n---\n') : 'No relevant personal info found.';
+                            } else if (call.name === 'send_whatsapp_message') {
+                                toolResult = await actionRouter.routeAction(userId, 'SEND_WHATSAPP', call.args);
+                            } else if (call.name === 'list_whatsapp_chats') {
+                                toolResult = await actionRouter.routeAction(userId, 'GET_WHATSAPP_MESSAGES', call.args);
+                            } else if (call.name === 'list_whatsapp_contacts') {
+                                toolResult = await actionRouter.routeAction(userId, 'GET_WHATSAPP_CONTACTS', call.args);
+                            } else if (call.name === 'clear_whatsapp_cache') {
+                                toolResult = await actionRouter.routeAction(userId, 'CLEAR_WHATSAPP_CACHE', call.args);
+                            } else if (call.name === 'send_email') {
+                                toolResult = await actionRouter.routeAction(userId, 'SEND_EMAIL', call.args);
+                            } else if (call.name === 'get_inbox') {
+                                toolResult = await actionRouter.routeAction(userId, 'GET_INBOX', call.args);
+                            } else if (call.name === 'set_alarm') {
+                                toolResult = await actionRouter.routeAction(userId, 'SET_ALARM', call.args);
+                            } else if (call.name === 'make_call') {
+                                toolResult = await actionRouter.routeAction(userId, 'MAKE_CALL', call.args);
+                            } else if (call.name === 'open_app') {
+                                toolResult = await actionRouter.routeAction(userId, 'OPEN_APP', call.args);
+                            } else if (call.name === 'open_url') {
+                                toolResult = await actionRouter.routeAction(userId, 'OPEN_URL', call.args);
+                            } else if (call.name === 'play_music') {
+                                toolResult = await actionRouter.routeAction(userId, 'PLAY_MUSIC', call.args);
+                            } else if (call.name === 'schedule_whatsapp_message') {
+                                toolResult = await actionRouter.routeAction(userId, 'SCHEDULE_WHATSAPP', call.args);
+                            } else {
+                                toolResult = { error: 'Unknown tool' };
+                            }
+                        } catch (err) {
+                            toolResult = { error: err.message };
+                        }
+                        toolResponses.push({
+                            functionResponse: { name: call.name, response: { result: toolResult } }
+                        });
+                    }
+                    
+                    const nextResult = await chat.sendMessageStream(toolResponses);
+                    response = await nextResult.response;
+                    functionCalls = response.functionCalls();
+                    
+                    if (!functionCalls || functionCalls.length === 0) {
+                        for await (const chunk of nextResult.stream) {
+                            const token = chunk.text();
+                            if (token) yield { type: 'TOKEN', text: token };
+                        }
+                    }
+                }
+            })();
+        } catch (error) {
+            console.warn(`[GeminiAgent] Streaming error with ${modelName}: ${error.message}`);
+            if (!isRetryableError(error)) break;
         }
     }
 
-    // All Gemini models exhausted — fall back to Groq
-    console.warn('[GeminiAgent] All Gemini models failed. Falling back to Groq/Llama-3...');
-    const agentService = require('./agentService');
-    return await agentService.processMessage(userId, userMessage, context, imageBase64);
+    // Fallback to Groq if all Gemini failed (non-streaming for now to keep it simple)
+    const result = await require('./agentService').processMessage(userId, userMessage, context, imageBase64);
+    return (async function* () {
+        yield { type: 'TOKEN', text: result.message || 'Error occurred during fallback.' };
+    })();
 };
 
-module.exports = { processMessageWithTools };
+module.exports = { processMessageWithTools, streamMessageWithTools };
 

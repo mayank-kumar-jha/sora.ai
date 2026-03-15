@@ -20,16 +20,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const loadUser = async () => {
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Auth Timeout')), 5000)
+        );
+        
         try {
             const token = await storage.getAccessToken();
             if (token) {
-                const response = await apiClient.get('/auth/me');
+                // Race between the API call and a 5s timeout
+                const response = await Promise.race([
+                    apiClient.get('/auth/me'),
+                    timeoutPromise
+                ]) as any;
                 setUser(response.data.data);
             }
         } catch (err) {
-            console.log('Failed to load user, clearing tokens', err);
-            await storage.clearTokens();
-            setUser(null);
+            console.log('Failed to load user or timeout occurred, proceeding to login', err);
+            // If it's a timeout, we don't necessarily clear tokens, just proceed
+            if (err instanceof Error && err.message === 'Auth Timeout') {
+                setUser(null);
+            } else {
+                await storage.clearTokens();
+                setUser(null);
+            }
         } finally {
             setLoading(false);
         }

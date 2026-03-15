@@ -32,7 +32,8 @@ const phase3Vars = [
     'AWS_SECRET_ACCESS_KEY',
     'AWS_BUCKET',
     'GOOGLE_ENCRYPTION_KEY',
-    'STRIPE_SECRET_KEY'
+    'STRIPE_SECRET_KEY',
+    'DEEPGRAM_API_KEY'
 ];
 if (process.env.NODE_ENV !== 'production') {
     for (const key of phase3Vars) {
