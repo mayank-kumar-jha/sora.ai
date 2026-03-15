@@ -38,17 +38,40 @@ apiClient.interceptors.request.use(async (config) => {
     return config;
 });
 
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const subscribeTokenRefresh = (cb: (token: string) => void) => {
+    refreshSubscribers.push(cb);
+};
+
+const onRefreshed = (token: string) => {
+    refreshSubscribers.map((cb) => cb(token));
+    refreshSubscribers = [];
+};
+
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise((resolve) => {
+                    subscribeTokenRefresh((token) => {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                        resolve(apiClient(originalRequest));
+                    });
+                });
+            }
+
             originalRequest._retry = true;
+            isRefreshing = true;
+
             try {
                 const refreshToken = await getRefreshToken();
 
-                // No stored refresh token — clear and reject silently
                 if (!refreshToken) {
+                    isRefreshing = false;
                     await clearTokens();
                     return Promise.reject(error);
                 }
@@ -57,9 +80,13 @@ apiClient.interceptors.response.use(
                 const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
                 await saveTokens(accessToken, newRefreshToken);
+                isRefreshing = false;
+                onRefreshed(accessToken);
+
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
+                isRefreshing = false;
                 await clearTokens();
                 return Promise.reject(refreshError);
             }

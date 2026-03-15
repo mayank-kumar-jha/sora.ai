@@ -4,10 +4,11 @@
     ],
     "ext": "js,json",
     "ignore": [
-        ".whatsapp_store.json",
-        ".baileys_auth",
+        "data",
         "logs",
-        "node_modules"
+        "node_modules",
+        "*.test.js",
+        "whatsapp-qr.png"
     ],
     "delay": "2500"
 }

@@ -21,26 +21,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const loadUser = async () => {
         const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Auth Timeout')), 5000)
+            setTimeout(() => reject(new Error('Auth Timeout')), 30000)
         );
         
         try {
             const token = await storage.getAccessToken();
             if (token) {
-                // Race between the API call and a 5s timeout
+                // Race between the API call and a 30s timeout
                 const response = await Promise.race([
                     apiClient.get('/auth/me'),
                     timeoutPromise
                 ]) as any;
-                setUser(response.data.data);
+                setUser(response.data.data.user); // Fixed path to match backend response
             }
         } catch (err) {
-            console.log('Failed to load user or timeout occurred, proceeding to login', err);
-            // If it's a timeout, we don't necessarily clear tokens, just proceed
-            if (err instanceof Error && err.message === 'Auth Timeout') {
+            console.log('Failed to load user or timeout occurred:', err);
+            // If it's a timeout, we DON'T clear tokens. We just stay on the login screen or retry.
+            // Only clear tokens if the server explicitly says 401/403 (Invalid Token)
+            if (err instanceof Error && (err.message === 'Auth Timeout' || err.message === 'Network Error')) {
                 setUser(null);
             } else {
-                await storage.clearTokens();
+                // Check if it's an axios error with a specific status
+                const status = (err as any).response?.status;
+                if (status === 401 || status === 403) {
+                    await storage.clearTokens();
+                }
                 setUser(null);
             }
         } finally {

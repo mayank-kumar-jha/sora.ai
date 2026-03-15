@@ -214,3 +214,11 @@ model AuditLog {
   @@index([action])
   @@map("audit_logs")
 }
+
+model WhatsAppSession {
+  id        String   @id @default("singleton")
+  creds     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("whatsapp_sessions")
+}

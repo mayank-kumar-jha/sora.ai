@@ -24,6 +24,7 @@ const P = require('pino');
 // (whatsappService -> agentService -> whatsappService)
 
 const fs = require('fs');
+const prisma = require('../config/database');
 
 const AUTH_FOLDER = path.join(process.cwd(), 'data', '.baileys_auth');
 const STORE_FILE = path.join(process.cwd(), 'data', 'whatsapp_store.json');
@@ -76,6 +77,28 @@ const loadStore = () => {
     }
 };
 
+
+/**
+ * Restore credentials from DB if filesystem is empty (for ephmeral environments like Render)
+ */
+const restoreCredsFromDb = async () => {
+    try {
+        if (!fs.existsSync(AUTH_FOLDER) || fs.readdirSync(AUTH_FOLDER).length === 0) {
+            const session = await prisma.whatsAppSession.findUnique({ where: { id: 'singleton' } });
+            if (session && session.creds) {
+                logger.info('Restoring WhatsApp credentials from database...');
+                if (!fs.existsSync(AUTH_FOLDER)) fs.mkdirSync(AUTH_FOLDER, { recursive: true });
+                fs.writeFileSync(path.join(AUTH_FOLDER, 'creds.json'), JSON.stringify(session.creds));
+                logger.info('WhatsApp credentials restored successfully.');
+                return true;
+            }
+        }
+    } catch (err) {
+        logger.error('Failed to restore credentials from DB:', err.message);
+    }
+    return false;
+};
+
 /**
  * Initialize WhatsApp with Baileys
  */
@@ -86,6 +109,9 @@ const initWhatsApp = async () => {
 
     // Load persistent store on startup
     loadStore();
+
+    // Restore from DB if needed
+    await restoreCredsFromDb();
 
     try {
         const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
@@ -192,7 +218,19 @@ const initWhatsApp = async () => {
             saveStore();
         });
 
-        sock.ev.on('creds.update', saveCreds);
+        sock.ev.on('creds.update', async () => {
+            await saveCreds();
+            // Save to DB for persistence in ephemeral environments
+            try {
+                await prisma.whatsAppSession.upsert({
+                    where: { id: 'singleton' },
+                    update: { creds: state.creds },
+                    create: { id: 'singleton', creds: state.creds }
+                });
+            } catch (err) {
+                logger.error('Failed to save creds to DB:', err.message);
+            }
+        });
 
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
