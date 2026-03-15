@@ -488,5 +488,24 @@ const streamMessageWithTools = async (userId, userMessage, context = [], imageBa
     })();
 };
 
+/**
+ * Non-streaming version for REST API calls
+ */
+const processMessageWithTools = async (userId, userMessage, context = [], imageBase64 = null) => {
+    const stream = await streamMessageWithTools(userId, userMessage, context, imageBase64);
+    let fullText = '';
+    
+    for await (const chunk of stream) {
+        if (chunk.type === 'TOKEN') {
+            fullText += chunk.text;
+        }
+    }
+    
+    return {
+        type: 'CHAT',
+        message: fullText
+    };
+};
+
 module.exports = { processMessageWithTools, streamMessageWithTools };
 
