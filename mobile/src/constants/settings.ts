@@ -19,14 +19,13 @@ export const THEMES = [
 ];
 
 export const VOICES = [
-    { id: 'EXAVITQu4vr4xnSDxMaL', label: 'Sarah', desc: 'Warm, reassuring female voice', gender: 'F' },
-    { id: '21m00Tcm4TlvDq8ikWAM', label: 'Rachel', desc: 'Calm, professional female voice', gender: 'F' },
-    { id: 'pNInz6obpgDQGcFmaJgB', label: 'Adam', desc: 'Deep, authoritative male voice', gender: 'M' },
-    { id: 'ErXwobaYiN019PkySvjV', label: 'Antoni', desc: 'Friendly, conversational male voice', gender: 'M' },
-    { id: 'VR6AewLTigWG4xSOukaG', label: 'Arnold', desc: 'Bold, confident male voice', gender: 'M' },
-    { id: 'MF3mGyEYCl7XYWbV9V6O', label: 'Emily', desc: 'Soft, soothing female voice', gender: 'F' },
-    { id: 'TxGEqnHWrfWFTfGW9XjX', label: 'Josh', desc: 'Young, energetic male voice', gender: 'M' },
-    { id: 'jBpfAIEqQ4SFnGBmCvjp', label: 'Gigi', desc: 'Youthful, expressive female voice', gender: 'F' },
+    { id: 'aura-asteria-en', label: 'Sarah (Aura)', desc: 'Warm, reassuring female voice', gender: 'F' },
+    { id: 'aura-luna-en', label: 'Rachel (Aura)', desc: 'Calm, professional female voice', gender: 'F' },
+    { id: 'aura-orion-en', label: 'Adam (Aura)', desc: 'Deep, authoritative male voice', gender: 'M' },
+    { id: 'aura-arcas-en', label: 'Antoni (Aura)', desc: 'Friendly, conversational male voice', gender: 'M' },
+    { id: 'aura-perseus-en', label: 'Arnold (Aura)', desc: 'Bold, confident male voice', gender: 'M' },
+    { id: 'aura-stella-en', label: 'Emily (Aura)', desc: 'Soft, soothing female voice', gender: 'F' },
+    { id: 'aura-angus-en', label: 'Josh (Aura)', desc: 'Young, energetic male voice', gender: 'M' },
 ];
 
 export const PERSONAS = [

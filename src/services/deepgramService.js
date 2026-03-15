@@ -18,12 +18,26 @@ const getFallbackTTS = async (text) => {
     }
 };
 
+const VOICE_MAPPING = {
+    'EXAVITQu4vr4xnSDxMaL': 'aura-asteria-en', // Sarah -> Asteria
+    '21m00Tcm4TlvDq8ikWAM': 'aura-luna-en',    // Rachel -> Luna
+    'pNInz6obpgDQGcFmaJgB': 'aura-orion-en',   // Adam -> Orion
+    'ErXwobaYiN019PkySvjV': 'aura-arcas-en',   // Antoni -> Arcas
+    'VR6AewLTigWG4xSOukaG': 'aura-perseus-en', // Arnold -> Perseus
+    'MF3mGyEYCl7XYWbV9V6O': 'aura-stella-en',  // Emily -> Stella
+    'TxGEqnHWrfWFTfGW9XjX': 'aura-angus-en',   // Josh -> Angus
+    'jBpfAIEqQ4SFnGBmCvjp': 'aura-stella-en',  // Gigi -> Stella
+};
+
 /**
  * Convert text to speech using Deepgram Aura API
  * Returns a Buffer of MP3 audio data
  */
 const synthesizeSpeech = (text, voiceId = 'aura-asteria-en') => {
     return new Promise((resolve, reject) => {
+        // Map legacy ElevenLabs IDs to Deepgram Aura models
+        const mappedVoiceId = VOICE_MAPPING[voiceId] || (voiceId.startsWith('aura-') ? voiceId : 'aura-asteria-en');
+        
         const apiKey = config.deepgram.apiKey;
 
         if (!apiKey || apiKey === 'your_deepgram_api_key_here') {
@@ -35,7 +49,7 @@ const synthesizeSpeech = (text, voiceId = 'aura-asteria-en') => {
 
         const options = {
             hostname: 'api.deepgram.com',
-            path: `/v1/speak?model=${voiceId}&encoding=mp3`,
+            path: `/v1/speak?model=${mappedVoiceId}&encoding=mp3`,
             method: 'POST',
             headers: {
                 'Authorization': `Token ${apiKey}`,

@@ -1,5 +1,5 @@
 'use strict';
-// Redeploying to switch to Deepgram Aura TTS for ultra-low latency speech
+// Redeploying to fix Deepgram Voice ID mapping mismatch (Eight legacy IDs mapped to Aura)
 
 // Must be first – validates & loads all env vars before anything else
 const config = require('./config/env');
