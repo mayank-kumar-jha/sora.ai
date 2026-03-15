@@ -4,7 +4,10 @@ const { Queue } = require('bullmq');
 const { redis: redisConfig } = require('../config/env');
 const logger = require('../config/logger');
 
+const Redis = require('ioredis');
 const { getCommonRedisOptions } = require('../config/redis');
+
+logger.info(`Queues: Using Redis URL length=${(redisConfig.url || '').length}`);
 
 // Dedicated Redis instance for BullMQ (Required to have maxRetriesPerRequest: null)
 const connection = new Redis(redisConfig.url, getCommonRedisOptions());
