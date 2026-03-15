@@ -6,11 +6,14 @@ const { redis: redisConfig } = require('./env');
 
 let redisClient = null;
 
-const createRedisClient = () => {
-    const isSsl = redisConfig.url.startsWith('rediss://');
-    const client = new Redis(redisConfig.url, {
-        tls: isSsl ? { rejectUnauthorized: false } : undefined, // Essential for most cloud providers
-        maxRetriesPerRequest: null, // Critical for BullMQ
+/**
+ * Common Redis options shared between main client and BullMQ
+ */
+const getCommonRedisOptions = () => {
+    const isSsl = (redisConfig.url || '').startsWith('rediss://');
+    return {
+        tls: isSsl ? { rejectUnauthorized: false } : undefined,
+        maxRetriesPerRequest: null, // Critical for BullMQ, safe for normal use
         enableReadyCheck: false,
         lazyConnect: false,
         connectTimeout: 15000,
@@ -23,15 +26,17 @@ const createRedisClient = () => {
             return delay;
         },
         reconnectOnError(err) {
-            const targetError = 'READONLY';
-            if (err.message.includes(targetError)) {
-                return true; 
-            }
+            if (err.message.includes('READONLY')) return true;
             return false;
         },
-    });
+    };
+};
 
-    if (isSsl) {
+const createRedisClient = () => {
+    const options = getCommonRedisOptions();
+    const client = new Redis(redisConfig.url, options);
+
+    if (options.tls) {
         logger.info('Redis: Initializing with SSL/TLS (rejectUnauthorized: false)');
     }
 
@@ -60,4 +65,4 @@ const disconnectRedis = async () => {
     }
 };
 
-module.exports = { getRedisClient, disconnectRedis };
+module.exports = { getRedisClient, disconnectRedis, getCommonRedisOptions };

@@ -4,22 +4,10 @@ const { Queue } = require('bullmq');
 const { redis: redisConfig } = require('../config/env');
 const logger = require('../config/logger');
 
-const Redis = require('ioredis');
+const { getCommonRedisOptions } = require('../config/redis');
 
-// Dedicted Redis instance for BullMQ (Required to have maxRetriesPerRequest: null)
-const connection = new Redis(redisConfig.url, {
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-    connectTimeout: 10000,
-    keepAlive: 10000,
-    retryStrategy(times) {
-        return Math.min(times * 1000, 30000);
-    },
-    reconnectOnError(err) {
-        if (err.message.includes('READONLY')) return true;
-        return false;
-    }
-});
+// Dedicated Redis instance for BullMQ (Required to have maxRetriesPerRequest: null)
+const connection = new Redis(redisConfig.url, getCommonRedisOptions());
 
 connection.on('error', (err) => {
     logger.error('Queues: Redis connection error', { error: err.message });

@@ -3,6 +3,18 @@
 
 // Must be first – validates & loads all env vars before anything else
 const config = require('./config/env');
+const logger = require('./config/logger');
+
+// Capture early crashes
+process.on('unhandledRejection', (reason) => {
+    logger.error('Unhandled Promise Rejection', { reason });
+    if (config.isProduction) process.exit(1);
+});
+
+process.on('uncaughtException', (err) => {
+    logger.error('Uncaught Exception', { error: err.message, stack: err.stack });
+    process.exit(1);
+});
 
 const express = require('express');
 const helmet = require('helmet');
@@ -153,17 +165,6 @@ const startServer = async () => {
 
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));
-
-    process.on('unhandledRejection', (reason) => {
-        logger.error('Unhandled Promise Rejection', { reason });
-        // In production, exit to let process manager restart cleanly
-        if (config.isProduction) process.exit(1);
-    });
-
-    process.on('uncaughtException', (err) => {
-        logger.error('Uncaught Exception', { error: err.message, stack: err.stack });
-        process.exit(1);
-    });
 };
 
 startServer().catch((err) => {
