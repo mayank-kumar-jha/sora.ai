@@ -19,7 +19,6 @@ process.on('uncaughtException', (err) => {
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const logger = require('./config/logger');
 const { requestLogger } = require('./middleware/requestLogger');
 const { globalRateLimiter } = require('./middleware/rateLimiter');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
