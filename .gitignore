@@ -11,7 +11,7 @@ logs/
 *.log
 
 # Prisma
-prisma/migrations/
+# prisma/migrations/
 
 # Build
 dist/
