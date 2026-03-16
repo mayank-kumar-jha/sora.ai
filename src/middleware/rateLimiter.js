@@ -19,6 +19,7 @@ const createLimiter = ({ windowMs, max, message, keyPrefix }) => {
         legacyHeaders: false,
         message: { success: false, message },
         keyGenerator: (req) => `${keyPrefix}:${req.ip}`,
+        skip: (req) => req.path === '/api/health' || req.path === '/health',
         handler: (req, res, _next, options) => {
             logger.warn('Rate limit exceeded', {
                 ip: req.ip,

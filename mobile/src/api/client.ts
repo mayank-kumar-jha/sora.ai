@@ -65,8 +65,6 @@ apiClient.interceptors.response.use(
             }
 
             originalRequest._retry = true;
-            isRefreshing = true;
-
             try {
                 const refreshToken = await getRefreshToken();
 
@@ -76,7 +74,14 @@ apiClient.interceptors.response.use(
                     return Promise.reject(error);
                 }
 
-                const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
+                // Dynamically resolve base URL for refresh call
+                const customUrl = await getServerUrl();
+                const base = (customUrl && Platform.OS !== 'web')
+                    ? (customUrl.startsWith('http') ? customUrl : `http://${customUrl}:3000`)
+                    : DEFAULT_BASE_URL;
+                const refreshUrl = `${base}/api/auth/refresh`;
+
+                const response = await axios.post(refreshUrl, { refreshToken });
                 const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
                 await saveTokens(accessToken, newRefreshToken);

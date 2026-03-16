@@ -10,25 +10,39 @@ const prisma = require('../config/database');
  * POST /api/ai/message
  */
 const sendMessage = asyncHandler(async (req, res) => {
-    const { message, conversationId, image } = req.body; // Added image for Vision
+    const { message, conversationId, image } = req.body; // conversationId for isolation
     console.log(`[AI Controller] REQ BODY KEYS:`, Object.keys(req.body));
-    console.log(`[AI Controller] Message: "${message}", Image size: ${image ? image.length : 0}`);
+    console.log(`[AI Controller] Message: "${message}", Image size: ${image ? image.length : 0}, ConversationId: ${conversationId}`);
+
+    // Build filter: Isolated by conversationId if provided, else general user history
+    const historyFilter = { userId: req.user.id };
+    if (conversationId) {
+        historyFilter.conversationId = conversationId;
+    }
 
     // 1. Fetch context and Create user message in PARALLEL to save time
-    const [recentConversations, _userMsg] = await Promise.all([
-        prisma.conversation.findMany({
-            where: { userId: req.user.id },
-            orderBy: { timestamp: 'desc' },
-            take: 10
-        }),
-        prisma.conversation.create({
-            data: {
-                userId: req.user.id,
-                role: 'USER',
-                message: image ? `[Sent an Image] ${message}` : message
-            }
-        })
-    ]);
+    let recentConversations = [];
+    try {
+        const [convs, _userMsg] = await Promise.all([
+            prisma.conversation.findMany({
+                where: historyFilter,
+                orderBy: { timestamp: 'desc' },
+                take: 10
+            }),
+            prisma.conversation.create({
+                data: {
+                    userId: req.user.id,
+                    conversationId: conversationId || null,
+                    role: 'USER',
+                    message: image ? `[Sent an Image] ${message}` : message
+                }
+            })
+        ]);
+        recentConversations = convs;
+    } catch (dbError) {
+        console.error('Database error during parallel context fetch:', dbError.message);
+        // Fallback: Continue with empty history if fetch fails, but don't crash if possible
+    }
 
     const context = recentConversations.reverse().map(c => ({
         role: c.role.toLowerCase(),
@@ -50,6 +64,7 @@ const sendMessage = asyncHandler(async (req, res) => {
         await prisma.conversation.create({
             data: {
                 userId: req.user.id,
+                conversationId: conversationId || null,
                 role: 'ASSISTANT',
                 message: displayMessage
             }

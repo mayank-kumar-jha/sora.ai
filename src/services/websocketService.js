@@ -81,7 +81,7 @@ const deepgramService = require('./deepgramService');
 const { v4: uuidv4 } = require('uuid');
 
 const handleAiChat = async (ws, payload) => {
-    const { message, context = [], image, voiceId = 'aura-asteria-en' } = payload;
+    const { message, context = [], image, voiceId = 'aura-asteria-en', conversationId } = payload;
     const userId = ws.userId;
     let fullResponse = '';
     let sentenceBuffer = '';
@@ -150,6 +150,7 @@ const handleAiChat = async (ws, payload) => {
         prisma.conversation.create({
             data: {
                 userId,
+                conversationId: conversationId || null,
                 role: 'ASSISTANT',
                 message: fullResponse || '[Action Executed]'
             }

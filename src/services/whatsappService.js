@@ -258,7 +258,7 @@ const initWhatsApp = async () => {
                     notifyUser('system', 'WHATSAPP_QR', { qr: currentQrCode });
                     logger.info('QR Code also sent to Sora dashboard.');
                 } catch (err) {
-                    logger.error('Failed to generate QR code image', err.message);
+                    logger.error('Failed to generate QR code image', { error: err.message });
                 }
                 isReady = false;
                 logger.info('====================================================');

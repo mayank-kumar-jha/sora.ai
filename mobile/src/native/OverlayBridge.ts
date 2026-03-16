@@ -113,4 +113,13 @@ export const OverlayBridge = {
     if (!isAndroid || !SoraOverlay || !SoraOverlay.resetVisionCapture) return;
     SoraOverlay.resetVisionCapture();
   },
+
+  // ─── JS-only session storage for background services ──────────────
+  _conversationId: null as string | null,
+  setConversationId(id: string): void {
+    this._conversationId = id;
+  },
+  getConversationId(): string | null {
+    return this._conversationId;
+  },
 };

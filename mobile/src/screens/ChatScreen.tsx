@@ -13,6 +13,9 @@ import Animated, { FadeInUp, FadeIn, Layout, SlideInDown } from 'react-native-re
 import { useSoraSettings } from '../context/SoraSettingsContext';
 import { setGlobalMuted, connectWs } from '../services/BackgroundService';
 
+import { v4 as uuidv4 } from 'uuid';
+import 'react-native-get-random-values';
+
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Fallback TTS (ElevenLabs/Internal)
@@ -36,6 +39,7 @@ const speakText = async (text: string, voiceId?: string, onEnd?: () => void) => 
 };
 
 export default function ChatScreen() {
+    const [conversationId] = useState(uuidv4());
     const [input, setInput] = useState('');
     const [showTextInput, setShowTextInput] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
@@ -43,7 +47,7 @@ export default function ChatScreen() {
     const [isMuted, setIsMuted] = useState(false);
     const [amplitude, setAmplitude] = useState(0);
     const { settings } = useSoraSettings();
-    const { messages, sendMessage, loading, isStreaming } = useAI();
+    const { messages, sendMessage, loading, isStreaming } = useAI(conversationId);
     const scrollRef = useRef<ScrollView>(null);
 
     // Eye state logic

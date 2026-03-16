@@ -178,7 +178,7 @@ const handleClientAction = async (result: any) => {
     }
 };
 
-export const useAI = () => {
+export const useAI = (conversationId?: string) => {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
@@ -215,7 +215,6 @@ export const useAI = () => {
                 });
                 streamBuffer.current = '';
                 
-                // Handle client-side actions if any (though usually they are in complete responses)
                 if (data.result?.clientAction) {
                     handleClientAction(data.result);
                 }
@@ -250,6 +249,7 @@ export const useAI = () => {
                 message: messageWithSettings,
                 context: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
                 image,
+                conversationId,
                 voiceId: await AsyncStorage.getItem('sora_voice') || 'aura-asteria-en'
             }
         };
@@ -257,7 +257,11 @@ export const useAI = () => {
         const success = sendWsMessage(payload);
         if (!success) {
             try {
-                const response = await apiClient.post('/ai/message', { message: messageWithSettings, image });
+                const response = await apiClient.post('/ai/message', { 
+                    message: messageWithSettings, 
+                    image,
+                    conversationId
+                });
                 const aiData = response.data.data;
                 const aiMessage = aiData.message || aiData.result?.message;
                 setMessages(prev => [...prev, { role: 'assistant', content: aiMessage, isComplete: true }]);
@@ -271,7 +275,7 @@ export const useAI = () => {
                 setMessages(prev => [...prev, { role: 'assistant', content: 'Connection lost.' }]);
             }
         }
-    }, [messages]);
+    }, [messages, conversationId]);
 
     return { messages, sendMessage, loading, isStreaming };
 };

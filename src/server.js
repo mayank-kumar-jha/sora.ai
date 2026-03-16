@@ -63,13 +63,13 @@ app.set('trust proxy', 1);
 // ─── Request Logging ────────────────────────────────────────────────────────
 app.use(requestLogger);
 
-// ─── Global Rate Limiting ───────────────────────────────────────────────────
-app.use(globalRateLimiter);
-
-// ─── Health check ──────────────────────────────────────────────────────────
+// ─── Health check (Moved above rate limiter to prevent Render 429s) ────────
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable' });
 });
+
+// ─── Global Rate Limiting ───────────────────────────────────────────────────
+app.use(globalRateLimiter);
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 // Bull Board Dashboard

@@ -12,6 +12,8 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { useSoraSettings } from '../context/SoraSettingsContext';
 import { OverlayBridge } from '../native/OverlayBridge';
 import { stopBackgroundSilence, startBackgroundSilence } from '../services/BackgroundService';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 const WHISPER_PRESET: Audio.RecordingOptions = {
   android: {
@@ -51,6 +53,12 @@ export default function FloatingAssistant() {
   const [utilityEvents, setUtilityEvents] = useState<UtilityEvent[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [conversationId] = useState(uuidv4());
+
+  // Register conversationId for background services
+  useEffect(() => {
+    OverlayBridge.setConversationId(conversationId);
+  }, [conversationId]);
 
   const isCapturingRef = useRef(false);
   const isVisionProcessing = useRef(false);
@@ -95,15 +103,14 @@ export default function FloatingAssistant() {
           await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        console.log(`[FloatingAssistant] App resumed. Action found: ${action}`);
-        if (action === 'ask') {
-          handleMicPress();
-        } else if (action === 'vision' || action === 'request_vision') {
-          // If we just launched to request permission/capture, handle it
-          setIsCapturing(true);
-          setFaceState('Thinking');
-          handleVisionPress();
-        }
+          console.log(`[FloatingAssistant] App resumed. Action found: ${action}`);
+          if (action === 'ask') {
+            handleMicPress();
+          } else if (action === 'vision' || action === 'request_vision') {
+            // If we just launched to request permission/capture, handle it
+            console.log('[Vision] Triggering capture from initial action');
+            setTimeout(() => handleVisionPress(), 500);
+          }
       }
       appStateRef.current = nextState;
     });
@@ -204,6 +211,15 @@ export default function FloatingAssistant() {
     }, 1000);
   };
 
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (visionTimeoutRef.current) clearTimeout(visionTimeoutRef.current);
+      if (backgroundRecordingTimer.current) clearTimeout(backgroundRecordingTimer.current);
+    };
+  }, []);
+
   useEffect(() => {
     isCapturingRef.current = isCapturing;
     OverlayBridge.updateIsCapturing(isCapturing);
@@ -261,11 +277,12 @@ export default function FloatingAssistant() {
           console.log(`[Vision] Handling manual manual screenshot capture`);
           await handleVisionCaptureResult(data.base64);
         }
-      } catch (err: any) {
+        } catch (err: any) {
         console.error(`[Vision] Error processing screenshot: ${err.message}`);
-        addMessage(`Screenshot processing failed: ${err.message}`, 'ai');
+        addMessage(`Vision Error: ${err.message}`, 'ai');
         setIsCapturing(false);
         setFaceState('Idle');
+        OverlayBridge.updateState('Idle');
       } finally {
         console.log('[Vision] Releasing vision processing lock');
         isVisionProcessing.current = false;
@@ -484,7 +501,8 @@ export default function FloatingAssistant() {
     try {
       const response = await apiClient.post('/ai/message', {
         message: text,
-        image: imageBase64
+        image: imageBase64,
+        conversationId: conversationId
       });
 
       console.log(`[AI] Response received from server`);
@@ -516,6 +534,7 @@ export default function FloatingAssistant() {
         // Revert to Idle after a delay to let the emotion sink in
         setTimeout(() => {
           setFaceState('Idle');
+          OverlayBridge.updateState('Idle');
         }, 5000);
       }
     } catch (err: any) {
@@ -523,6 +542,7 @@ export default function FloatingAssistant() {
       const errMsg = "Sorry, I'm having trouble connecting.";
       addMessage(errMsg, 'ai');
       setFaceState('Idle');
+      OverlayBridge.updateState('Idle');
     }
   };
 

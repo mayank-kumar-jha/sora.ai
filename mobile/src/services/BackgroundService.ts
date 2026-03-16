@@ -11,7 +11,7 @@ import { DEFAULT_BASE_URL } from '../constants/settings';
 const silenceAsset = require('../assets/silence.mp3');
 
 let ws: WebSocket | null = null;
-let reconnectTimer: NodeJS.Timeout | null = null;
+let reconnectTimer: any = null;
 let backgroundSound: Audio.Sound | null = null;
 let lastMessageSound: Audio.Sound | null = null;
 let isConnecting = false;
@@ -276,7 +276,11 @@ export const connectWs = async () => {
                 if (!isAppActive) {
                     const ping = `[SYSTEM: Incoming WhatsApp message from ${from}: "${text}". Please summarize it briefly.]`;
                     try {
-                        const response = await apiClient.post('/ai/message', { message: ping });
+                        const conversationId = OverlayBridge.getConversationId();
+                        const response = await apiClient.post('/ai/message', { 
+                            message: ping,
+                            conversationId: conversationId 
+                        });
                         const aiMsg = response.data.data.message || response.data.data.result?.message;
                         if (aiMsg) {
                             DeviceEventEmitter.emit('PROACTIVE_ALERT', { text: aiMsg });

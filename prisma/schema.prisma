@@ -140,15 +140,17 @@ model Reminder {
 }
 
 model Conversation {
-  id        String           @id @default(uuid()) @db.Uuid
-  userId    String           @map("user_id") @db.Uuid
-  role      ConversationRole
-  message   String           @db.Text
-  timestamp DateTime         @default(now())
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  conversationId String?          @map("conversation_id")
+  role           ConversationRole
+  message        String           @db.Text
+  timestamp      DateTime         @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([conversationId])
   @@index([timestamp])
   @@map("conversations")
 }
