@@ -29,6 +29,11 @@ const prisma = require('../config/database');
 const AUTH_FOLDER = path.join(process.cwd(), 'data', '.baileys_auth');
 const STORE_FILE = path.join(process.cwd(), 'data', 'whatsapp_store.json');
 
+// Ensure data directory exists for Render ephemeral storage / persistent disk
+if (!fs.existsSync(path.join(process.cwd(), 'data'))) {
+    fs.mkdirSync(path.join(process.cwd(), 'data'), { recursive: true });
+}
+
 let sock = null;
 let currentQrCode = null;
 let isReady = false;

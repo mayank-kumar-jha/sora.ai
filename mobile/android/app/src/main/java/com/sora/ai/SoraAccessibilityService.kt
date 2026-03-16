@@ -29,8 +29,8 @@ class SoraAccessibilityService : AccessibilityService() {
     fun takeScreenshotQuick() {
         Log.i("SoraAccessibility", "takeScreenshotQuick: Requesting system capture...")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            takeScreenshot(Display.DEFAULT_DISPLAY, mainExecutor, object : TakeScreenshotCallback {
-                override fun onSuccess(screenshotResult: ScreenshotResult) {
+            takeScreenshot(Display.DEFAULT_DISPLAY, this.mainExecutor, object : AccessibilityService.TakeScreenshotCallback {
+                override fun onSuccess(screenshotResult: AccessibilityService.ScreenshotResult) {
                     Log.i("SoraAccessibility", "Screenshot success! Format: ${screenshotResult.format}")
                     val bitmap = Bitmap.wrapHardwareBuffer(screenshotResult.hardwareBuffer, screenshotResult.colorSpace)
                     if (bitmap != null) {
