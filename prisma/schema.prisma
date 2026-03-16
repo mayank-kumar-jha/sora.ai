@@ -220,6 +220,7 @@ model AuditLog {
 model WhatsAppSession {
   id        String   @id @default("singleton")
   creds     Json
+  lastQrCode String? @db.Text @map("last_qr_code")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("whatsapp_sessions")
