@@ -85,7 +85,11 @@ const handleCallback = async (code, state) => {
 
     // Cache session
     const redis = getRedisClient();
-    await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+    try {
+        await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+    } catch (err) {
+        logger.warn('Redis: Failed to cache Google session', { error: err.message, userId: user.id });
+    }
 
     return {
         accessToken,

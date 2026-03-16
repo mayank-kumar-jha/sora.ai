@@ -59,7 +59,11 @@ const login = async ({ email, password }) => {
 
     // Cache session in Redis for fast lookup
     const redis = getRedisClient();
-    await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+    try {
+        await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+    } catch (err) {
+        logger.warn('Redis: Failed to cache session', { error: err.message, userId: user.id });
+    }
 
     return {
         accessToken,
@@ -108,13 +112,21 @@ const refreshTokens = async ({ refreshToken }) => {
     // Token rotation: delete old session, create new one
     await prisma.session.deleteMany({ where: { id: session.id } });
     const redis = getRedisClient();
-    await redis.del(`session:${user.id}:${refreshToken}`);
+    try {
+        await redis.del(`session:${user.id}:${refreshToken}`);
+    } catch (err) {
+        logger.warn('Redis: Failed to delete old session from cache', { error: err.message, userId: user.id });
+    }
 
     const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);
     await prisma.session.create({
         data: { userId: user.id, refreshToken: newRefreshToken, expiresAt },
     });
-    await redis.setex(`session:${user.id}:${newRefreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+    try {
+        await redis.setex(`session:${user.id}:${newRefreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+    } catch (err) {
+        logger.warn('Redis: Failed to cache new session', { error: err.message, userId: user.id });
+    }
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 };
@@ -126,7 +138,11 @@ const logout = async ({ userId, refreshToken }) => {
     await prisma.session.deleteMany({ where: { userId, refreshToken } });
 
     const redis = getRedisClient();
-    await redis.del(`session:${userId}:${refreshToken}`);
+    try {
+        await redis.del(`session:${userId}:${refreshToken}`);
+    } catch (err) {
+        logger.warn('Redis: Failed to remove session from cache during logout', { error: err.message, userId });
+    }
 };
 
 module.exports = { register, login, refreshTokens, logout };

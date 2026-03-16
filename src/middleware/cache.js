@@ -23,20 +23,24 @@ const cacheMiddleware = (duration = 60) => {
                 logger.debug(`Cache hit for ${key}`);
                 return res.status(200).json(JSON.parse(cachedResponse));
             }
+        } catch (error) {
+            logger.warn('Redis Cache Get Error - proceeding without cache', { error: error.message, key });
+        }
 
+        try {
             // Patch res.json to store the response in Redis
             const originalJson = res.json;
             res.json = (body) => {
                 res.json = originalJson;
                 redis.setex(key, duration, JSON.stringify(body)).catch(err => {
-                    logger.error('Redis Cache Set Error', { error: err.message, key });
+                    logger.warn('Redis Cache Set Error', { error: err.message, key });
                 });
                 return originalJson.call(res, body);
             };
 
             next();
         } catch (error) {
-            logger.error('Redis Cache Get Error', { error: error.message, key });
+            logger.error('Error during cache middleware next() or setup', { error: error.message, key });
             next();
         }
     };

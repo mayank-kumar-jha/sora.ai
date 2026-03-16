@@ -17,12 +17,19 @@ const createLimiter = ({ windowMs, max, message, keyPrefix }) => {
         // Only attach Redis store if the client is in a connected/ready state
         if (client.status === 'ready' || client.status === 'connect') {
             store = new RedisStore({
-                sendCommand: (...args) => client.call(...args),
+                sendCommand: async (...args) => {
+                    try {
+                        return await client.call(...args);
+                    } catch (err) {
+                        logger.warn(`Rate limiter Redis command failed: ${err.message}`);
+                        throw err; // rate-limit-redis will handle this or we might need a more complex fallback
+                    }
+                },
                 prefix: `rl:${keyPrefix}:`,
             });
         }
     } catch (err) {
-        logger.warn(`Rate limiter [${keyPrefix}]: Redis unavailable, using in-memory store`, {
+        logger.warn(`Rate limiter [${keyPrefix}]: Redis store creation failed, using in-memory store`, {
             error: err.message,
         });
     }
