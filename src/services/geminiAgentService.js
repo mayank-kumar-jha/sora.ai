@@ -220,10 +220,15 @@ CONSTRAINTS:
 
 // Model waterfall — using the latest models provided by the user
 const GEMINI_MODELS = [
-    'gemini-1.5-flash',             // High speed, high quota, vision support
-    'gemini-2.0-flash',             // Latest multimodal
-    'gemini-1.5-pro',               // Deep reasoning
-    'gemini-2.0-flash-lite-preview', // Speed optimized
+    'gemini-3.1-flash-lite-preview', // Most cost-efficient for free tier
+    'gemini-3-flash-preview',      // High speed, high quota
+    'gemini-flash-latest',         // Alias to latest flash
+    'gemini-flash-lite-latest',    // Alias to latest lite
+    'gemini-2.0-flash',            // Second gen multimodal
+    'gemini-2.5-flash',            // Hybrid reasoning
+    'gemini-2.0-flash-lite',       // Scalable usage
+    'gemini-3.1-pro-preview',      // SOTA reasoning
+    'gemini-2.5-pro',              // Advanced reasoning
 ];
 
 const isRetryableError = (error) => {
