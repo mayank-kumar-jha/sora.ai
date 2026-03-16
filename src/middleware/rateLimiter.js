@@ -10,36 +10,12 @@ const logger = require('../config/logger');
  * Attempts to use Redis store; falls back to in-memory if Redis is unavailable.
  */
 const createLimiter = ({ windowMs, max, message, keyPrefix }) => {
-    let store;
-
-    try {
-        const client = getRedisClient();
-        // Only attach Redis store if the client is in a connected/ready state
-        if (client.status === 'ready' || client.status === 'connect') {
-            store = new RedisStore({
-                sendCommand: async (...args) => {
-                    try {
-                        return await client.call(...args);
-                    } catch (err) {
-                        logger.warn(`Rate limiter Redis command failed - falling back to permissive mode`, { error: err.message });
-                        // Return something that doesn't crash the request
-                        // Most rate limiters will treat an error as "0 count" or "success" if handled this way
-                        return null; 
-                    }
-                },
-                prefix: `rl:${keyPrefix}:`,
-            });
-        }
-    } catch (err) {
-        logger.warn(`Rate limiter [${keyPrefix}]: Redis store creation failed, using in-memory store`, {
-            error: err.message,
-        });
-    }
-
+    // Switching to In-Memory store to stay within Upstash Redis request limits.
+    // This is safe for single-server deployments and saves hundreds of thousands of commands.
     return rateLimit({
         windowMs,
         max,
-        standardHeaders: true,   // Return RateLimit-* headers
+        standardHeaders: true,
         legacyHeaders: false,
         message: { success: false, message },
         keyGenerator: (req) => `${keyPrefix}:${req.ip}`,
@@ -52,8 +28,6 @@ const createLimiter = ({ windowMs, max, message, keyPrefix }) => {
             });
             res.status(options.statusCode).json(options.message);
         },
-        // If store is undefined, express-rate-limit uses its built-in in-memory store
-        ...(store && { store }),
     });
 };
 

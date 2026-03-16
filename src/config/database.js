@@ -9,14 +9,6 @@ const prisma = new PrismaClient({
         { level: 'warn', emit: 'event' },
         { level: 'error', emit: 'event' },
     ],
-    // Explicitly handle connection pool limits
-    // Note: Render's free/starter tier often has a low connection limit (9-10)
-    // We adjust the client to be more conservative.
-    datasources: {
-        db: {
-            url: `${process.env.DATABASE_URL}${process.env.DATABASE_URL.includes('?') ? '&' : '?'}connection_limit=5&pool_timeout=20`,
-        },
-    },
 });
 
 // Log slow queries in development

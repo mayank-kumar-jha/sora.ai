@@ -11,45 +11,36 @@ const cronParser = require('cron-parser');
 const schedulePendingTasks = async () => {
     const now = new Date();
 
-    // 1. One-time tasks that are due
-    const oneTimeTasks = await prisma.task.findMany({
+    // Fetch both pending one-time tasks and active recurring tasks in one batch
+    const pendingTasks = await prisma.task.findMany({
         where: {
-            type: 'ONE_TIME',
             status: 'PENDING',
-            scheduledTime: { lte: now }
-        }
+            OR: [
+                { type: 'ONE_TIME', scheduledTime: { lte: now } },
+                { type: 'RECURRING' }
+            ]
+        },
+        select: { id: true, userId: true, type: true, recurrenceRule: true, lastRunAt: true, createdAt: true }
     });
 
-    for (const task of oneTimeTasks) {
-        await queues.task.add(`task-${task.id}`, { taskId: task.id, userId: task.userId });
-        logger.info(`Queued one-time task ${task.id}`);
-    }
+    for (const task of pendingTasks) {
+        if (task.type === 'ONE_TIME') {
+            await queues.task.add(`task-${task.id}`, { taskId: task.id, userId: task.userId });
+            logger.info(`Queued one-time task ${task.id}`);
+        } else if (task.type === 'RECURRING' && task.recurrenceRule) {
+            try {
+                const interval = cronParser.parseExpression(task.recurrenceRule, {
+                    currentDate: task.lastRunAt || task.createdAt
+                });
+                const nextRun = interval.next().toDate();
 
-    // 2. Recurring tasks (Simplified Scan)
-    // In a production app, you might use BullMQ's repeatable jobs
-    // but here we demonstrate the trigger engine logic.
-    const recurringTasks = await prisma.task.findMany({
-        where: {
-            type: 'RECURRING',
-            status: 'PENDING'
-        }
-    });
-
-    for (const task of recurringTasks) {
-        if (!task.recurrenceRule) continue;
-
-        try {
-            const interval = cronParser.parseExpression(task.recurrenceRule, {
-                currentDate: task.lastRunAt || task.createdAt
-            });
-            const nextRun = interval.next().toDate();
-
-            if (nextRun <= now) {
-                await queues.task.add(`task-${task.id}`, { taskId: task.id, userId: task.userId });
-                logger.info(`Queued recurring task ${task.id}`);
+                if (nextRun <= now) {
+                    await queues.task.add(`task-${task.id}`, { taskId: task.id, userId: task.userId });
+                    logger.info(`Queued recurring task ${task.id}`);
+                }
+            } catch (err) {
+                logger.error(`Invalid cron pattern for task ${task.id}`, { error: err.message });
             }
-        } catch (err) {
-            logger.error(`Invalid cron pattern for task ${task.id}`, { error: err.message });
         }
     }
 };
