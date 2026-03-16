@@ -10,7 +10,7 @@ const fs = require('fs');
 const prisma = require('../config/database');
 
 // Baileys imports (lazy loaded)
-let makeWASocket, DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers;
+let makeWASocket, DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers, BufferJSON;
 
 const loadBaileys = async () => {
     if (!makeWASocket) {
@@ -21,6 +21,7 @@ const loadBaileys = async () => {
         fetchLatestBaileysVersion = baileys.fetchLatestBaileysVersion;
         makeCacheableSignalKeyStore = baileys.makeCacheableSignalKeyStore;
         Browsers = baileys.Browsers;
+        BufferJSON = baileys.BufferJSON;
     }
 };
 
@@ -130,10 +131,12 @@ class WhatsAppManager {
         this.sock.ev.on('creds.update', async () => {
             await saveCreds();
             try {
+                // state.creds contains Buffers. We must use BufferJSON to correctly handle them for Prisma JSON field.
+                const serialized = JSON.parse(JSON.stringify(state.creds, BufferJSON.replacer));
                 await prisma.whatsAppSession.upsert({
                     where: { id: 'singleton' },
-                    update: { creds: state.creds },
-                    create: { id: 'singleton', creds: state.creds }
+                    update: { creds: serialized },
+                    create: { id: 'singleton', creds: serialized }
                 });
             } catch (err) {
                 logger.error('[WhatsApp] Failed to save creds to DB:', err.message);
@@ -251,7 +254,10 @@ class WhatsAppManager {
                 if (session && session.creds) {
                     logger.info('[WhatsApp] Restoring credentials from DB...');
                     if (!fs.existsSync(AUTH_FOLDER)) fs.mkdirSync(AUTH_FOLDER, { recursive: true });
-                    fs.writeFileSync(path.join(AUTH_FOLDER, 'creds.json'), JSON.stringify(session.creds));
+                    
+                    // session.creds is an object. useMultiFileAuthState expects a JSON string with specific Buffer markers.
+                    const credsContent = JSON.stringify(session.creds, BufferJSON.replacer);
+                    fs.writeFileSync(path.join(AUTH_FOLDER, 'creds.json'), credsContent);
                     return session;
                 }
             }
