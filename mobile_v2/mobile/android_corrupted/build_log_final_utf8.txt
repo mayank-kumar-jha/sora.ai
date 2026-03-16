@@ -1,0 +1,11 @@
+﻿./gradlew : Error: Could not find or load main class 
+org.gradle.wrapper.GradleWrapperMain
+At line:1 char:1
++ ./gradlew assembleRelease --stacktrace --info > build_log_final.txt 2 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error: Could no...adleWrapperMain: 
+   String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Caused by: java.lang.ClassNotFoundException: 
+org.gradle.wrapper.GradleWrapperMain

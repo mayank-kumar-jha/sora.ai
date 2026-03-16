@@ -1,0 +1,123 @@
+Downloading https://services.gradle.org/distributions/gradle-8.8-all.zip
+.....................10%......................20%......................30%......................40%......................50%......................60%......................70%......................80%......................90%......................100%
+
+Welcome to Gradle 8.8!
+
+Here are the highlights of this release:
+ - Running Gradle on Java 22
+ - Configurable Gradle daemon JVM
+ - Improved IDE performance for large projects
+
+For more details see https://docs.gradle.org/8.8/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors
+> Task :gradle-plugin:settings-plugin:processResources
+> Task :gradle-plugin:shared:compileKotlin
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar
+> Task :gradle-plugin:settings-plugin:compileKotlin
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:classes
+> Task :gradle-plugin:settings-plugin:jar
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-gradle-plugin:pluginDescriptors
+> Task :expo-updates-gradle-plugin:processResources
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors
+> Task :gradle-plugin:react-native-gradle-plugin:processResources
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:classes
+> Task :gradle-plugin:react-native-gradle-plugin:jar
+> Task :expo-updates-gradle-plugin:compileKotlin
+> Task :expo-updates-gradle-plugin:compileJava NO-SOURCE
+> Task :expo-updates-gradle-plugin:classes
+> Task :expo-updates-gradle-plugin:jar
+
+> Configure project :app
+ ??  [33mApplying gradle plugin[0m '[32mexpo-updates-gradle-plugin[0m' (expo-updates@0.27.5)
+
+> Configure project :expo
+
+Using expo modules
+  - [32mexpo-application[0m (6.0.2)
+  - [32mexpo-asset[0m (11.0.5)
+  - [32mexpo-av[0m (15.0.2)
+  - [32mexpo-background-fetch[0m (13.0.6)
+  - [32mexpo-clipboard[0m (7.0.1)
+  - [32mexpo-constants[0m (17.0.8)
+  - [32mexpo-contacts[0m (14.0.5)
+  - [32mexpo-eas-client[0m (0.13.3)
+  - [32mexpo-file-system[0m (18.0.12)
+  - [32mexpo-font[0m (13.0.4)
+  - [32mexpo-json-utils[0m (0.14.0)
+  - [32mexpo-keep-awake[0m (14.0.3)
+  - [32mexpo-linear-gradient[0m (14.0.2)
+  - [32mexpo-linking[0m (7.0.5)
+  - [32mexpo-manifests[0m (0.15.8)
+  - [32mexpo-modules-core[0m (2.2.3)
+  - [32mexpo-notifications[0m (0.29.14)
+  - [32mexpo-secure-store[0m (14.0.1)
+  - [32mexpo-speech[0m (13.0.1)
+  - [32mexpo-splash-screen[0m (0.29.24)
+  - [32mexpo-structured-headers[0m (4.0.0)
+  - [32mexpo-task-manager[0m (12.0.6)
+  - [32mexpo-updates[0m (0.27.5)
+  - [32mexpo-web-browser[0m (14.0.2)
+  - [32munimodules-app-loader[0m (5.0.1)
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Could not determine the dependencies of task ':app:compileDebugJavaWithJavac'.
+> Could not resolve all dependencies for configuration ':app:debugCompileClasspath'.
+   > Could not resolve project :react-native-async-storage_async-storage.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-async-storage_async-storage.
+   > Could not resolve project :react-native-reanimated.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-reanimated.
+   > Could not resolve project :react-native-safe-area-context.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-safe-area-context.
+   > Could not resolve project :react-native-screens.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-screens.
+   > Could not resolve project :react-native-svg.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-svg.
+   > Could not resolve project :react-native-view-shot.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-view-shot.
+   > Could not resolve project :react-native-webview.
+     Required by:
+         project :app
+      > A dependency was declared on configuration 'default' which is not declared in the descriptor for project :react-native-webview.
+
+* Try:
+> Review the variant matching algorithm at https://docs.gradle.org/8.8/userguide/variant_attributes.html#sec:abm_algorithm.
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.8/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2m 23s
+18 actionable tasks: 18 executed

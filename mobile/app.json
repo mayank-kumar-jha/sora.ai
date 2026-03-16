@@ -2,7 +2,7 @@
   "expo": {
     "name": "mobile",
     "slug": "mobile",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
@@ -20,7 +20,8 @@
           "fetch",
           "remote-notification"
         ]
-      }
+      },
+      "bundleIdentifier": "com.sora.ai"
     },
     "android": {
       "permissions": [
@@ -44,7 +45,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.anonymous.mobile"
+      "package": "com.sora.ai"
     },
     "web": {
       "bundler": "metro",
@@ -67,18 +68,21 @@
         {
           "android": {
             "minSdkVersion": 24,
-            "kotlinVersion": "1.9.24",
+            "kotlinVersion": "2.1.20",
             "usesCleartextTraffic": true,
             "extraProperties": {
               "suppressKotlinVersionCompatibilityCheck": "true",
-              "kotlinCompilerExtensionVersion": "1.5.14"
+              "kotlinCompilerExtensionVersion": "1.5.15"
             }
           },
           "ios": {
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

@@ -1,0 +1,1089 @@
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :expo-updates-gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
+> Task :expo-updates-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :expo-updates-gradle-plugin:compileJava NO-SOURCE
+> Task :expo-updates-gradle-plugin:classes UP-TO-DATE
+> Task :expo-updates-gradle-plugin:jar UP-TO-DATE
+
+> Configure project :app
+ ℹ️  [33mApplying gradle plugin[0m '[32mexpo-updates-gradle-plugin[0m' (expo-updates@0.27.5)
+
+> Configure project :expo
+
+Using expo modules
+  - [32mexpo-application[0m (6.0.2)
+  - [32mexpo-asset[0m (11.0.5)
+  - [32mexpo-av[0m (15.0.2)
+  - [32mexpo-background-fetch[0m (13.0.6)
+  - [32mexpo-clipboard[0m (7.0.1)
+  - [32mexpo-constants[0m (17.0.8)
+  - [32mexpo-contacts[0m (14.0.5)
+  - [32mexpo-eas-client[0m (0.13.3)
+  - [32mexpo-file-system[0m (18.0.12)
+  - [32mexpo-font[0m (13.0.4)
+  - [32mexpo-json-utils[0m (0.14.0)
+  - [32mexpo-keep-awake[0m (14.0.3)
+  - [32mexpo-linear-gradient[0m (14.0.2)
+  - [32mexpo-linking[0m (7.0.5)
+  - [32mexpo-manifests[0m (0.15.8)
+  - [32mexpo-modules-core[0m (2.2.3)
+  - [32mexpo-notifications[0m (0.29.14)
+  - [32mexpo-secure-store[0m (14.0.1)
+  - [32mexpo-speech[0m (13.0.1)
+  - [32mexpo-splash-screen[0m (0.29.24)
+  - [32mexpo-structured-headers[0m (4.0.0)
+  - [32mexpo-task-manager[0m (12.0.6)
+  - [32mexpo-updates[0m (0.27.5)
+  - [32mexpo-web-browser[0m (14.0.2)
+  - [32munimodules-app-loader[0m (5.0.1)
+
+
+> Task :app:generateAutolinkingPackageList
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:generateDebugBuildConfig
+> Task :expo:generateExpoModulesPackageListTask
+> Task :expo:preBuild
+> Task :expo:preDebugBuild
+> Task :expo-application:preBuild UP-TO-DATE
+> Task :expo-application:preDebugBuild UP-TO-DATE
+> Task :expo:writeDebugAarMetadata
+> Task :expo-asset:preBuild UP-TO-DATE
+> Task :expo-asset:preDebugBuild UP-TO-DATE
+> Task :expo-application:writeDebugAarMetadata
+> Task :expo-av:preBuild UP-TO-DATE
+> Task :expo-av:preDebugBuild UP-TO-DATE
+> Task :expo-asset:writeDebugAarMetadata
+> Task :expo-background-fetch:preBuild UP-TO-DATE
+> Task :expo-background-fetch:preDebugBuild UP-TO-DATE
+> Task :expo-av:writeDebugAarMetadata
+> Task :expo-clipboard:preBuild UP-TO-DATE
+> Task :expo-clipboard:preDebugBuild UP-TO-DATE
+> Task :expo-background-fetch:writeDebugAarMetadata
+> Task :expo-clipboard:writeDebugAarMetadata
+
+> Task :expo-constants:createExpoConfig
+The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled with Expo CLI or NODE_ENV is set.
+Proceeding without mode-specific .env
+
+> Task :expo-constants:preBuild
+> Task :expo-constants:preDebugBuild
+> Task :expo-contacts:preBuild UP-TO-DATE
+> Task :expo-contacts:preDebugBuild UP-TO-DATE
+> Task :expo-constants:writeDebugAarMetadata
+> Task :expo-contacts:writeDebugAarMetadata
+> Task :expo-eas-client:preBuild UP-TO-DATE
+> Task :expo-eas-client:preDebugBuild UP-TO-DATE
+> Task :expo-file-system:preBuild UP-TO-DATE
+> Task :expo-eas-client:writeDebugAarMetadata
+> Task :expo-file-system:preDebugBuild UP-TO-DATE
+> Task :expo-font:preBuild UP-TO-DATE
+> Task :expo-font:preDebugBuild UP-TO-DATE
+> Task :expo-file-system:writeDebugAarMetadata
+> Task :expo-json-utils:preBuild UP-TO-DATE
+> Task :expo-json-utils:preDebugBuild UP-TO-DATE
+> Task :expo-font:writeDebugAarMetadata
+> Task :expo-keep-awake:preBuild UP-TO-DATE
+> Task :expo-keep-awake:preDebugBuild UP-TO-DATE
+> Task :expo-json-utils:writeDebugAarMetadata
+> Task :expo-linear-gradient:preBuild UP-TO-DATE
+> Task :expo-linear-gradient:preDebugBuild UP-TO-DATE
+> Task :expo-keep-awake:writeDebugAarMetadata
+> Task :expo-linking:preBuild UP-TO-DATE
+> Task :expo-linking:preDebugBuild UP-TO-DATE
+> Task :expo-linear-gradient:writeDebugAarMetadata
+> Task :expo-manifests:preBuild UP-TO-DATE
+> Task :expo-manifests:preDebugBuild UP-TO-DATE
+> Task :expo-linking:writeDebugAarMetadata
+> Task :expo-modules-core:preBuild UP-TO-DATE
+> Task :expo-modules-core:preDebugBuild UP-TO-DATE
+> Task :expo-manifests:writeDebugAarMetadata
+> Task :expo-notifications:preBuild UP-TO-DATE
+> Task :expo-notifications:preDebugBuild UP-TO-DATE
+> Task :expo-modules-core:writeDebugAarMetadata
+> Task :expo-secure-store:preBuild UP-TO-DATE
+> Task :expo-secure-store:preDebugBuild UP-TO-DATE
+> Task :expo-notifications:writeDebugAarMetadata
+> Task :expo-speech:preBuild UP-TO-DATE
+> Task :expo-speech:preDebugBuild UP-TO-DATE
+> Task :expo-secure-store:writeDebugAarMetadata
+> Task :expo-splash-screen:preBuild UP-TO-DATE
+> Task :expo-splash-screen:preDebugBuild UP-TO-DATE
+> Task :expo-speech:writeDebugAarMetadata
+> Task :expo-structured-headers:preBuild UP-TO-DATE
+> Task :expo-structured-headers:preDebugBuild UP-TO-DATE
+> Task :expo-splash-screen:writeDebugAarMetadata
+> Task :expo-task-manager:preBuild UP-TO-DATE
+> Task :expo-task-manager:preDebugBuild UP-TO-DATE
+> Task :expo-structured-headers:writeDebugAarMetadata
+> Task :expo-updates:preBuild UP-TO-DATE
+> Task :expo-updates:preDebugBuild UP-TO-DATE
+> Task :expo-task-manager:writeDebugAarMetadata
+> Task :expo-updates-interface:preBuild UP-TO-DATE
+> Task :expo-updates-interface:preDebugBuild UP-TO-DATE
+> Task :expo-updates:writeDebugAarMetadata
+> Task :expo-web-browser:preBuild UP-TO-DATE
+> Task :expo-updates-interface:writeDebugAarMetadata
+> Task :expo-web-browser:preDebugBuild UP-TO-DATE
+> Task :unimodules-app-loader:preBuild UP-TO-DATE
+> Task :unimodules-app-loader:preDebugBuild UP-TO-DATE
+> Task :expo-web-browser:writeDebugAarMetadata
+> Task :unimodules-app-loader:writeDebugAarMetadata
+> Task :app:generateDebugResValues
+> Task :expo:generateDebugResValues
+> Task :expo:generateDebugResources
+> Task :expo:packageDebugResources
+> Task :expo-application:generateDebugResValues
+> Task :expo-application:generateDebugResources
+> Task :expo-application:packageDebugResources
+> Task :expo-asset:generateDebugResValues
+> Task :expo-asset:generateDebugResources
+> Task :app:checkDebugAarMetadata
+> Task :expo-asset:packageDebugResources
+> Task :expo-av:generateDebugResValues
+> Task :expo-av:generateDebugResources
+> Task :expo-av:packageDebugResources
+> Task :expo-background-fetch:generateDebugResValues
+> Task :expo-background-fetch:generateDebugResources
+> Task :expo-background-fetch:packageDebugResources
+> Task :expo-clipboard:generateDebugResValues
+> Task :expo-clipboard:generateDebugResources
+> Task :expo-clipboard:packageDebugResources
+> Task :expo-constants:generateDebugResValues
+> Task :expo-constants:generateDebugResources
+> Task :expo-constants:packageDebugResources
+> Task :expo-contacts:generateDebugResValues
+> Task :expo-contacts:generateDebugResources
+> Task :expo-contacts:packageDebugResources
+> Task :expo-eas-client:generateDebugResValues
+> Task :expo-eas-client:generateDebugResources
+> Task :expo-eas-client:packageDebugResources
+> Task :expo-file-system:generateDebugResValues
+> Task :expo-file-system:generateDebugResources
+> Task :expo-file-system:packageDebugResources
+> Task :expo-font:generateDebugResValues
+> Task :expo-font:generateDebugResources
+> Task :expo-font:packageDebugResources
+> Task :expo-json-utils:generateDebugResValues
+> Task :expo-json-utils:generateDebugResources
+> Task :expo-json-utils:packageDebugResources
+> Task :expo-keep-awake:generateDebugResValues
+> Task :expo-keep-awake:generateDebugResources
+> Task :expo-keep-awake:packageDebugResources
+> Task :expo-linear-gradient:generateDebugResValues
+> Task :expo-linear-gradient:generateDebugResources
+> Task :expo-linear-gradient:packageDebugResources
+> Task :expo-linking:generateDebugResValues
+> Task :expo-linking:generateDebugResources
+> Task :expo-linking:packageDebugResources
+> Task :expo-manifests:generateDebugResValues
+> Task :expo-manifests:generateDebugResources
+> Task :expo-manifests:packageDebugResources
+> Task :expo-modules-core:generateDebugResValues
+> Task :expo-modules-core:generateDebugResources
+> Task :expo-modules-core:packageDebugResources
+> Task :expo-notifications:generateDebugResValues
+> Task :expo-notifications:generateDebugResources
+> Task :expo-notifications:packageDebugResources
+> Task :expo-secure-store:generateDebugResValues
+> Task :expo-secure-store:generateDebugResources
+> Task :expo-secure-store:packageDebugResources
+> Task :expo-speech:generateDebugResValues
+> Task :expo-speech:generateDebugResources
+> Task :expo-speech:packageDebugResources
+> Task :expo-splash-screen:generateDebugResValues
+> Task :expo-splash-screen:generateDebugResources
+> Task :expo-splash-screen:packageDebugResources
+> Task :expo-structured-headers:generateDebugResValues
+> Task :expo-structured-headers:generateDebugResources
+> Task :expo-structured-headers:packageDebugResources
+> Task :expo-task-manager:generateDebugResValues
+> Task :expo-task-manager:generateDebugResources
+> Task :expo-task-manager:packageDebugResources
+> Task :expo-updates:generateDebugResValues
+> Task :expo-updates:generateDebugResources
+> Task :expo-updates:packageDebugResources
+> Task :expo-updates-interface:generateDebugResValues
+> Task :expo-updates-interface:generateDebugResources
+> Task :expo-updates-interface:packageDebugResources
+> Task :expo-web-browser:generateDebugResValues
+> Task :expo-web-browser:generateDebugResources
+> Task :expo-web-browser:packageDebugResources
+> Task :unimodules-app-loader:generateDebugResValues
+> Task :unimodules-app-loader:generateDebugResources
+> Task :unimodules-app-loader:packageDebugResources
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :expo:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :expo-application:extractDeepLinksDebug
+> Task :expo:processDebugManifest
+> Task :expo-asset:extractDeepLinksDebug
+> Task :expo-application:processDebugManifest
+> Task :expo-av:extractDeepLinksDebug
+> Task :expo-asset:processDebugManifest
+> Task :expo-background-fetch:extractDeepLinksDebug
+> Task :expo-av:processDebugManifest
+> Task :app:mergeDebugResources
+> Task :expo-clipboard:extractDeepLinksDebug
+> Task :expo-background-fetch:processDebugManifest
+> Task :expo-constants:extractDeepLinksDebug
+> Task :expo-clipboard:processDebugManifest
+> Task :expo-contacts:extractDeepLinksDebug
+> Task :expo-constants:processDebugManifest
+> Task :expo-eas-client:extractDeepLinksDebug
+> Task :expo-contacts:processDebugManifest
+> Task :expo-file-system:extractDeepLinksDebug
+> Task :expo-eas-client:processDebugManifest
+> Task :expo-font:extractDeepLinksDebug
+
+> Task :expo-file-system:processDebugManifest
+C:\sora\mobile\node_modules\expo-file-system\android\src\main\AndroidManifest.xml:6:9-8:20 Warning:
+	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:6 to replace other declarations but no other declaration present
+
+> Task :expo-json-utils:extractDeepLinksDebug
+> Task :expo-font:processDebugManifest
+> Task :expo-keep-awake:extractDeepLinksDebug
+> Task :expo-json-utils:processDebugManifest
+> Task :expo-linear-gradient:extractDeepLinksDebug
+> Task :expo-keep-awake:processDebugManifest
+> Task :expo-linking:extractDeepLinksDebug
+> Task :expo-linear-gradient:processDebugManifest
+> Task :expo-manifests:extractDeepLinksDebug
+> Task :expo-linking:processDebugManifest
+> Task :expo-modules-core:extractDeepLinksDebug
+> Task :expo-manifests:processDebugManifest
+> Task :expo-notifications:extractDeepLinksDebug
+
+> Task :expo-modules-core:processDebugManifest
+C:\sora\mobile\node_modules\expo-modules-core\android\src\main\AndroidManifest.xml:8:9-11:45 Warning:
+	meta-data#com.facebook.soloader.enabled@android:value was tagged at AndroidManifest.xml:8 to replace other declarations but no other declaration present
+
+> Task :expo-secure-store:extractDeepLinksDebug
+> Task :expo-notifications:processDebugManifest
+> Task :expo-speech:extractDeepLinksDebug
+> Task :expo-secure-store:processDebugManifest
+> Task :expo-splash-screen:extractDeepLinksDebug
+> Task :expo-speech:processDebugManifest
+> Task :expo-structured-headers:extractDeepLinksDebug
+> Task :expo-splash-screen:processDebugManifest
+> Task :expo-task-manager:extractDeepLinksDebug
+> Task :expo-structured-headers:processDebugManifest
+> Task :expo-updates:extractDeepLinksDebug
+> Task :expo-task-manager:processDebugManifest
+> Task :expo-updates-interface:extractDeepLinksDebug
+> Task :expo-updates:processDebugManifest
+> Task :expo-web-browser:extractDeepLinksDebug
+> Task :expo-updates-interface:processDebugManifest
+> Task :unimodules-app-loader:extractDeepLinksDebug
+> Task :expo-web-browser:processDebugManifest
+> Task :unimodules-app-loader:processDebugManifest
+> Task :expo:compileDebugLibraryResources
+
+> Task :app:processDebugMainManifest
+C:\sora\mobile\android\app\src\debug\AndroidManifest.xml Warning:
+	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:0 to replace other declarations but no other declaration present
+
+> Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
+> Task :expo:parseDebugLocalResources
+> Task :expo-application:compileDebugLibraryResources
+> Task :expo:generateDebugRFile
+> Task :expo-application:parseDebugLocalResources
+> Task :expo-asset:compileDebugLibraryResources
+> Task :expo-application:generateDebugRFile
+> Task :expo-asset:parseDebugLocalResources
+> Task :expo-asset:generateDebugRFile
+> Task :expo-av:compileDebugLibraryResources
+> Task :expo-av:parseDebugLocalResources
+> Task :expo-background-fetch:compileDebugLibraryResources
+> Task :expo-background-fetch:parseDebugLocalResources
+> Task :expo-av:generateDebugRFile
+> Task :expo-clipboard:compileDebugLibraryResources
+> Task :expo-background-fetch:generateDebugRFile
+> Task :expo-clipboard:parseDebugLocalResources
+> Task :expo-constants:compileDebugLibraryResources
+> Task :expo-constants:parseDebugLocalResources
+> Task :expo-clipboard:generateDebugRFile
+> Task :expo-contacts:compileDebugLibraryResources
+> Task :expo-constants:generateDebugRFile
+> Task :expo-contacts:parseDebugLocalResources
+> Task :expo-eas-client:compileDebugLibraryResources
+> Task :expo-contacts:generateDebugRFile
+> Task :expo-eas-client:parseDebugLocalResources
+> Task :expo-file-system:compileDebugLibraryResources
+> Task :expo-eas-client:generateDebugRFile
+> Task :expo-file-system:parseDebugLocalResources
+> Task :expo-font:compileDebugLibraryResources
+> Task :expo-font:parseDebugLocalResources
+> Task :expo-file-system:generateDebugRFile
+> Task :expo-font:generateDebugRFile
+> Task :expo-json-utils:compileDebugLibraryResources
+> Task :expo-json-utils:parseDebugLocalResources
+> Task :expo-keep-awake:compileDebugLibraryResources
+> Task :expo-json-utils:generateDebugRFile
+> Task :expo-keep-awake:parseDebugLocalResources
+> Task :expo-linear-gradient:compileDebugLibraryResources
+> Task :expo-keep-awake:generateDebugRFile
+> Task :expo-linear-gradient:parseDebugLocalResources
+> Task :expo-linking:compileDebugLibraryResources
+> Task :expo-linear-gradient:generateDebugRFile
+> Task :expo-linking:parseDebugLocalResources
+> Task :expo-manifests:compileDebugLibraryResources
+> Task :expo-linking:generateDebugRFile
+> Task :expo-manifests:parseDebugLocalResources
+> Task :expo-modules-core:compileDebugLibraryResources
+> Task :expo-manifests:generateDebugRFile
+> Task :expo-modules-core:parseDebugLocalResources
+> Task :expo-notifications:compileDebugLibraryResources
+> Task :expo-modules-core:generateDebugRFile
+> Task :expo-notifications:parseDebugLocalResources
+> Task :expo-secure-store:compileDebugLibraryResources
+> Task :expo-notifications:generateDebugRFile
+> Task :expo-speech:compileDebugLibraryResources
+> Task :expo-secure-store:parseDebugLocalResources
+> Task :expo-speech:parseDebugLocalResources
+> Task :expo-secure-store:generateDebugRFile
+> Task :expo-speech:generateDebugRFile
+> Task :expo-splash-screen:compileDebugLibraryResources
+> Task :expo-splash-screen:parseDebugLocalResources
+> Task :expo-structured-headers:compileDebugLibraryResources
+> Task :expo-splash-screen:generateDebugRFile
+> Task :expo-structured-headers:parseDebugLocalResources
+> Task :expo-task-manager:compileDebugLibraryResources
+> Task :expo-structured-headers:generateDebugRFile
+> Task :expo-task-manager:parseDebugLocalResources
+> Task :expo-updates:compileDebugLibraryResources
+> Task :expo-task-manager:generateDebugRFile
+> Task :expo-updates:parseDebugLocalResources
+> Task :expo-updates-interface:compileDebugLibraryResources
+> Task :expo-updates:generateDebugRFile
+> Task :expo-updates-interface:parseDebugLocalResources
+> Task :expo-web-browser:compileDebugLibraryResources
+> Task :expo-updates-interface:generateDebugRFile
+> Task :expo-web-browser:parseDebugLocalResources
+> Task :unimodules-app-loader:compileDebugLibraryResources
+> Task :expo:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-web-browser:generateDebugRFile
+> Task :unimodules-app-loader:parseDebugLocalResources
+> Task :expo:generateDebugBuildConfig
+> Task :expo-application:checkKotlinGradlePluginConfigurationErrors
+> Task :unimodules-app-loader:generateDebugRFile
+> Task :expo-application:generateDebugBuildConfig
+> Task :expo-modules-core:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-modules-core:generateDebugBuildConfig
+> Task :expo-modules-core:javaPreCompileDebug
+> Task :expo-asset:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-application:javaPreCompileDebug
+> Task :expo-asset:generateDebugBuildConfig
+> Task :expo-av:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-asset:javaPreCompileDebug
+> Task :expo-av:generateDebugBuildConfig
+> Task :expo-background-fetch:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-av:javaPreCompileDebug
+> Task :expo-background-fetch:generateDebugBuildConfig
+> Task :expo-clipboard:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-background-fetch:javaPreCompileDebug
+> Task :expo-clipboard:generateDebugBuildConfig
+> Task :expo-constants:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-clipboard:javaPreCompileDebug
+> Task :expo-constants:generateDebugBuildConfig
+> Task :expo-contacts:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-constants:javaPreCompileDebug
+> Task :expo-contacts:generateDebugBuildConfig
+> Task :expo-eas-client:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-contacts:javaPreCompileDebug
+> Task :expo-eas-client:generateDebugBuildConfig
+> Task :expo-file-system:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-eas-client:javaPreCompileDebug
+> Task :expo-file-system:generateDebugBuildConfig
+> Task :expo-font:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-file-system:javaPreCompileDebug
+> Task :expo-font:generateDebugBuildConfig
+> Task :expo-json-utils:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-font:javaPreCompileDebug
+> Task :expo-json-utils:generateDebugBuildConfig
+> Task :expo-keep-awake:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-json-utils:javaPreCompileDebug
+> Task :expo-keep-awake:generateDebugBuildConfig
+> Task :expo-linear-gradient:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-keep-awake:javaPreCompileDebug
+> Task :expo-linear-gradient:generateDebugBuildConfig
+> Task :expo-linking:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-linear-gradient:javaPreCompileDebug
+> Task :expo-linking:generateDebugBuildConfig
+> Task :expo-manifests:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-linking:javaPreCompileDebug
+> Task :expo-manifests:generateDebugBuildConfig
+> Task :expo-notifications:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-manifests:javaPreCompileDebug
+> Task :expo-notifications:generateDebugBuildConfig
+> Task :expo-secure-store:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-notifications:javaPreCompileDebug
+> Task :expo-secure-store:generateDebugBuildConfig
+> Task :expo-speech:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-secure-store:javaPreCompileDebug
+> Task :expo-speech:generateDebugBuildConfig
+> Task :expo-splash-screen:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-speech:javaPreCompileDebug
+> Task :expo-splash-screen:generateDebugBuildConfig
+> Task :expo-structured-headers:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-splash-screen:javaPreCompileDebug
+> Task :expo-structured-headers:generateDebugBuildConfig
+> Task :expo-task-manager:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-structured-headers:javaPreCompileDebug
+> Task :expo-task-manager:generateDebugBuildConfig
+> Task :unimodules-app-loader:checkKotlinGradlePluginConfigurationErrors
+> Task :unimodules-app-loader:generateDebugBuildConfig
+> Task :unimodules-app-loader:javaPreCompileDebug
+> Task :expo-updates:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-task-manager:javaPreCompileDebug
+> Task :expo-updates:generateDebugBuildConfig
+> Task :expo-updates-interface:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-updates-interface:generateDebugBuildConfig
+> Task :expo-updates-interface:javaPreCompileDebug
+> Task :expo-web-browser:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-web-browser:generateDebugBuildConfig
+> Task :expo-web-browser:javaPreCompileDebug
+> Task :expo:javaPreCompileDebug
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :expo-updates:javaPreCompileDebug
+> Task :app:processDebugResources
+> Task :app:createDebugUpdatesResources
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :expo:mergeDebugShaders
+> Task :expo:compileDebugShaders NO-SOURCE
+> Task :expo:generateDebugAssets UP-TO-DATE
+> Task :expo:packageDebugAssets
+> Task :expo-application:mergeDebugShaders
+> Task :expo-application:compileDebugShaders NO-SOURCE
+> Task :expo-application:generateDebugAssets UP-TO-DATE
+> Task :expo-application:packageDebugAssets
+> Task :expo-asset:mergeDebugShaders
+> Task :expo-asset:compileDebugShaders NO-SOURCE
+> Task :expo-asset:generateDebugAssets UP-TO-DATE
+> Task :expo-asset:packageDebugAssets
+> Task :expo-av:mergeDebugShaders
+> Task :expo-av:compileDebugShaders NO-SOURCE
+> Task :expo-av:generateDebugAssets UP-TO-DATE
+> Task :expo-av:packageDebugAssets
+> Task :expo-background-fetch:mergeDebugShaders
+> Task :expo-background-fetch:compileDebugShaders NO-SOURCE
+> Task :expo-background-fetch:generateDebugAssets UP-TO-DATE
+> Task :expo-background-fetch:packageDebugAssets
+> Task :expo-clipboard:mergeDebugShaders
+> Task :expo-clipboard:compileDebugShaders NO-SOURCE
+> Task :expo-clipboard:generateDebugAssets UP-TO-DATE
+> Task :expo-clipboard:packageDebugAssets
+> Task :expo-constants:mergeDebugShaders
+> Task :expo-constants:compileDebugShaders NO-SOURCE
+> Task :expo-constants:generateDebugAssets UP-TO-DATE
+> Task :expo-constants:packageDebugAssets
+> Task :expo-contacts:mergeDebugShaders
+> Task :expo-contacts:compileDebugShaders NO-SOURCE
+> Task :expo-contacts:generateDebugAssets UP-TO-DATE
+> Task :expo-contacts:packageDebugAssets
+> Task :expo-eas-client:mergeDebugShaders
+> Task :expo-eas-client:compileDebugShaders NO-SOURCE
+> Task :expo-eas-client:generateDebugAssets UP-TO-DATE
+> Task :expo-eas-client:packageDebugAssets
+> Task :expo-file-system:mergeDebugShaders
+> Task :expo-file-system:compileDebugShaders NO-SOURCE
+> Task :expo-file-system:generateDebugAssets UP-TO-DATE
+> Task :expo-file-system:packageDebugAssets
+> Task :expo-font:mergeDebugShaders
+> Task :expo-font:compileDebugShaders NO-SOURCE
+> Task :expo-font:generateDebugAssets UP-TO-DATE
+> Task :expo-font:packageDebugAssets
+> Task :expo-json-utils:mergeDebugShaders
+> Task :expo-json-utils:compileDebugShaders NO-SOURCE
+> Task :expo-json-utils:generateDebugAssets UP-TO-DATE
+> Task :expo-json-utils:packageDebugAssets
+> Task :expo-keep-awake:mergeDebugShaders
+> Task :expo-keep-awake:compileDebugShaders NO-SOURCE
+> Task :expo-keep-awake:generateDebugAssets UP-TO-DATE
+> Task :expo-keep-awake:packageDebugAssets
+> Task :expo-linear-gradient:mergeDebugShaders
+> Task :expo-linear-gradient:compileDebugShaders NO-SOURCE
+> Task :expo-linear-gradient:generateDebugAssets UP-TO-DATE
+> Task :expo-linear-gradient:packageDebugAssets
+> Task :expo-linking:mergeDebugShaders
+> Task :expo-linking:compileDebugShaders NO-SOURCE
+> Task :expo-linking:generateDebugAssets UP-TO-DATE
+> Task :expo-linking:packageDebugAssets
+> Task :expo-manifests:mergeDebugShaders
+> Task :expo-manifests:compileDebugShaders NO-SOURCE
+> Task :expo-manifests:generateDebugAssets UP-TO-DATE
+> Task :expo-manifests:packageDebugAssets
+> Task :expo-modules-core:mergeDebugShaders
+> Task :expo-modules-core:compileDebugShaders NO-SOURCE
+> Task :expo-modules-core:generateDebugAssets UP-TO-DATE
+> Task :expo-modules-core:packageDebugAssets
+> Task :expo-notifications:mergeDebugShaders
+> Task :expo-notifications:compileDebugShaders NO-SOURCE
+> Task :expo-notifications:generateDebugAssets UP-TO-DATE
+> Task :expo-notifications:packageDebugAssets
+> Task :expo-secure-store:mergeDebugShaders
+> Task :expo-secure-store:compileDebugShaders NO-SOURCE
+> Task :expo-secure-store:generateDebugAssets UP-TO-DATE
+> Task :expo-secure-store:packageDebugAssets
+> Task :expo-speech:mergeDebugShaders
+> Task :expo-speech:compileDebugShaders NO-SOURCE
+> Task :expo-speech:generateDebugAssets UP-TO-DATE
+> Task :expo-speech:packageDebugAssets
+> Task :expo-splash-screen:mergeDebugShaders
+> Task :expo-splash-screen:compileDebugShaders NO-SOURCE
+> Task :expo-splash-screen:generateDebugAssets UP-TO-DATE
+> Task :expo-splash-screen:packageDebugAssets
+> Task :expo-structured-headers:mergeDebugShaders
+> Task :expo-structured-headers:compileDebugShaders NO-SOURCE
+> Task :expo-structured-headers:generateDebugAssets UP-TO-DATE
+> Task :expo-structured-headers:packageDebugAssets
+> Task :expo-task-manager:mergeDebugShaders
+> Task :expo-task-manager:compileDebugShaders NO-SOURCE
+> Task :expo-task-manager:generateDebugAssets UP-TO-DATE
+> Task :expo-task-manager:packageDebugAssets
+> Task :expo-updates:mergeDebugShaders
+> Task :expo-updates:compileDebugShaders NO-SOURCE
+> Task :expo-updates:generateDebugAssets UP-TO-DATE
+> Task :expo-updates:packageDebugAssets
+> Task :expo-updates-interface:mergeDebugShaders
+> Task :expo-updates-interface:compileDebugShaders NO-SOURCE
+> Task :expo-updates-interface:generateDebugAssets UP-TO-DATE
+> Task :expo-updates-interface:packageDebugAssets
+> Task :expo-web-browser:mergeDebugShaders
+> Task :expo-web-browser:compileDebugShaders NO-SOURCE
+> Task :expo-web-browser:generateDebugAssets UP-TO-DATE
+> Task :expo-web-browser:packageDebugAssets
+> Task :unimodules-app-loader:mergeDebugShaders
+> Task :unimodules-app-loader:compileDebugShaders NO-SOURCE
+> Task :unimodules-app-loader:generateDebugAssets UP-TO-DATE
+> Task :unimodules-app-loader:packageDebugAssets
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeDebugJniLibFolders
+> Task :expo:mergeDebugJniLibFolders
+> Task :expo:mergeDebugNativeLibs NO-SOURCE
+> Task :expo:copyDebugJniLibsProjectOnly
+> Task :expo-application:mergeDebugJniLibFolders
+> Task :expo-application:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-application:copyDebugJniLibsProjectOnly
+> Task :expo-asset:mergeDebugJniLibFolders
+> Task :expo-asset:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-asset:copyDebugJniLibsProjectOnly
+> Task :app:checkDebugDuplicateClasses
+> Task :expo-av:configureCMakeDebug[arm64-v8a]
+> Task :expo-av:buildCMakeDebug[arm64-v8a]
+> Task :expo-av:configureCMakeDebug[armeabi-v7a]
+> Task :app:mergeExtDexDebug
+> Task :expo-av:buildCMakeDebug[armeabi-v7a]
+> Task :expo-av:configureCMakeDebug[x86]
+> Task :expo-av:buildCMakeDebug[x86]
+> Task :expo-av:configureCMakeDebug[x86_64]
+
+> Task :expo-modules-core:compileDebugKotlin
+w:  `suppressKotlinVersionCompatibilityCheck` should specify the version of Kotlin for which you want the compatibility check to be disabled. For example, `suppressKotlinVersionCompatibilityCheck=1.9.24`
+
+> Task :expo-av:buildCMakeDebug[x86_64]
+> Task :expo-modules-core:compileDebugJavaWithJavac
+> Task :expo-modules-core:processDebugJavaRes
+> Task :expo-av:mergeDebugJniLibFolders
+> Task :expo-background-fetch:mergeDebugJniLibFolders
+> Task :expo-background-fetch:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-background-fetch:copyDebugJniLibsProjectOnly
+> Task :expo-clipboard:mergeDebugJniLibFolders
+> Task :expo-clipboard:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-clipboard:copyDebugJniLibsProjectOnly
+> Task :expo-av:mergeDebugNativeLibs
+> Task :expo-constants:mergeDebugJniLibFolders
+> Task :expo-constants:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-constants:copyDebugJniLibsProjectOnly
+> Task :expo-contacts:mergeDebugJniLibFolders
+> Task :expo-contacts:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-contacts:copyDebugJniLibsProjectOnly
+> Task :expo-av:copyDebugJniLibsProjectOnly
+> Task :expo-modules-core:bundleLibRuntimeToJarDebug
+> Task :expo-modules-core:bundleLibCompileToJarDebug
+> Task :expo-eas-client:mergeDebugJniLibFolders
+> Task :expo-asset:compileDebugKotlin
+> Task :expo-constants:compileDebugKotlin
+> Task :expo-background-fetch:compileDebugKotlin
+> Task :expo-application:compileDebugKotlin
+> Task :expo-eas-client:compileDebugKotlin
+> Task :expo-asset:compileDebugJavaWithJavac
+> Task :expo-font:compileDebugKotlin
+> Task :expo-json-utils:compileDebugKotlin
+> Task :expo-application:compileDebugJavaWithJavac
+> Task :expo-application:bundleLibCompileToJarDebug
+> Task :expo-asset:bundleLibCompileToJarDebug
+> Task :expo-clipboard:compileDebugKotlin
+> Task :expo-background-fetch:compileDebugJavaWithJavac
+> Task :expo-background-fetch:bundleLibCompileToJarDebug
+> Task :expo-clipboard:compileDebugJavaWithJavac
+> Task :expo-clipboard:bundleLibCompileToJarDebug
+> Task :expo-constants:compileDebugJavaWithJavac
+> Task :expo-constants:bundleLibCompileToJarDebug
+> Task :expo-eas-client:compileDebugJavaWithJavac
+> Task :expo-eas-client:bundleLibCompileToJarDebug
+
+> Task :expo-av:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/ViewUtils.kt:10:26 'Promise' is deprecated. AsyncFunction will crash when called. Use expo.modules.kotlin.Promise instead
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/ViewUtils.kt:19:129 'Promise' is deprecated. AsyncFunction will crash when called. Use expo.modules.kotlin.Promise instead
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/ViewUtils.kt:21:78 'resolveView(Int): View?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/ViewUtils.kt:39:111 'Promise' is deprecated. AsyncFunction will crash when called. Use expo.modules.kotlin.Promise instead
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/ViewUtils.kt:52:78 'resolveView(Int): View?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/player/datasource/CustomHeadersOkHttpDataSourceFactory.kt:32:12 'constructor OkHttpDataSource(Call.Factory, String?, CacheControl?, HttpDataSource.RequestProperties?)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/progress/AndroidLooperTimeMachine.kt:8:5 'constructor Handler()' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-av/android/src/main/java/expo/modules/av/video/VideoViewModule.kt:64:17 'tryRunWithVideoView(ModuleRegistry, Int, ViewUtils.VideoViewCallback, Promise): Unit' is deprecated. Use `dispatchCommands` in favor of finding view with imperative calls
+
+> Task :expo-font:compileDebugJavaWithJavac
+
+> Task :expo-contacts:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/Contact.kt:125:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/Contact.kt:125:26 'CONTENT_ITEM_TYPE: String' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/Contact.kt:319:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/Contact.kt:319:26 'CONTENT_ITEM_TYPE: String' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:407:22 Unchecked cast: Any to Map<String, Any>
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:533:38 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:534:38 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:535:38 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:535:41 'PROTOCOL: String' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:536:38 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:538:41 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/ContactsModule.kt:538:44 'CONTENT_ITEM_TYPE: String' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:8:54 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:8:57 'CONTENT_ITEM_TYPE: String' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:14:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:14:26 'PROTOCOL_AIM: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:15:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:15:26 'PROTOCOL_GOOGLE_TALK: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:16:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:16:26 'PROTOCOL_ICQ: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:17:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:17:26 'PROTOCOL_JABBER: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:18:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:18:26 'PROTOCOL_MSN: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:19:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:19:26 'PROTOCOL_NETMEETING: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:20:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:20:26 'PROTOCOL_QQ: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:21:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:21:26 'PROTOCOL_SKYPE: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:22:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:22:26 'PROTOCOL_YAHOO: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:23:23 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:23:26 'PROTOCOL_CUSTOM: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:30:106 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:30:109 'PROTOCOL: String' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:36:34 'Im' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-contacts/android/src/main/java/expo/modules/contacts/models/ImAddressModel.kt:36:37 'PROTOCOL: String' is deprecated. Deprecated in Java
+
+> Task :expo-modules-core:bundleLibRuntimeToDirDebug
+
+> Task :expo-av:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :expo-av:bundleLibCompileToJarDebug
+> Task :expo-file-system:compileDebugKotlin
+> Task :expo-contacts:compileDebugJavaWithJavac
+> Task :expo-contacts:bundleLibCompileToJarDebug
+> Task :expo-file-system:compileDebugJavaWithJavac
+> Task :expo-font:bundleLibCompileToJarDebug
+> Task :expo-file-system:bundleLibCompileToJarDebug
+> Task :expo-json-utils:compileDebugJavaWithJavac
+> Task :expo-json-utils:bundleLibCompileToJarDebug
+> Task :expo-linking:compileDebugKotlin
+> Task :expo-keep-awake:compileDebugKotlin
+> Task :expo-linking:compileDebugJavaWithJavac
+> Task :expo-linear-gradient:compileDebugKotlin
+> Task :expo-keep-awake:compileDebugJavaWithJavac
+> Task :expo-keep-awake:bundleLibCompileToJarDebug
+> Task :expo-linear-gradient:compileDebugJavaWithJavac
+> Task :expo-linear-gradient:bundleLibCompileToJarDebug
+
+> Task :expo-manifests:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/EmbeddedManifest.kt:19:16 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
+w: file:///C:/sora/mobile/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/EmbeddedManifest.kt:19:86 'getLegacyID(): String' is deprecated. Prefer scopeKey or projectId depending on use case
+w: file:///C:/sora/mobile/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/ExpoUpdatesManifest.kt:16:16 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
+w: file:///C:/sora/mobile/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/Manifest.kt:15:12 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+
+> Task :expo-linking:bundleLibCompileToJarDebug
+> Task :expo-manifests:compileDebugJavaWithJavac
+> Task :expo-manifests:bundleLibCompileToJarDebug
+> Task :expo-structured-headers:compileDebugKotlin NO-SOURCE
+
+> Task :expo-secure-store:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-secure-store/android/src/main/java/expo/modules/securestore/SecureStoreModule.kt:5:27 'PreferenceManager' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-secure-store/android/src/main/java/expo/modules/securestore/SecureStoreModule.kt:110:9 Variable 'legacyReadFailedWarning' is never used
+w: file:///C:/sora/mobile/node_modules/expo-secure-store/android/src/main/java/expo/modules/securestore/SecureStoreModule.kt:247:23 'PreferenceManager' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-secure-store/android/src/main/java/expo/modules/securestore/SecureStoreModule.kt:247:41 'getDefaultSharedPreferences(Context!): SharedPreferences!' is deprecated. Deprecated in Java
+
+> Task :expo-speech:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-speech/android/src/main/java/expo/modules/speech/SpeechModule.kt:153:26 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
+
+> Task :expo-splash-screen:compileDebugKotlin
+> Task :expo-structured-headers:compileDebugJavaWithJavac
+> Task :expo-secure-store:compileDebugJavaWithJavac
+> Task :expo-secure-store:bundleLibCompileToJarDebug
+> Task :expo-speech:compileDebugJavaWithJavac
+> Task :expo-speech:bundleLibCompileToJarDebug
+> Task :expo-splash-screen:compileDebugJavaWithJavac
+> Task :expo-splash-screen:bundleLibCompileToJarDebug
+> Task :unimodules-app-loader:compileDebugKotlin NO-SOURCE
+> Task :expo-structured-headers:bundleLibCompileToJarDebug
+> Task :unimodules-app-loader:compileDebugJavaWithJavac
+> Task :unimodules-app-loader:bundleLibCompileToJarDebug
+> Task :expo-application:bundleLibRuntimeToJarDebug
+> Task :expo-asset:bundleLibRuntimeToJarDebug
+> Task :expo-background-fetch:bundleLibRuntimeToJarDebug
+> Task :expo-av:bundleLibRuntimeToJarDebug
+> Task :expo-clipboard:bundleLibRuntimeToJarDebug
+> Task :expo-constants:bundleLibRuntimeToJarDebug
+> Task :expo-contacts:bundleLibRuntimeToJarDebug
+> Task :expo-eas-client:bundleLibRuntimeToJarDebug
+> Task :expo-font:bundleLibRuntimeToJarDebug
+> Task :expo-manifests:bundleLibRuntimeToJarDebug
+> Task :expo-json-utils:bundleLibRuntimeToJarDebug
+> Task :expo-file-system:bundleLibRuntimeToJarDebug
+> Task :expo-keep-awake:bundleLibRuntimeToJarDebug
+> Task :expo-linear-gradient:bundleLibRuntimeToJarDebug
+> Task :expo-linking:bundleLibRuntimeToJarDebug
+> Task :expo-secure-store:bundleLibRuntimeToJarDebug
+> Task :expo-speech:bundleLibRuntimeToJarDebug
+> Task :expo-splash-screen:bundleLibRuntimeToJarDebug
+> Task :expo-updates-interface:compileDebugKotlin
+> Task :expo-structured-headers:bundleLibRuntimeToJarDebug
+> Task :expo-updates-interface:compileDebugJavaWithJavac
+> Task :expo-updates-interface:bundleLibCompileToJarDebug
+> Task :unimodules-app-loader:bundleLibRuntimeToJarDebug
+> Task :expo-task-manager:compileDebugKotlin
+
+> Task :expo-web-browser:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-web-browser/android/src/main/java/expo/modules/webbrowser/WebBrowserModule.kt:112:15 'setToolbarColor(Int): CustomTabsIntent.Builder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-web-browser/android/src/main/java/expo/modules/webbrowser/WebBrowserModule.kt:117:15 'setSecondaryToolbarColor(Int): CustomTabsIntent.Builder' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-web-browser/android/src/main/java/expo/modules/webbrowser/WebBrowserModule.kt:123:15 'addDefaultShareMenuItem(): CustomTabsIntent.Builder' is deprecated. Deprecated in Java
+
+> Task :expo-notifications:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/Utils.kt:41:21 'get(String!): Any?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/categories/ExpoNotificationCategoriesModule.kt:69:40 'getParcelableArrayList(String?): ArrayList<T!>?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/categories/ExpoNotificationCategoriesModule.kt:122:36 'getParcelable(String?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/debug/DebugLogging.kt:30:23 'get(String!): Any?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/model/RemoteNotificationContent.kt:21:45 'readParcelable(ClassLoader?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/model/triggers/FirebaseNotificationTrigger.kt:19:12 'readParcelable(ClassLoader?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/presentation/ExpoNotificationPresentationModule.kt:46:33 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/presentation/ExpoNotificationPresentationModule.kt:57:43 'getParcelableArrayList(String?): ArrayList<T!>?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/presentation/ExpoNotificationPresentationModule.kt:61:33 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/presentation/ExpoNotificationPresentationModule.kt:81:31 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/presentation/ExpoNotificationPresentationModule.kt:95:31 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/presentation/builders/BaseNotificationBuilder.kt:35:100 'constructor Builder(Context)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/scheduling/NotificationScheduler.kt:51:40 'getParcelableArrayList(String?): ArrayList<T!>?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/scheduling/NotificationScheduler.kt:58:33 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/scheduling/NotificationScheduler.kt:81:35 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/scheduling/NotificationScheduler.kt:128:31 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/scheduling/NotificationScheduler.kt:142:31 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:480:34 'getParcelable(String?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:481:28 'getParcelable(String?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:505:33 'getParcelableExtra(String!): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:506:27 'getParcelableExtra(String!): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:609:54 'get(String!): Any?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:676:22 'getParcelable(String?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:677:22 'getParcelable(String?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:704:14 'getParcelableExtra(String!): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:734:18 'getParcelableExtra(String!): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/NotificationsService.kt:774:22 'getParcelable(String?): T?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/Base64Serialization.kt:26:45 Returning type parameter has been inferred to Nothing implicitly because Nothing is more specific than specified expected type. Please specify type arguments explicitly in accordance with expected type to hide this warning. Nothing can produce an exception at runtime. See KT-36776 for more details.
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoHandlingDelegate.kt:63:85 Parameter 'notificationResponse' is never used
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:194:70 'priority: Int' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:195:41 'vibrate: LongArray!' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:196:30 'sound: Uri!' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:207:41 'get(String!): Any?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:210:124 'get(String!): Any?' is deprecated. Deprecated in Java
+
+> Task :expo-task-manager:compileDebugJavaWithJavac
+Note: C:\sora\mobile\node_modules\expo-task-manager\android\src\main\java\expo\modules\taskManager\TaskService.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :expo-updates:kspDebugKotlin
+
+> Task :expo-notifications:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: C:\sora\mobile\node_modules\expo-notifications\android\src\main\java\expo\modules\notifications\notifications\model\NotificationCategory.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :expo-task-manager:bundleLibCompileToJarDebug
+> Task :expo-notifications:bundleLibCompileToJarDebug
+> Task :expo-web-browser:compileDebugJavaWithJavac
+> Task :expo-web-browser:bundleLibCompileToJarDebug
+> Task :expo-task-manager:bundleLibRuntimeToJarDebug
+> Task :expo-web-browser:bundleLibRuntimeToJarDebug
+> Task :expo-updates-interface:bundleLibRuntimeToJarDebug
+> Task :expo-application:processDebugJavaRes
+> Task :expo-asset:processDebugJavaRes
+> Task :expo-notifications:bundleLibRuntimeToJarDebug
+> Task :expo-av:processDebugJavaRes
+> Task :expo-background-fetch:processDebugJavaRes
+> Task :expo-clipboard:processDebugJavaRes
+> Task :expo-constants:processDebugJavaRes
+> Task :expo-contacts:processDebugJavaRes
+> Task :expo-eas-client:processDebugJavaRes
+> Task :expo-file-system:processDebugJavaRes
+> Task :expo-font:processDebugJavaRes
+> Task :expo-json-utils:processDebugJavaRes
+> Task :expo-keep-awake:processDebugJavaRes
+> Task :expo-linear-gradient:processDebugJavaRes
+> Task :expo-linking:processDebugJavaRes
+> Task :expo-manifests:processDebugJavaRes
+> Task :expo-notifications:processDebugJavaRes
+> Task :expo-secure-store:processDebugJavaRes
+> Task :expo-speech:processDebugJavaRes
+> Task :expo-splash-screen:processDebugJavaRes
+> Task :expo-structured-headers:processDebugJavaRes NO-SOURCE
+> Task :expo-task-manager:processDebugJavaRes
+> Task :expo-updates-interface:processDebugJavaRes
+> Task :expo-web-browser:processDebugJavaRes
+> Task :unimodules-app-loader:processDebugJavaRes NO-SOURCE
+> Task :expo-background-fetch:bundleLibRuntimeToDirDebug
+> Task :expo-asset:bundleLibRuntimeToDirDebug
+> Task :expo-eas-client:bundleLibRuntimeToDirDebug
+> Task :expo-constants:bundleLibRuntimeToDirDebug
+> Task :expo-application:bundleLibRuntimeToDirDebug
+> Task :expo-font:bundleLibRuntimeToDirDebug
+> Task :expo-json-utils:bundleLibRuntimeToDirDebug
+> Task :expo-linear-gradient:bundleLibRuntimeToDirDebug
+> Task :expo-keep-awake:bundleLibRuntimeToDirDebug
+> Task :expo-manifests:bundleLibRuntimeToDirDebug
+> Task :expo-linking:bundleLibRuntimeToDirDebug
+> Task :unimodules-app-loader:bundleLibRuntimeToDirDebug
+> Task :expo-clipboard:bundleLibRuntimeToDirDebug
+> Task :expo-splash-screen:bundleLibRuntimeToDirDebug
+> Task :expo-eas-client:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-speech:bundleLibRuntimeToDirDebug
+> Task :expo-eas-client:copyDebugJniLibsProjectOnly
+> Task :expo-file-system:mergeDebugJniLibFolders
+> Task :expo-file-system:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-updates-interface:bundleLibRuntimeToDirDebug
+> Task :expo-file-system:copyDebugJniLibsProjectOnly
+> Task :expo-font:mergeDebugJniLibFolders
+> Task :expo-font:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-structured-headers:bundleLibRuntimeToDirDebug
+> Task :expo-font:copyDebugJniLibsProjectOnly
+> Task :expo-json-utils:mergeDebugJniLibFolders
+> Task :expo-json-utils:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-json-utils:copyDebugJniLibsProjectOnly
+> Task :expo-contacts:bundleLibRuntimeToDirDebug
+> Task :expo-keep-awake:mergeDebugJniLibFolders
+> Task :expo-keep-awake:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-keep-awake:copyDebugJniLibsProjectOnly
+> Task :expo-secure-store:bundleLibRuntimeToDirDebug
+> Task :expo-linear-gradient:mergeDebugJniLibFolders
+> Task :expo-linear-gradient:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-linear-gradient:copyDebugJniLibsProjectOnly
+> Task :expo-linking:mergeDebugJniLibFolders
+> Task :expo-linking:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-web-browser:bundleLibRuntimeToDirDebug
+> Task :expo-linking:copyDebugJniLibsProjectOnly
+> Task :expo-task-manager:bundleLibRuntimeToDirDebug
+> Task :expo-manifests:mergeDebugJniLibFolders
+> Task :expo-manifests:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-manifests:copyDebugJniLibsProjectOnly
+> Task :expo-av:bundleLibRuntimeToDirDebug
+> Task :expo-file-system:bundleLibRuntimeToDirDebug
+> Task :expo-notifications:bundleLibRuntimeToDirDebug
+> Task :expo-modules-core:configureCMakeDebug[arm64-v8a]
+
+> Task :expo-updates:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/DisabledUpdatesController.kt:66:20 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/DisabledUpdatesController.kt:175:14 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:5:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:72:39 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:108:20 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:222:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:222:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:248:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/EnabledUpdatesController.kt:248:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesConfiguration.kt:250:13 'get(String!): Any?' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesDevLauncherController.kt:4:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesDevLauncherController.kt:194:138 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesDevLauncherController.kt:301:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesDevLauncherController.kt:301:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesModule.kt:5:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesModule.kt:108:46 'toString(): String' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesModule.kt:197:7 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesModule.kt:197:17 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesModule.kt:203:7 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/UpdatesModule.kt:203:17 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/Converters.kt:56:30 Type mismatch: inferred type is ByteArray? but ByteArray was expected
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/Converters.kt:98:21 Parameter 'value' is never used
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/Converters.kt:103:21 Parameter 'hashType' is never used
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/DatabaseHolder.kt:24:20 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/DatabaseHolder.kt:36:14 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/DatabaseIntegrityCheck.kt:38:39 Type mismatch: inferred type is String? but String was expected
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/Reaper.kt:50:41 Type mismatch: inferred type is String? but String was expected
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/db/Reaper.kt:68:41 Type mismatch: inferred type is String? but String was expected
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/launcher/NoDatabaseLauncher.kt:4:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/launcher/NoDatabaseLauncher.kt:61:7 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/launcher/NoDatabaseLauncher.kt:61:17 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/Loader.kt:239:13 Type mismatch: inferred type is String? but String was expected
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/Loader.kt:303:65 Type mismatch: inferred type is String? but String was expected
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:4:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:297:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:297:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:361:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:361:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:414:105 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:490:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/loader/LoaderTask.kt:490:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/manifest/EmbeddedUpdate.kt:30:89 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/manifest/ExpoUpdatesUpdate.kt:35:92 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/CheckForUpdateProcedure.kt:4:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/CheckForUpdateProcedure.kt:34:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/CheckForUpdateProcedure.kt:34:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/CheckForUpdateProcedure.kt:131:108 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/CheckForUpdateProcedure.kt:164:108 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/FetchUpdateProcedure.kt:4:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/FetchUpdateProcedure.kt:36:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/FetchUpdateProcedure.kt:36:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/RelaunchProcedure.kt:5:19 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/RelaunchProcedure.kt:94:5 'AsyncTask<Params : Any!, Progress : Any!, Result : Any!>' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/RelaunchProcedure.kt:94:15 'execute(Runnable!): Unit' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/StartupProcedure.kt:165:36 'getCurrentState(): UpdatesStateValue' is deprecated. Avoid needing to access current state to know how to transition to next state
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/StartupProcedure.kt:199:34 'getCurrentState(): UpdatesStateValue' is deprecated. Avoid needing to access current state to know how to transition to next state
+w: file:///C:/sora/mobile/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/StateMachineSerialExecutorQueue.kt:43:35 'getCurrentState(): UpdatesStateValue' is deprecated. Avoid needing to access current state to know how to transition to next state
+
+> Task :expo-modules-core:buildCMakeDebug[arm64-v8a]
+> Task :expo-updates:compileDebugJavaWithJavac
+> Task :expo-updates:processDebugJavaRes
+> Task :expo-updates:bundleLibCompileToJarDebug
+> Task :expo-updates:bundleLibRuntimeToJarDebug
+> Task :expo-modules-core:configureCMakeDebug[armeabi-v7a]
+> Task :expo-updates:bundleLibRuntimeToDirDebug
+
+> Task :expo:compileDebugKotlin
+w: file:///C:/sora/mobile/node_modules/expo/android/src/main/java/expo/modules/ReactActivityDelegateWrapper.kt:163:34 'constructor ReactDelegate(Activity!, ReactNativeHost!, String?, Bundle?)' is deprecated. Deprecated in Java
+w: file:///C:/sora/mobile/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt:40:16 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
+w: file:///C:/sora/mobile/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt:42:11 'deallocate(): Unit' is deprecated. Use sharedObjectDidRelease() instead.
+
+> Task :expo-modules-core:buildCMakeDebug[armeabi-v7a]
+> Task :expo:compileDebugJavaWithJavac
+> Task :expo:processDebugJavaRes
+> Task :expo:bundleLibRuntimeToJarDebug
+> Task :expo:bundleLibCompileToJarDebug
+> Task :expo:bundleLibRuntimeToDirDebug
+> Task :expo-modules-core:configureCMakeDebug[x86]
+> Task :app:compileDebugKotlin
+> Task :expo-modules-core:buildCMakeDebug[x86]
+
+> Task :app:compileDebugJavaWithJavac FAILED
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:14: error: package com.reactnativecommunity.asyncstorage does not exist
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+                                            ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:18: error: package com.swmansion.reanimated does not exist
+import com.swmansion.reanimated.ReanimatedPackage;
+                               ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:20: error: package com.th3rdwave.safeareacontext does not exist
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+                                    ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:22: error: package com.swmansion.rnscreens does not exist
+import com.swmansion.rnscreens.RNScreensPackage;
+                              ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:24: error: package com.horcrux.svg does not exist
+import com.horcrux.svg.SvgPackage;
+                      ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:26: error: package fr.greweb.reactnativeviewshot does not exist
+import fr.greweb.reactnativeviewshot.RNViewShotPackage;
+                                    ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:28: error: package com.reactnativecommunity.webview does not exist
+import com.reactnativecommunity.webview.RNCWebViewPackage;
+                                       ^
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:74: error: cannot find symbol
+      new AsyncStoragePackage(),
+          ^
+  symbol:   class AsyncStoragePackage
+  location: class PackageList
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:76: error: cannot find symbol
+      new ReanimatedPackage(),
+          ^
+  symbol:   class ReanimatedPackage
+  location: class PackageList
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:77: error: cannot find symbol
+      new SafeAreaContextPackage(),
+          ^
+  symbol:   class SafeAreaContextPackage
+  location: class PackageList
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:78: error: cannot find symbol
+      new RNScreensPackage(),
+          ^
+  symbol:   class RNScreensPackage
+  location: class PackageList
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:79: error: cannot find symbol
+      new SvgPackage(),
+          ^
+  symbol:   class SvgPackage
+  location: class PackageList
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:80: error: cannot find symbol
+      new RNViewShotPackage(),
+          ^
+  symbol:   class RNViewShotPackage
+  location: class PackageList
+C:\sora\mobile\android\app\build\generated\autolinking\src\main\java\com\facebook\react\PackageList.java:81: error: cannot find symbol
+      new RNCWebViewPackage()
+          ^
+  symbol:   class RNCWebViewPackage
+  location: class PackageList
+14 errors
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2m 16s
+631 actionable tasks: 617 executed, 14 up-to-date

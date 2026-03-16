@@ -238,51 +238,57 @@ export default function FloatingAssistant() {
 
     // 2. Listen for Screenshot Captured events (from RootLayout or Native)
     const screenshotSub = DeviceEventEmitter.addListener('SCREENSHOT_CAPTURED', async (data) => {
+      console.log(`[Vision] Received SCREENSHOT_CAPTURED event. Processing: ${isVisionProcessing.current}`);
       if (isVisionProcessing.current) {
-        console.log('[Vision] Ignoring duplicate screenshot event');
+        console.warn('[Vision] Ignoring duplicate screenshot event (lock active)');
         return;
       }
       isVisionProcessing.current = true;
 
-      // Check if we were waiting for a vision result from a voice command
-      if (pendingVisionTranscriptRef.current) {
-        const transcript = pendingVisionTranscriptRef.current;
-        pendingVisionTranscriptRef.current = null;
-        console.log(`[Vision] Handling voice-to-vision request with transcript: "${transcript}"`);
-        await handleAiRequest(transcript, data.base64);
-      } else {
-        // Normal manual screenshot capture
-        await handleVisionCaptureResult(data.base64);
-      }
-      
-      isVisionProcessing.current = false;
-      if (visionTimeoutRef.current) {
-        clearTimeout(visionTimeoutRef.current);
-        visionTimeoutRef.current = null;
+      try {
+        if (!data?.base64) {
+          throw new Error("Screenshot data is empty");
+        }
+        
+        console.log(`[Vision] Data base64 length: ${data.base64.length}`);
+
+        if (pendingVisionTranscriptRef.current) {
+          const transcript = pendingVisionTranscriptRef.current;
+          pendingVisionTranscriptRef.current = null;
+          console.log(`[Vision] Handling voice-to-vision request with transcript: "${transcript}"`);
+          await handleAiRequest(transcript, data.base64);
+        } else {
+          console.log(`[Vision] Handling manual manual screenshot capture`);
+          await handleVisionCaptureResult(data.base64);
+        }
+      } catch (err: any) {
+        console.error(`[Vision] Error processing screenshot: ${err.message}`);
+        addMessage(`Screenshot processing failed: ${err.message}`, 'ai');
+        setIsCapturing(false);
+        setFaceState('Idle');
+      } finally {
+        console.log('[Vision] Releasing vision processing lock');
+        isVisionProcessing.current = false;
+        if (visionTimeoutRef.current) {
+          clearTimeout(visionTimeoutRef.current);
+          visionTimeoutRef.current = null;
+        }
       }
     });
 
     // 2.1 Listen for Screenshot Error (Permission Needed)
     const screenshotErrorSub = DeviceEventEmitter.addListener('SCREENSHOT_ERROR', (data) => {
-      console.log('[FloatingAssistant] Screenshot error:', data.error);
+      console.error(`[Vision] Screenshot Error: ${data.error}`);
+      addMessage(`Vision Error: ${data.error}`, 'ai'); // Inform user
       
-      pendingVisionTranscriptRef.current = null; // Clear any pending voice command
+      pendingVisionTranscriptRef.current = null;
       isVisionProcessing.current = false;
       
-      if (data.error === 'PERMISSION_DENIED_BY_USER') {
-        addMessage("Screen capture permission was denied. I need this to see your screen.", 'ai');
-      } else if (data.error === 'TIMEOUT' || data.error === 'WATCHDOG_TIMEOUT') {
-        addMessage("Sora couldn't capture your screen in time. Please try again.", 'ai');
-      } else if (data.error === 'PROCESSING_FAILED' || data.error === 'ENCODING_FAILED') {
-        addMessage("Something went wrong while processing the image. Please try again.", 'ai');
-      }
-      if (visionTimeoutRef.current) {
-        clearTimeout(visionTimeoutRef.current);
-        visionTimeoutRef.current = null;
-      }
+      // Reset state
       setIsCapturing(false);
       setFaceState('Idle');
       OverlayBridge.resetVisionCapture();
+      OverlayBridge.updateState('Idle');
     });
 
     // 4. Listen for Native Overlay Action Events (Direct from OverlayService)
@@ -656,6 +662,7 @@ export default function FloatingAssistant() {
       console.log('[Vision] App in background, using native screenshot');
       // If manual vision press, we don't have a transcript, so clear native one
       OverlayBridge.setVisionTranscript(null);
+      OverlayBridge.updateState('Thinking'); // Visual feedback immediately
       OverlayBridge.takeScreenshot();
     }
 

@@ -217,17 +217,17 @@ function RootLayoutNav() {
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener('REQUEST_SCREENSHOT', async () => {
       try {
-        console.log('[Layout] Screenshot requested...');
+        console.log('[Layout] Starting captureRef...');
         const uri = await captureRef(viewShotRef, {
           format: 'jpg',
           quality: 0.8,
           result: 'base64'
         });
+        console.log(`[Layout] Capture successful, base64 length: ${uri?.length || 0}`);
         DeviceEventEmitter.emit('SCREENSHOT_CAPTURED', { base64: uri });
-      } catch (err) {
-        console.error('Screenshot capture failed:', err);
-        // IMPORTANT: Emit error so FloatingAssistant can reset its state
-        DeviceEventEmitter.emit('SCREENSHOT_ERROR', { error: 'PROCESSING_FAILED' });
+      } catch (err: any) {
+        console.error('[Layout] Screenshot captureRef failed:', err.message);
+        DeviceEventEmitter.emit('SCREENSHOT_ERROR', { error: `CAPTURE_REF_FAILED_${err.message}` });
       }
     });
 
