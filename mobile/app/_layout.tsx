@@ -35,7 +35,8 @@ if (!hasSoraOverlay && !isExpoGo) {
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -162,7 +163,9 @@ function RootLayoutNav() {
   }, [user, loading, segments]);
 
   useEffect(() => {
-    console.log('[RootLayoutNav] Initializing background services...');
+    if (!user) return;
+    
+    console.log('[RootLayoutNav] Initializing background services for user:', user.id);
     // Initialize background services
     // WebSocket is safe for Expo Go
     try {
@@ -174,7 +177,7 @@ function RootLayoutNav() {
     } catch (err) {
       console.error('[RootLayoutNav] Service initialization failed:', err);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     // 1. Persistent Notification Trigger

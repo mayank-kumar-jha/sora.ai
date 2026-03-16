@@ -8,7 +8,7 @@ import apiClient from '../api/client';
 import { Audio } from 'expo-av';
 import { getAccessToken, getServerUrl } from '../utils/storage';
 import { DEFAULT_BASE_URL } from '../constants/settings';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useSoraSettings } from '../context/SoraSettingsContext';
 import { OverlayBridge } from '../native/OverlayBridge';
 import { stopBackgroundSilence, startBackgroundSilence } from '../services/BackgroundService';

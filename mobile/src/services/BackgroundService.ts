@@ -3,7 +3,7 @@ import { getAccessToken, getServerUrl } from '../utils/storage';
 import { OverlayBridge } from '../native/OverlayBridge';
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import apiClient from '../api/client';
 import { Buffer } from 'buffer';
 import { DEFAULT_BASE_URL } from '../constants/settings';

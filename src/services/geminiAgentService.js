@@ -220,20 +220,20 @@ CONSTRAINTS:
 
 // Model waterfall — using the latest models provided by the user
 const GEMINI_MODELS = [
-    'gemini-3.1-pro-preview',       // Most powerful SOTA
-    'gemini-3-flash-preview',       // Intelligent speed
-    'gemini-2.5-pro',               // Advanced reasoning
-    'gemini-2.5-flash',             // Hybrid reasoning
-    'gemini-2.0-flash',             // Second gen multimodal
+    'gemini-1.5-flash',             // High speed, high quota, vision support
+    'gemini-2.0-flash',             // Latest multimodal
+    'gemini-1.5-pro',               // Deep reasoning
+    'gemini-2.0-flash-lite-preview', // Speed optimized
 ];
 
 const isRetryableError = (error) => {
     const status = error.status || error.code;
-    const msg = error.message || '';
+    const msg = error.message?.toLowerCase() || '';
     return (
-        status === 429 || status === 404 || status === 403 ||
+        status === 429 || status === 404 || status === 403 || status === 500 ||
         msg.includes('quota') || msg.includes('not found') ||
-        msg.includes('fetching from') || msg.includes('limit')
+        msg.includes('limit') || msg.includes('fetching from') ||
+        msg.includes('model is not')
     );
 };
 
@@ -341,73 +341,64 @@ const runWithModel = async (ai, modelName, userId, userMessage, context, imageBa
  * Process a user message using Gemini with Function Calling and return a stream.
  */
 const streamMessageWithTools = async (userId, userMessage, context = [], imageBase64 = null) => {
-    console.log(`[GeminiAgent] Streaming message. Text: "${userMessage}"`);
+    console.log(`[GeminiAgent] Starting stream for user ${userId}. Vision: ${!!imageBase64}`);
 
     const preferredModel = config.gemini.model;
     const modelQueue = [preferredModel, ...GEMINI_MODELS.filter(m => m !== preferredModel)];
 
-    // Build toolset dynamically
+    // Build toolset
     const tokenRecord = await prisma.googleToken.findUnique({ where: { userId } });
     const isGoogleLinked = !!tokenRecord;
-
     const toolDeclarations = [...coreFunctions, ...nativeFunctions];
-    if (isGoogleLinked) {
-        toolDeclarations.push(...googleFunctions);
-    }
-
+    if (isGoogleLinked) toolDeclarations.push(...googleFunctions);
     const effectiveTools = { functionDeclarations: toolDeclarations };
 
-    for (const modelName of modelQueue) {
-        try {
-            const ai = getGenAI();
-            if (!ai) break;
+    return (async function* () {
+        for (const modelName of modelQueue) {
+            if (!modelName) continue;
+            try {
+                console.log(`[GeminiAgent] Trying model: ${modelName}`);
+                const ai = getGenAI();
+                if (!ai) throw new Error('API Key missing');
 
-            const model = ai.getGenerativeModel({
-                model: modelName,
-                tools: [effectiveTools],
-                safetySettings,
-                systemInstruction: {
-                    role: 'system',
-                    parts: [{ text: `[SYSTEM CONTEXT: ${new Date().toString()}]\n${SYSTEM_PROMPT}` }]
+                const model = ai.getGenerativeModel({
+                    model: modelName,
+                    tools: [effectiveTools],
+                    safetySettings,
+                    systemInstruction: {
+                        role: 'system',
+                        parts: [{ text: `[SYSTEM CONTEXT: ${new Date().toString()}]\n${SYSTEM_PROMPT}` }]
+                    }
+                });
+
+                let history = context.map(c => ({
+                    role: c.role === 'assistant' ? 'model' : c.role,
+                    parts: [{ text: c.content }]
+                }));
+                const firstUserIndex = history.findIndex(h => h.role === 'user');
+                history = firstUserIndex !== -1 ? history.slice(firstUserIndex) : [];
+
+                const chat = model.startChat({ history });
+                const messageParts = [];
+                if (imageBase64) {
+                    const cleanBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
+                    messageParts.push({ inlineData: { data: cleanBase64, mimeType: 'image/jpeg' } });
                 }
-            });
+                messageParts.push({ text: userMessage });
 
-            let history = context.map(c => ({
-                role: c.role === 'assistant' ? 'model' : c.role,
-                parts: [{ text: c.content }]
-            }));
-            const firstUserIndex = history.findIndex(h => h.role === 'user');
-            if (firstUserIndex !== -1) {
-                history = history.slice(firstUserIndex);
-            } else if (history.length > 0) {
-                history = [];
-            }
-
-            const chat = model.startChat({ history });
-
-            const messageParts = [];
-            if (imageBase64) {
-                const cleanBase64 = imageBase64.includes('base64,')
-                    ? imageBase64.split('base64,')[1]
-                    : imageBase64;
-                messageParts.push({ inlineData: { data: cleanBase64, mimeType: 'image/jpeg' } });
-            }
-            messageParts.push({ text: userMessage });
-
-            const result = await chat.sendMessageStream(messageParts);
-
-            // Create a generator that yields tokens and handles function calls
-            return (async function* () {
-                let response = await result.response; // Wait for the first part to ensure no immediate tool calls
+                const result = await chat.sendMessageStream(messageParts);
+                
+                // CRITICAL: We await the response here to catch quota errors BEFORE yielding anything.
+                // If this fails, we catch it and continue to the next model.
+                let response = await result.response;
                 let functionCalls = response.functionCalls();
 
-                // If no tool calls, just yield the stream tokens
                 if (!functionCalls || functionCalls.length === 0) {
                     for await (const chunk of result.stream) {
                         const token = chunk.text();
                         if (token) yield { type: 'TOKEN', text: token };
                     }
-                    return;
+                    return; // Success
                 }
 
                 // Tool call loop
@@ -415,31 +406,22 @@ const streamMessageWithTools = async (userId, userMessage, context = [], imageBa
                     const toolResponses = [];
                     for (const call of functionCalls) {
                         let toolResult;
-                        let actionName = call.name.toUpperCase();
                         yield { type: 'THOUGHT', text: `Executing ${call.name}...` };
-                        
                         try {
                             if (call.name === 'create_calendar_event' || call.name === 'list_calendar_events') {
-                                const args = call.name === 'list_calendar_events' ? { maxResults: call.args.maxResults || 5 } : call.args;
-                                toolResult = await actionRouter.routeAction(userId, actionName, args);
+                                toolResult = await actionRouter.routeAction(userId, call.name.toUpperCase(), call.args);
                             } else if (call.name === 'perform_web_search') {
                                 toolResult = await webSearchService.performWebSearch(call.args.query);
                             } else if (call.name === 'query_knowledge_base') {
-                                const queryEmbedding = await require('./embeddingService').generateEmbedding(call.args.query);
-                                const matches = queryEmbedding ? await vectorDbService.queryVectors(queryEmbedding, userId) : [];
-                                toolResult = matches.length > 0 ? matches.map(m => m.text).join('\n---\n') : 'No relevant personal info found.';
+                                const emb = await require('./embeddingService').generateEmbedding(call.args.query);
+                                const matches = emb ? await vectorDbService.queryVectors(emb, userId) : [];
+                                toolResult = matches.length > 0 ? matches.map(m => m.text).join('\n---\n') : 'No info found.';
                             } else if (call.name === 'send_whatsapp_message') {
                                 toolResult = await actionRouter.routeAction(userId, 'SEND_WHATSAPP', call.args);
                             } else if (call.name === 'list_whatsapp_chats') {
                                 toolResult = await actionRouter.routeAction(userId, 'GET_WHATSAPP_MESSAGES', call.args);
                             } else if (call.name === 'list_whatsapp_contacts') {
                                 toolResult = await actionRouter.routeAction(userId, 'GET_WHATSAPP_CONTACTS', call.args);
-                            } else if (call.name === 'clear_whatsapp_cache') {
-                                toolResult = await actionRouter.routeAction(userId, 'CLEAR_WHATSAPP_CACHE', call.args);
-                            } else if (call.name === 'send_email') {
-                                toolResult = await actionRouter.routeAction(userId, 'SEND_EMAIL', call.args);
-                            } else if (call.name === 'get_inbox') {
-                                toolResult = await actionRouter.routeAction(userId, 'GET_INBOX', call.args);
                             } else if (call.name === 'set_alarm') {
                                 toolResult = await actionRouter.routeAction(userId, 'SET_ALARM', call.args);
                             } else if (call.name === 'make_call') {
@@ -458,9 +440,7 @@ const streamMessageWithTools = async (userId, userMessage, context = [], imageBa
                         } catch (err) {
                             toolResult = { error: err.message };
                         }
-                        toolResponses.push({
-                            functionResponse: { name: call.name, response: { result: toolResult } }
-                        });
+                        toolResponses.push({ functionResponse: { name: call.name, response: { result: toolResult } } });
                     }
                     
                     const nextResult = await chat.sendMessageStream(toolResponses);
@@ -474,17 +454,27 @@ const streamMessageWithTools = async (userId, userMessage, context = [], imageBa
                         }
                     }
                 }
-            })();
-        } catch (error) {
-            console.warn(`[GeminiAgent] Streaming error with ${modelName}: ${error.message}`);
-            if (!isRetryableError(error)) break;
+                return; // Success
+            } catch (error) {
+                console.error(`[GeminiAgent] Error with ${modelName}:`, error.message);
+                if (isRetryableError(error)) {
+                    console.warn(`[GeminiAgent] Retrying with next model...`);
+                    continue;
+                }
+                // If not retryable, yield the error and stop
+                yield { type: 'TOKEN', text: `I encountered an error: ${error.message}` };
+                return;
+            }
         }
-    }
 
-    // Fallback to Groq if all Gemini failed (non-streaming for now to keep it simple)
-    const result = await require('./agentService').processMessage(userId, userMessage, context, imageBase64);
-    return (async function* () {
-        yield { type: 'TOKEN', text: result.message || 'Error occurred during fallback.' };
+        // Final Fallback to Groq
+        console.warn(`[GeminiAgent] All models failed. Falling back to Groq.`);
+        try {
+            const fallbackResult = await require('./agentService').processMessage(userId, userMessage, context, imageBase64);
+            yield { type: 'TOKEN', text: fallbackResult.message || 'I am having trouble replying right now.' };
+        } catch (fErr) {
+            yield { type: 'TOKEN', text: 'Sorry, I am currently unable to process your request.' };
+        }
     })();
 };
 
