@@ -1,11 +1,12 @@
 {
     "name": "super-ai-assistant",
-    "version": "1.0.0",
+    "version": "1.2.1",
     "description": "Production-grade AI SaaS Backend – Phase 1",
     "main": "src/server.js",
     "scripts": {
         "start": "node src/server.js",
         "dev": "nodemon src/server.js",
+        "build": "prisma generate",
         "migrate": "prisma migrate dev",
         "migrate:prod": "prisma migrate deploy",
         "generate": "prisma generate",
