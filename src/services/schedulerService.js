@@ -1,7 +1,7 @@
 'use strict';
 
 const prisma = require('../config/database');
-const { queues } = require('../queues');
+const { addJob } = require('../queues');
 const logger = require('../config/logger');
 const cronParser = require('cron-parser');
 
@@ -25,8 +25,7 @@ const schedulePendingTasks = async () => {
 
     for (const task of pendingTasks) {
         if (task.type === 'ONE_TIME') {
-            await queues.task.add(`task-${task.id}`, { taskId: task.id, userId: task.userId });
-            logger.info(`Queued one-time task ${task.id}`);
+            await addJob('EXECUTE_TASK', { taskId: task.id, userId: task.userId }, { jobId: `task-${task.id}` });
         } else if (task.type === 'RECURRING' && task.recurrenceRule) {
             try {
                 const interval = cronParser.parseExpression(task.recurrenceRule, {
@@ -35,8 +34,7 @@ const schedulePendingTasks = async () => {
                 const nextRun = interval.next().toDate();
 
                 if (nextRun <= now) {
-                    await queues.task.add(`task-${task.id}`, { taskId: task.id, userId: task.userId });
-                    logger.info(`Queued recurring task ${task.id}`);
+                    await addJob('EXECUTE_TASK', { taskId: task.id, userId: task.userId }, { jobId: `task-${task.id}-${Date.now()}` });
                 }
             } catch (err) {
                 logger.error(`Invalid cron pattern for task ${task.id}`, { error: err.message });
@@ -58,8 +56,7 @@ const schedulePendingReminders = async () => {
     });
 
     for (const reminder of reminders) {
-        await queues.reminder.add(`reminder-${reminder.id}`, { reminderId: reminder.id });
-        logger.info(`Queued reminder ${reminder.id}`);
+        await addJob('TRIGGER_REMINDER', { reminderId: reminder.id }, { jobId: `reminder-${reminder.id}` });
     }
 };
 

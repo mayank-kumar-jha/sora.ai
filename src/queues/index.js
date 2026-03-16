@@ -16,24 +16,41 @@ connection.on('error', (err) => {
     logger.error('Queues: Redis connection error', { error: err.message });
 });
 
-// Queue Definitions
-const aiQueue = new Queue('aiQueue', { connection });
-const taskQueue = new Queue('taskQueue', { connection });
-const reminderQueue = new Queue('reminderQueue', { connection });
-const emailQueue = new Queue('emailQueue', { connection });
-const embeddingQueue = new Queue('embeddingQueue', { connection });
+const mainQueue = new Queue('mainQueue', { connection });
 
-const queues = {
-    ai: aiQueue,
-    task: taskQueue,
-    reminder: reminderQueue,
-    email: emailQueue,
-    embedding: embeddingQueue
+/**
+ * Safe wrapper to add jobs to the queue.
+ * name: The job type (e.g. 'EXECUTE_TASK', 'TRIGGER_REMINDER')
+ * data: The job payload
+ * options: BullMQ options (like jobId for de-duplication)
+ */
+const addJob = async (name, data, options = {}) => {
+    try {
+        await mainQueue.add(name, data, {
+            removeOnComplete: true,
+            removeOnFail: 1000,
+            ...options
+        });
+        logger.info(`Job added to mainQueue: ${name}`);
+    } catch (err) {
+        logger.warn(`Failed to add job ${name} to mainQueue`, { error: err.message });
+    }
 };
 
-logger.info('BullMQ Queues initialized with dedicated connection');
+const queues = {
+    main: mainQueue,
+    // Add legacy naming for safety during transition
+    aiQueue: mainQueue,
+    taskQueue: mainQueue,
+    reminderQueue: mainQueue,
+    emailQueue: mainQueue,
+    embeddingQueue: mainQueue
+};
+
+logger.info('BullMQ Consolidated Queue initialized');
 
 module.exports = {
     queues,
+    addJob,
     connection
 };

@@ -2,11 +2,7 @@
 
 const logger = require('../config/logger');
 
-// Import all workers to initialize them
-require('./aiWorker');
-require('./taskWorker');
-require('./reminderWorker');
-require('./emailWorker');
-require('./embeddingWorker');
+// Import the consolidated worker to initialize it
+require('./mainWorker');
 
-logger.info('All BullMQ workers started');
+logger.info('Consolidated BullMQ worker started');
