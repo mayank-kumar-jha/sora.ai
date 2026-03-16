@@ -96,4 +96,14 @@ mainWorker.on('failed', (job, err) => {
     logger.error(`Job ${job.id} failed permanently`, { error: err.message });
 });
 
+// Prevent unhandled rejections from worker errors (e.g. Redis connection drops)
+mainWorker.on('error', (err) => {
+    if (err.message.includes('max requests limit exceeded')) {
+        logger.warn('MainWorker: Redis limit hit, pausing worker...');
+        mainWorker.pause().catch(() => {});
+    } else {
+        logger.error('MainWorker: Unexpected error', { error: err.message });
+    }
+});
+
 module.exports = mainWorker;

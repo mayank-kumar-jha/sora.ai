@@ -92,13 +92,20 @@ const startServer = async () => {
             logger.error('DATABASE CONNECTION FAILED - Server may be unstable', { error: err.message });
         });
 
-    // Pre-flight: Redis is optional
-    const redis = getRedisClient();
-    redis.ping()
-        .then(() => logger.info('Redis: Connected successfully'))
-        .catch((err) => {
-            logger.warn('Redis: Unavailable at startup - proceeding with database only', { error: err.message });
-        });
+    // Pre-flight: Redis is optional and protected by circuit breaker
+    const { getRedisSuspended } = require('./config/redis');
+    if (getRedisSuspended()) {
+        logger.warn('Redis: CIRCUIT BREAKER ACTIVE - Skipping connection check');
+    } else {
+        const redis = getRedisClient();
+        if (redis) {
+            redis.ping()
+                .then(() => logger.info('Redis: Connected successfully'))
+                .catch((err) => {
+                    logger.warn('Redis: Unavailable at startup - proceeding with database only', { error: err.message });
+                });
+        }
+    }
 
     const server = app.listen(config.port, '0.0.0.0', () => {
         logger.info(`Server started`, {
