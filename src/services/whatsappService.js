@@ -246,6 +246,29 @@ class WhatsAppManager {
             this.saveStore();
         });
 
+        // Contact Sync (Real-time)
+        this.sock.ev.on('contacts.upsert', (contacts) => {
+            contacts.forEach(c => {
+                const name = c.name || c.verifiedName || c.notify;
+                if (name && !c.id.includes('@newsletter')) {
+                    this.contacts.set(c.id, name);
+                }
+            });
+            this.saveStore();
+        });
+
+        this.sock.ev.on('contacts.update', (updates) => {
+            updates.forEach(u => {
+                if (u.name || u.verifiedName || u.notify) {
+                    const name = u.name || u.verifiedName || u.notify;
+                    if (!u.id.includes('@newsletter')) {
+                        this.contacts.set(u.id, name);
+                    }
+                }
+            });
+            this.saveStore();
+        });
+
         // Messages Upsert
         this.sock.ev.on('messages.upsert', (m) => {
             const msg = m.messages[0];
