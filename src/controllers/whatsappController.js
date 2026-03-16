@@ -154,6 +154,22 @@ const renderQrPage = asyncHandler(async (req, res) => {
     `);
 });
 
+/**
+ * GET /api/whatsapp/pairing-code?phoneNumber=...
+ */
+const getPairingCode = asyncHandler(async (req, res) => {
+    const { phoneNumber } = req.query;
+    if (!phoneNumber) throw new AppError('phoneNumber is required.', 400);
+
+    const cleanNumber = phoneNumber.replace(/\D/g, '');
+    const code = await whatsappService.requestPairingCode(cleanNumber);
+    
+    sendSuccess(res, { 
+        message: 'Pairing code generated successfully.', 
+        data: { pairingCode: code } 
+    });
+});
+
 module.exports = {
-    getStatus, getQrCode, getChats, sendMessage, renderQrPage, resetSession
+    getStatus, getQrCode, getChats, sendMessage, renderQrPage, resetSession, getPairingCode
 };

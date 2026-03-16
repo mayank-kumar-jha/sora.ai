@@ -65,7 +65,7 @@ app.use(requestLogger);
 
 // ─── Health check (Moved above rate limiter to prevent Render 429s) ────────
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable (v1.2.1-deploy-trigger)' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable (v1.2.2-route-fix)' });
 });
 
 // ─── Global Rate Limiting ───────────────────────────────────────────────────

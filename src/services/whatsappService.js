@@ -328,6 +328,19 @@ class WhatsAppManager {
         await this.sock.sendMessage(jid, { text });
         return { to, jid, status: 'sent' };
     }
+
+    async requestPairingCode(phoneNumber) {
+        if (this.status === WhatsAppStatus.CONNECTED) return null;
+        if (!this.sock) await this.init();
+        
+        try {
+            const code = await this.sock.requestPairingCode(phoneNumber);
+            return code;
+        } catch (err) {
+            logger.error('[WhatsApp] Pairing code request failed:', err.message);
+            throw new AppError('Failed to generate pairing code', 500);
+        }
+    }
 }
 
 const manager = new WhatsAppManager();
@@ -344,6 +357,7 @@ module.exports = {
         }));
     },
     sendWhatsAppMessage: (to, text) => manager.send(to, text),
+    requestPairingCode: (phone) => manager.requestPairingCode(phone),
     resetSession: () => manager.wipeSession(),
     getLastReceivedMessage: () => manager.lastReceivedMessage,
     WhatsAppStatus // Export enum for controller
