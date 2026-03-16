@@ -25,6 +25,38 @@ const loadBaileys = async () => {
     }
 };
 
+/**
+ * Robustly revives an object that may contain Buffers serialized in various formats
+ */
+const reviveBuffers = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+
+    if (obj.type === 'Buffer' && (typeof obj.data === 'string' || Array.isArray(obj.data))) {
+        return Buffer.from(obj.data, typeof obj.data === 'string' ? 'base64' : undefined);
+    }
+
+    const revived = Array.isArray(obj) ? [] : {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (value && typeof value === 'object') {
+            revived[key] = reviveBuffers(value);
+        } else if (typeof value === 'string' && value.length > 20 && /^[A-Za-z0-9+/=]+$/.test(value)) {
+            // Heuristic for raw base64 strings that should have been Buffers
+            // Only apply if the key looks like one that should be a Buffer
+            const bufferKeys = ['noiseKey', 'signedPreKey', 'identityKey', 'advSecretKey', 'private', 'public', 'iv', 'key'];
+            if (bufferKeys.includes(key)) {
+                try { 
+                    revived[key] = Buffer.from(value, 'base64');
+                    continue;
+                } catch (e) {}
+            }
+            revived[key] = value;
+        } else {
+            revived[key] = value;
+        }
+    }
+    return revived;
+};
+
 const AUTH_FOLDER = path.join(process.cwd(), 'data', '.baileys_auth');
 const STORE_FILE = path.join(process.cwd(), 'data', 'whatsapp_store.json');
 
@@ -256,11 +288,11 @@ class WhatsAppManager {
                     logger.info('[WhatsApp] Restoring credentials from DB...');
                     if (!fs.existsSync(AUTH_FOLDER)) fs.mkdirSync(AUTH_FOLDER, { recursive: true });
                     
-                    // We must revive the Buffers before serializing to the file, 
-                    // or write it in a format that Baileys can understand.
-                    // Baileys useMultiFileAuthState reads the file with JSON.parse and some internal revival logic.
-                    // The safest way is to use BufferJSON.replacer to ensure the file format is correct for Baileys.
-                    const credsContent = JSON.stringify(session.creds, BufferJSON.replacer);
+                    // 1. Manually revive to ensure Buffers are real
+                    const revived = reviveBuffers(session.creds);
+                    
+                    // 2. Serialize to file in the format Baileys expects
+                    const credsContent = JSON.stringify(revived, BufferJSON.replacer);
                     fs.writeFileSync(path.join(AUTH_FOLDER, 'creds.json'), credsContent);
                     return session;
                 }
