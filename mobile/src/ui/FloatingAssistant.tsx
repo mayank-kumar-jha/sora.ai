@@ -667,6 +667,7 @@ export default function FloatingAssistant() {
   };
 
   const handleVisionPress = () => {
+    console.log('[Vision] Vision button pressed');
     setIsCapturing(true);
     setFaceState('Thinking');
     OverlayBridge.updateState('Thinking');
@@ -674,28 +675,39 @@ export default function FloatingAssistant() {
     // Use different capture paths depending on app state:
     // - Foreground: ViewShot (captureRef) — fast, no permission needed
     // - Background: Native MediaProjection — captures actual screen
+    // FORCE NATIVE if we suspect background issues or user requested system-wide
     const isInForeground = AppState.currentState === 'active';
-    if (isInForeground) {
-      console.log('[Vision] App in foreground, using ViewShot capture');
-      DeviceEventEmitter.emit('REQUEST_SCREENSHOT');
-    } else {
-      console.log('[Vision] App in background, using native screenshot');
-      // If manual vision press, we don't have a transcript, so clear native one
-      OverlayBridge.setVisionTranscript(null);
-      OverlayBridge.updateState('Thinking'); // Visual feedback immediately
-      OverlayBridge.takeScreenshot();
+    console.log(`[Vision] App foreground status: ${isInForeground}`);
+
+    try {
+        if (isInForeground) {
+          console.log('[Vision] App in foreground, using internal ViewShot capture');
+          DeviceEventEmitter.emit('REQUEST_SCREENSHOT');
+        } else {
+          console.log('[Vision] App in background, triggering native system-wide screenshot');
+          // If manual vision press, we don't have a transcript, so clear native one
+          OverlayBridge.setVisionTranscript(null);
+          OverlayBridge.updateState('Thinking'); 
+          OverlayBridge.takeScreenshot();
+        }
+    } catch (err: any) {
+        console.error(`[Vision] Direct capture trigger failed: ${err.message}`);
+        setIsCapturing(false);
+        setFaceState('Idle');
     }
 
     // Set a 15-second safety timeout for vision capture
     if (visionTimeoutRef.current) clearTimeout(visionTimeoutRef.current);
     visionTimeoutRef.current = setTimeout(() => {
-      console.warn('[Vision] Capture timed out. Resetting state...');
-      setIsCapturing(false);
-      setFaceState('Idle');
-      OverlayBridge.resetVisionCapture();
-      addMessage("Vision capture timed out. Please try again.", 'ai');
+      if (isCapturingRef.current) {
+        console.warn('[Vision] Capture timed out after 15s. Resetting state...');
+        setIsCapturing(false);
+        setFaceState('Idle');
+        OverlayBridge.resetVisionCapture();
+      }
     }, 15000);
   };
+
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>

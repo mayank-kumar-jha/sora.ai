@@ -235,12 +235,13 @@ const initWhatsApp = async () => {
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
-            if (connection) logger.info(`WhatsApp Connection Update: ${connection}`);
+            if (connection) logger.info(`[WhatsApp] Connection Status: ${connection}`);
 
             if (qr) {
                 reconnectAttempts = 0;
                 logger.info('====================================================');
                 logger.info('SCAN THE QR CODE BELOW TO CONNECT WHATSAPP');
+                logger.info(`[WhatsApp] New QR received at: ${new Date().toISOString()}`);
                 logger.info('====================================================');
 
                 // Print to terminal for the user (Standard format for Windows compatibility)
@@ -250,15 +251,15 @@ const initWhatsApp = async () => {
                     qrcodeTerminal.generate(qr, { small: true });
                     console.log('\n'); // Add some space
                 } catch (e) {
-                    logger.warn('Could not print QR to terminal: ' + e.message);
+                    logger.warn('[WhatsApp] Could not print QR to terminal: ' + e.message);
                 }
 
                 try {
                     currentQrCode = await qrcode.toDataURL(qr, { margin: 2, scale: 8 });
                     notifyUser('system', 'WHATSAPP_QR', { qr: currentQrCode });
-                    logger.info('QR Code also sent to Sora dashboard.');
+                    logger.info('[WhatsApp] QR Code image generated and broadcasted.');
                 } catch (err) {
-                    logger.error('Failed to generate QR code image', { error: err.message });
+                    logger.error('[WhatsApp] Failed to generate QR code image', { error: err.message });
                 }
                 isReady = false;
                 logger.info('====================================================');
@@ -267,28 +268,37 @@ const initWhatsApp = async () => {
             if (connection === 'close') {
                 const statusCode = lastDisconnect?.error?.output?.statusCode;
                 const loggedOut = statusCode === DisconnectReason.loggedOut;
+                const shouldReconnect = !loggedOut && reconnectAttempts < MAX_RECONNECT_ATTEMPTS;
 
-                logger.warn(`WhatsApp disconnected. Code: ${statusCode} | LoggedOut: ${loggedOut}`);
+                logger.warn(`[WhatsApp] Connection closed. Status: ${statusCode} | LoggedOut: ${loggedOut} | Should Reconnect: ${shouldReconnect}`);
+                
                 isReady = false;
-                currentQrCode = null;
+                // DO NOT clear currentQrCode here unless we are logged out
+                // Clearing it on every temporary closure is what causes the "Refresh in 5s" hang
+                if (loggedOut) {
+                    logger.info('[WhatsApp] Session logged out. Wiping credentials...');
+                    currentQrCode = null;
+                }
+                
                 sock = null;
 
-                if (!loggedOut && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                if (shouldReconnect) {
                     reconnectAttempts++;
-                    const delay = reconnectAttempts * 3000;
-                    logger.info(`Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts})...`);
+                    const delay = Math.min(reconnectAttempts * 3000, 15000);
+                    logger.info(`[WhatsApp] Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts})...`);
                     setTimeout(() => initWhatsApp(), delay);
                 } else if (loggedOut) {
-                    logger.info('WhatsApp logged out. Please re-scan QR code.');
+                    logger.info('[WhatsApp] Logged out. Waiting for user to trigger new QR flow or restart.');
                 }
             } else if (connection === 'open') {
-                logger.info('✅ WhatsApp Baileys Client is Ready!');
+                logger.info('✅ [WhatsApp] Client is Ready and Connected!');
                 isReady = true;
-                currentQrCode = null;
+                currentQrCode = null; // Clear QR only when successfully connected
                 reconnectAttempts = 0;
                 notifyUser('system', 'WHATSAPP_READY', { status: 'connected' });
             }
         });
+
 
     } catch (err) {
         logger.error('Failed to initialize WhatsApp Baileys client:', err.message);
