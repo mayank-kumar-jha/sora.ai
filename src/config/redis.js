@@ -7,6 +7,7 @@ const { redis: redisConfig } = require('./env');
 // Global flag to suspend Redis operations if limits are hit
 let isRedisSuspended = false;
 let suspensionTimer = null;
+let redisClient = null;
 
 const suspendRedis = (durationMs = 5 * 60 * 1000) => {
     if (isRedisSuspended) return;
