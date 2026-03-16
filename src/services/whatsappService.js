@@ -128,10 +128,11 @@ class WhatsAppManager {
 
     setupListeners(saveCreds, state) {
         // Creds Update
-        this.sock.ev.on('creds.update', async () => {
+        this.sock.ev.on('creds.update', async (update) => {
             await saveCreds();
             try {
                 // state.creds contains Buffers. We must use BufferJSON to correctly handle them for Prisma JSON field.
+                // We stringify with replacer and then parse to get a serializable object for Prisma.
                 const serialized = JSON.parse(JSON.stringify(state.creds, BufferJSON.replacer));
                 await prisma.whatsAppSession.upsert({
                     where: { id: 'singleton' },
@@ -255,7 +256,10 @@ class WhatsAppManager {
                     logger.info('[WhatsApp] Restoring credentials from DB...');
                     if (!fs.existsSync(AUTH_FOLDER)) fs.mkdirSync(AUTH_FOLDER, { recursive: true });
                     
-                    // session.creds is an object. useMultiFileAuthState expects a JSON string with specific Buffer markers.
+                    // We must revive the Buffers before serializing to the file, 
+                    // or write it in a format that Baileys can understand.
+                    // Baileys useMultiFileAuthState reads the file with JSON.parse and some internal revival logic.
+                    // The safest way is to use BufferJSON.replacer to ensure the file format is correct for Baileys.
                     const credsContent = JSON.stringify(session.creds, BufferJSON.replacer);
                     fs.writeFileSync(path.join(AUTH_FOLDER, 'creds.json'), credsContent);
                     return session;
