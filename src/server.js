@@ -89,7 +89,7 @@ const startServer = async () => {
     prisma.$connect()
         .then(() => logger.info('Database: Connected successfully'))
         .catch((err) => {
-            logger.error('DATABASE CONNECTION FAILED', { error: err.message });
+            logger.error('DATABASE CONNECTION FAILED - Server may be unstable', { error: err.message });
         });
 
     // Pre-flight: Redis is optional
@@ -97,7 +97,7 @@ const startServer = async () => {
     redis.ping()
         .then(() => logger.info('Redis: Connected successfully'))
         .catch((err) => {
-            logger.warn('Redis: Unavailable at startup', { error: err.message });
+            logger.warn('Redis: Unavailable at startup - proceeding with database only', { error: err.message });
         });
 
     const server = app.listen(config.port, '0.0.0.0', () => {
@@ -125,17 +125,30 @@ const startServer = async () => {
 
     // Initialize WhatsApp
     const { initWhatsApp } = require('./services/whatsappService');
-    initWhatsApp();
+    initWhatsApp().catch(err => {
+        logger.error('WhatsApp Initialization Failed', { error: err.message });
+    });
 
-    // Initial Scheduler Scan
-    await schedulePendingTasks();
-    await schedulePendingReminders();
+    // Initial Scheduler Scan - Non-blocking to prevent startup timeouts
+    setImmediate(async () => {
+        try {
+            logger.info('Performing initial scheduler scan...');
+            await schedulePendingTasks();
+            await schedulePendingReminders();
+        } catch (err) {
+            logger.warn('Initial scheduler scan failed', { error: err.message });
+        }
+    });
 
     // Setup Cron for Scheduler (every 1 minute)
     cron.schedule('* * * * *', async () => {
-        logger.info('Running scheduled task scan...');
-        await schedulePendingTasks();
-        await schedulePendingReminders();
+        try {
+            logger.info('Running scheduled task scan...');
+            await schedulePendingTasks();
+            await schedulePendingReminders();
+        } catch (err) {
+            logger.error('Scheduled task scan failed', { error: err.message });
+        }
     });
 
     // ─── Graceful Shutdown ────────────────────────────────────────────────────

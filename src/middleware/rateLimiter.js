@@ -21,8 +21,10 @@ const createLimiter = ({ windowMs, max, message, keyPrefix }) => {
                     try {
                         return await client.call(...args);
                     } catch (err) {
-                        logger.warn(`Rate limiter Redis command failed: ${err.message}`);
-                        throw err; // rate-limit-redis will handle this or we might need a more complex fallback
+                        logger.warn(`Rate limiter Redis command failed - falling back to permissive mode`, { error: err.message });
+                        // Return something that doesn't crash the request
+                        // Most rate limiters will treat an error as "0 count" or "success" if handled this way
+                        return null; 
                     }
                 },
                 prefix: `rl:${keyPrefix}:`,
