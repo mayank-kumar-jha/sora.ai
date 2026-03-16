@@ -77,8 +77,44 @@ const createRedisClient = () => {
     return client;
 };
 
+/**
+ * A No-Op Mock Redis Client that prevents crashes when Redis is suspended.
+ * It uses a Proxy to intercept all method calls and return successful promises.
+ */
+const createMockRedisClient = () => {
+    logger.warn('Redis: Initializing Mock Redis Proxy (Safe Mode)');
+    return new Proxy({}, {
+        get: (target, prop) => {
+            // Standard EventEmitter methods used by BullMQ/ioredis
+            if (prop === 'on' || prop === 'once' || prop === 'removeListener') {
+                return () => target;
+            }
+            if (prop === 'quit' || prop === 'disconnect') {
+                return () => Promise.resolve();
+            }
+            if (prop === 'ping') {
+                return () => Promise.resolve('PONG');
+            }
+            // Catch-all for any Redis command (set, get, del, evalsha, etc.)
+            return async () => {
+                // Return null or empty value as if Redis succeeded but key was missing
+                return null;
+            };
+        }
+    });
+};
+
+const getNewRedisConnection = () => {
+    if (isRedisSuspended) {
+        return createMockRedisClient();
+    }
+    return createRedisClient();
+};
+
 const getRedisClient = () => {
-    if (isRedisSuspended) return null;
+    if (isRedisSuspended) {
+        return createMockRedisClient();
+    }
     if (!redisClient) {
         redisClient = createRedisClient();
     }
@@ -93,4 +129,10 @@ const disconnectRedis = async () => {
     }
 };
 
-module.exports = { getRedisClient, disconnectRedis, getCommonRedisOptions, getRedisSuspended };
+module.exports = { 
+    getRedisClient, 
+    getNewRedisConnection, 
+    disconnectRedis, 
+    getCommonRedisOptions, 
+    getRedisSuspended 
+};

@@ -5,12 +5,12 @@ const { redis: redisConfig } = require('../config/env');
 const logger = require('../config/logger');
 
 const Redis = require('ioredis');
-const { getCommonRedisOptions, getRedisSuspended } = require('../config/redis');
+const { getCommonRedisOptions, getRedisSuspended, getNewRedisConnection } = require('../config/redis');
 
 logger.info(`Queues: Using Redis URL length=${(redisConfig.url || '').length}`);
 
-// Dedicated Redis instance for BullMQ (Required to have maxRetriesPerRequest: null)
-const connection = new Redis(redisConfig.url, getCommonRedisOptions());
+// Dedicated Redis instance for BullMQ (Protected by circuit breaker)
+const connection = getNewRedisConnection();
 
 connection.on('error', (err) => {
     logger.error('Queues: Redis connection error', { error: err.message });
