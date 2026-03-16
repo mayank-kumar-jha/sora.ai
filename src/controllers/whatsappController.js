@@ -130,11 +130,12 @@ const renderQrPage = asyncHandler(async (req, res) => {
             </head>
             <body>
                 <div class="card">
-                    <div class="status-line">STATUS: ${status.status}</div>
+                    <div class="status-line" style="color: ${getStatusColor(status.status)}">STATUS: ${status.status}</div>
+                    ${status.lastError ? `<div style="color: #ef4444; font-size: 0.7rem; margin-bottom: 10px; opacity: 0.8;">ERROR: ${status.lastError}</div>` : ''}
                     <h1>Connect WhatsApp</h1>
                     <p>Scan the code below using WhatsApp on your phone to link it with Sora.</p>
                     <div class="qr-box">
-                        ${qrCode ? `<img src="${qrCode}" width="300" height="300">` : `<div style="width:300px; height:300px; display:flex; align-items:center; justify-content:center; color:#000;">Generating QR Code...</div>`}
+                        ${qrCode ? `<img src="${qrCode}" width="300" height="300">` : `<div style="width:300px; height:300px; display:flex; align-items:center; justify-content:center; color:#000;">${status.status === 'INITIALIZING' ? 'Initializing Connection...' : 'Generating QR Code...'}</div>`}
                     </div>
                     <p>This code is unique to your session.</p>
                     <button class="btn-reset" onclick="resetSession()">Hard Reset Session</button>

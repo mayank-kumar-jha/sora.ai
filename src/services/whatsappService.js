@@ -48,6 +48,7 @@ class WhatsAppManager {
     constructor() {
         this.sock = null;
         this.status = WhatsAppStatus.DISCONNECTED;
+        this.lastError = null;
         this.currentQrCode = null;
         this.reconnectAttempts = 0;
         this.MAX_RECONNECT_ATTEMPTS = 5;
@@ -82,11 +83,20 @@ class WhatsAppManager {
 
             // 2. Setup auth state
             const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
-            const { version } = await fetchLatestBaileysVersion();
             
+            let version = [2, 3000, 1015901307]; // Fallback version
+            try {
+                const latest = await fetchLatestBaileysVersion().catch(() => null);
+                if (latest) version = latest.version;
+            } catch (err) {
+                logger.warn('[WhatsApp] Failed to fetch latest Baileys version, using fallback.');
+            }
+
             const baileysLogFile = path.join(process.cwd(), 'logs', 'baileys.log');
             if (!fs.existsSync(path.dirname(baileysLogFile))) fs.mkdirSync(path.dirname(baileysLogFile), { recursive: true });
-            const baileysLogger = P({ level: 'info' }, P.destination(baileysLogFile));
+            
+            // Re-use main logger instead of file for Render to avoid filesystem issues
+            const baileysLogger = P({ level: 'error' }); 
 
             // 3. Create Socket
             this.sock = makeWASocket({
@@ -96,18 +106,20 @@ class WhatsAppManager {
                     keys: makeCacheableSignalKeyStore(state.keys, baileysLogger),
                 },
                 logger: baileysLogger,
+                printQRInTerminal: false,
                 browser: Browsers.ubuntu('Chrome'),
                 connectTimeoutMs: 60000,
                 defaultQueryTimeoutMs: 60000,
-                syncFullHistory: true,
+                syncFullHistory: false, // Set to false to reduce initial load on Render
                 markOnlineOnConnect: false,
             });
 
             this.setupListeners(saveCreds, state);
-            
+            this.lastError = null;
             logger.info('[WhatsApp] Manager initialized and socket created.');
         } catch (err) {
             this.status = WhatsAppStatus.ERROR;
+            this.lastError = err.message;
             logger.error('[WhatsApp] Global initialization failed:', err.message);
             this.scheduleReconnect();
         }
@@ -301,6 +313,7 @@ class WhatsAppManager {
     getStatus() {
         return {
             status: this.status,
+            lastError: this.lastError,
             isReady: this.status === WhatsAppStatus.CONNECTED,
             hasQr: !!this.currentQrCode,
             contactsCount: this.contacts.size,
