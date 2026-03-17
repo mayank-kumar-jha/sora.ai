@@ -294,18 +294,40 @@ class WhatsAppManager {
     async usePrismaAuthState() {
         const { initAuthCreds } = await import('@whiskeysockets/baileys');
 
+        // Robust recursive revival
+        const revive = (data) => {
+            if (!data || typeof data !== 'object') return data;
+            
+            if (data.type === 'Buffer' && data.data) {
+                return Buffer.from(data.data, typeof data.data === 'string' ? 'base64' : undefined);
+            }
+            
+            if (Array.isArray(data)) {
+                return data.map(revive);
+            }
+            
+            const revived = {};
+            for (const [key, value] of Object.entries(data)) {
+                revived[key] = revive(value);
+            }
+            return revived;
+        };
+
         const readData = async (type, id) => {
             try {
                 const key = await prisma.whatsAppKey.findUnique({ where: { id: `${type}-${id}` } });
                 if (!key) return null;
-                return JSON.parse(JSON.stringify(key.data), BufferJSON.reviver);
+                // key.data is already an object from Prisma, but contains "Buffer-masked" objects
+                return revive(key.data);
             } catch (err) {
+                logger.error(`[WhatsApp] Read error for ${type}-${id}: ${err.message}`);
                 return null;
             }
         };
 
         const writeData = async (data, type, id) => {
             try {
+                // serialized is a plain object with Buffers replaced by {type:'Buffer', data:...}
                 const serialized = JSON.parse(JSON.stringify(data, BufferJSON.replacer));
                 await prisma.whatsAppKey.upsert({
                     where: { id: `${type}-${id}` },
@@ -324,7 +346,7 @@ class WhatsAppManager {
         };
 
         const credsRecord = await prisma.whatsAppSession.findUnique({ where: { id: 'singleton' } });
-        let creds = credsRecord?.creds ? JSON.parse(JSON.stringify(credsRecord.creds), BufferJSON.reviver) : initAuthCreds();
+        let creds = credsRecord?.creds ? revive(credsRecord.creds) : initAuthCreds();
 
         return {
             state: {
