@@ -89,7 +89,7 @@ const mainWorker = new Worker('mainQueue', async (job) => {
     // Bulletproof settings for Upstash/Render
     lockDuration: 60000,          // 1 minute lock
     stalledInterval: 60000,       // Check for stalled tasks once a minute
-    drainDelay: 10,               // Delay polling by 10s when empty to save requests
+    drainDelay: 5000,             // Polling delay (5s) when queue is empty to save Upstash requests
 });
 
 mainWorker.on('failed', (job, err) => {

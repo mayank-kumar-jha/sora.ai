@@ -86,10 +86,10 @@ const createMockRedisClient = () => {
     return new Proxy({}, {
         get: (target, prop) => {
             // Standard EventEmitter methods used by BullMQ/ioredis
-            if (prop === 'on' || prop === 'once' || prop === 'removeListener') {
+            if (prop === 'on' || prop === 'once' || prop === 'removeListener' || prop === 'off') {
                 return () => target;
             }
-            if (prop === 'quit' || prop === 'disconnect') {
+            if (prop === 'quit' || prop === 'disconnect' || prop === 'close') {
                 return () => Promise.resolve();
             }
             if (prop === 'ping') {
@@ -97,7 +97,6 @@ const createMockRedisClient = () => {
             }
             // Catch-all for any Redis command (set, get, del, evalsha, etc.)
             return async () => {
-                // Return null or empty value as if Redis succeeded but key was missing
                 return null;
             };
         }

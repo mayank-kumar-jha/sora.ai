@@ -57,12 +57,14 @@ const login = async ({ email, password }) => {
         data: { userId: user.id, refreshToken, expiresAt },
     });
 
-    // Cache session in Redis for fast lookup
-    const redis = getRedisClient();
-    try {
-        await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
-    } catch (err) {
-        logger.warn('Redis: Failed to cache session', { error: err.message, userId: user.id });
+    // Cache session in Redis for fast lookup (Optional, falls back to DB)
+    if (!getRedisSuspended()) {
+        const redis = getRedisClient();
+        try {
+            await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+        } catch (err) {
+            logger.warn('Redis: Failed to cache session', { error: err.message, userId: user.id });
+        }
     }
 
     return {
@@ -109,23 +111,23 @@ const refreshTokens = async ({ refreshToken }) => {
     const newAccessToken = generateAccessToken(tokenPayload);
     const newRefreshToken = generateRefreshToken(tokenPayload);
 
-    // Token rotation: delete old session, create new one
+    // Token rotation: delete old session, update cache
     await prisma.session.deleteMany({ where: { id: session.id } });
-    const redis = getRedisClient();
-    try {
-        await redis.del(`session:${user.id}:${refreshToken}`);
-    } catch (err) {
-        logger.warn('Redis: Failed to delete old session from cache', { error: err.message, userId: user.id });
-    }
-
+    
+    // Always persist new session to DB as primary source of truth
     const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);
     await prisma.session.create({
         data: { userId: user.id, refreshToken: newRefreshToken, expiresAt },
     });
-    try {
-        await redis.setex(`session:${user.id}:${newRefreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
-    } catch (err) {
-        logger.warn('Redis: Failed to cache new session', { error: err.message, userId: user.id });
+
+    if (!getRedisSuspended()) {
+        const redis = getRedisClient();
+        try {
+            await redis.del(`session:${user.id}:${refreshToken}`);
+            await redis.setex(`session:${user.id}:${newRefreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
+        } catch (err) {
+            logger.warn('Redis: cache update skipped during refresh', { error: err.message });
+        }
     }
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
