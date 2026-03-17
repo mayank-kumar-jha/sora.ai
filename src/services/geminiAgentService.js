@@ -217,13 +217,18 @@ CONSTRAINTS:
    Sentiments: [SENTIMENT:HAPPY], [SENTIMENT:THINKING], [SENTIMENT:ALERT], [SENTIMENT:SAD], [SENTIMENT:QUESTION].
    Example: "I've scheduled your meeting. [SENTIMENT:HAPPY]"`;
 
-// Model waterfall — focusing on real, high-quota models with latest aliases
+// Model waterfall — focusing on latest 3.1, 3.0 and 2.x models
 const GEMINI_MODELS = [
+    'gemini-3.1-pro-preview',
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3-flash-preview',
+    'gemini-flash-latest',
+    'gemini-flash-lite-latest',
+    'gemini-2.5-pro',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
     'gemini-2.0-flash',
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-8b',
-    'gemini-1.5-pro-latest',
+    'gemini-2.0-flash-lite',
 ];
 
 const isRetryableError = (error) => {
