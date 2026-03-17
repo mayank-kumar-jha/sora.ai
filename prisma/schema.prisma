@@ -225,3 +225,10 @@ model WhatsAppSession {
 
   @@map("whatsapp_sessions")
 }
+
+model WhatsAppKey {
+  id    String @id
+  data  Json
+  
+  @@map("whatsapp_keys")
+}

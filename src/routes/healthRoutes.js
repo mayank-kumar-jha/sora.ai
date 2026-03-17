@@ -32,14 +32,12 @@ router.get('/', async (req, res) => {
         health.status = 'degraded';
     }
 
-    // Check Redis
+    // Check WhatsApp
     try {
-        const redis = getRedisClient();
-        await redis.ping();
-        health.services.redis = 'connected';
+        const whatsapp = require('../services/whatsappService');
+        health.services.whatsapp = whatsapp.getStatus().status;
     } catch {
-        health.services.redis = 'disconnected';
-        health.status = 'degraded';
+        health.services.whatsapp = 'unknown';
     }
 
     const statusCode = health.status === 'ok' ? 200 : 503;

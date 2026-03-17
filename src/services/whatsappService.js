@@ -114,8 +114,8 @@ class WhatsAppManager {
                 logger.info('[WhatsApp] Restored cached QR code from database.');
             }
 
-            // 2. Setup auth state
-            const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
+            // 2. Setup auth state (Custom Prisma implementation)
+            const { state, saveCreds } = await this.usePrismaAuthState();
             
             let version = [2, 3000, 1015901307]; // Fallback version
             try {
@@ -125,9 +125,6 @@ class WhatsAppManager {
                 logger.warn('[WhatsApp] Failed to fetch latest Baileys version, using fallback.');
             }
 
-            const baileysLogFile = path.join(process.cwd(), 'logs', 'baileys.log');
-            if (!fs.existsSync(path.dirname(baileysLogFile))) fs.mkdirSync(path.dirname(baileysLogFile), { recursive: true });
-            
             // Re-use main logger instead of file for Render to avoid filesystem issues
             const baileysLogger = P({ level: 'error' }); 
 
@@ -143,11 +140,11 @@ class WhatsAppManager {
                 browser: Browsers.ubuntu('Chrome'),
                 connectTimeoutMs: 60000,
                 defaultQueryTimeoutMs: 60000,
-                syncFullHistory: false, // Set to false to reduce initial load on Render
+                syncFullHistory: false, 
                 markOnlineOnConnect: false,
             });
 
-            this.setupListeners(saveCreds, state);
+            this.setupListeners(saveCreds);
             this.lastError = null;
             logger.info('[WhatsApp] Manager initialized and socket created.');
         } catch (err) {
@@ -158,22 +155,10 @@ class WhatsAppManager {
         }
     }
 
-    setupListeners(saveCreds, state) {
+    setupListeners(saveCreds) {
         // Creds Update
-        this.sock.ev.on('creds.update', async (update) => {
+        this.sock.ev.on('creds.update', async () => {
             await saveCreds();
-            try {
-                // state.creds contains Buffers. We must use BufferJSON to correctly handle them for Prisma JSON field.
-                // We stringify with replacer and then parse to get a serializable object for Prisma.
-                const serialized = JSON.parse(JSON.stringify(state.creds, BufferJSON.replacer));
-                await prisma.whatsAppSession.upsert({
-                    where: { id: 'singleton' },
-                    update: { creds: serialized },
-                    create: { id: 'singleton', creds: serialized }
-                });
-            } catch (err) {
-                logger.error('[WhatsApp] Failed to save creds to DB:', err.message);
-            }
         });
 
         // Connection Update
@@ -196,7 +181,7 @@ class WhatsAppManager {
                     await prisma.whatsAppSession.upsert({
                         where: { id: 'singleton' },
                         update: { lastQrCode: this.currentQrCode },
-                        create: { id: 'singleton', creds: state.creds, lastQrCode: this.currentQrCode }
+                        create: { id: 'singleton', creds: {}, lastQrCode: this.currentQrCode }
                     });
                     
                     logger.info('[WhatsApp] New QR code generated and persisted.');
@@ -303,27 +288,95 @@ class WhatsAppManager {
         }
     }
 
-    async restoreCredsFromDb() {
-        try {
-            if (!fs.existsSync(AUTH_FOLDER) || fs.readdirSync(AUTH_FOLDER).length === 0) {
-                const session = await prisma.whatsAppSession.findUnique({ where: { id: 'singleton' } });
-                if (session && session.creds) {
-                    logger.info('[WhatsApp] Restoring credentials from DB...');
-                    if (!fs.existsSync(AUTH_FOLDER)) fs.mkdirSync(AUTH_FOLDER, { recursive: true });
-                    
-                    // 1. Manually revive to ensure Buffers are real
-                    const revived = reviveBuffers(session.creds);
-                    
-                    // 2. Serialize to file in the format Baileys expects
-                    const credsContent = JSON.stringify(revived, BufferJSON.replacer);
-                    fs.writeFileSync(path.join(AUTH_FOLDER, 'creds.json'), credsContent);
-                    return session;
-                }
+    /**
+     * Custom Baileys Authentication Provider for Prisma
+     */
+    async usePrismaAuthState() {
+        const { initAuthCreds } = await import('@whiskeysockets/baileys');
+
+        const readData = async (type, id) => {
+            try {
+                const key = await prisma.whatsAppKey.findUnique({ where: { id: `${type}-${id}` } });
+                if (!key) return null;
+                return JSON.parse(JSON.stringify(key.data), BufferJSON.reviver);
+            } catch (err) {
+                return null;
             }
-        } catch (err) {
-            logger.error('[WhatsApp] DB restoration failed:', err.message);
-        }
-        return null;
+        };
+
+        const writeData = async (data, type, id) => {
+            try {
+                const serialized = JSON.parse(JSON.stringify(data, BufferJSON.replacer));
+                await prisma.whatsAppKey.upsert({
+                    where: { id: `${type}-${id}` },
+                    update: { data: serialized },
+                    create: { id: `${type}-${id}`, data: serialized }
+                });
+            } catch (err) {
+                logger.error(`[WhatsApp] Failed to write key ${type}-${id}: ${err.message}`);
+            }
+        };
+
+        const removeData = async (type, id) => {
+            try {
+                await prisma.whatsAppKey.delete({ where: { id: `${type}-${id}` } }).catch(() => {});
+            } catch (err) {}
+        };
+
+        const credsRecord = await prisma.whatsAppSession.findUnique({ where: { id: 'singleton' } });
+        let creds = credsRecord?.creds ? JSON.parse(JSON.stringify(credsRecord.creds), BufferJSON.reviver) : initAuthCreds();
+
+        return {
+            state: {
+                creds,
+                keys: {
+                    get: async (type, ids) => {
+                        const data = {};
+                        await Promise.all(
+                            ids.map(async (id) => {
+                                let value = await readData(type, id);
+                                if (type === 'app-state-sync-key' && value) {
+                                    const { proto } = await import('@whiskeysockets/baileys');
+                                    value = proto.Message.AppStateSyncKeyData.fromObject(value);
+                                }
+                                data[id] = value;
+                            })
+                        );
+                        return data;
+                    },
+                    set: async (data) => {
+                        const tasks = [];
+                        for (const category in data) {
+                            for (const id in data[category]) {
+                                const value = data[category][id];
+                                if (value) {
+                                    tasks.push(writeData(value, category, id));
+                                } else {
+                                    tasks.push(removeData(category, id));
+                                }
+                            }
+                        }
+                        await Promise.all(tasks);
+                    },
+                },
+            },
+            saveCreds: async () => {
+                try {
+                    const serialized = JSON.parse(JSON.stringify(creds, BufferJSON.replacer));
+                    await prisma.whatsAppSession.upsert({
+                        where: { id: 'singleton' },
+                        update: { creds: serialized },
+                        create: { id: 'singleton', creds: serialized }
+                    });
+                } catch (err) {
+                    logger.error(`[WhatsApp] Failed to save creds: ${err.message}`);
+                }
+            },
+        };
+    }
+
+    async restoreCredsFromDb() {
+        return await prisma.whatsAppSession.findUnique({ where: { id: 'singleton' } });
     }
 
     async wipeSession() {
@@ -342,6 +395,7 @@ class WhatsAppManager {
         
         try {
             await prisma.whatsAppSession.delete({ where: { id: 'singleton' } }).catch(() => {});
+            await prisma.whatsAppKey.deleteMany({}).catch(() => {});
         } catch (e) {}
         
         logger.info('[WhatsApp] Session wiped.');

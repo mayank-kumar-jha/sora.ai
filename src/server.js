@@ -136,14 +136,14 @@ const startServer = async () => {
         logger.error('WhatsApp Initialization Failed', { error: err.message });
     });
 
-    // Initial Scheduler Scan - Non-blocking to prevent startup timeouts
+    // Initial Scheduler Scan - Non-blocking and error-isolated
     setImmediate(async () => {
         try {
             logger.info('Performing initial scheduler scan...');
             await schedulePendingTasks();
             await schedulePendingReminders();
         } catch (err) {
-            logger.warn('Initial scheduler scan failed', { error: err.message });
+            logger.warn('Initial scheduler scan failed - continuing anyway', { error: err.message });
         }
     });
 
