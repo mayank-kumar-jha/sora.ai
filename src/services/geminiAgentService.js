@@ -6,8 +6,8 @@ const AppError = require('../utils/AppError');
 
 const getGenAI = () => {
     if (!config.gemini.apiKey) return null;
-    // Always create fresh to ensure latest API key from env is used
-    return new GoogleGenerativeAI(config.gemini.apiKey);
+    // Force v1 API to ensure 1.5 models work reliably (v1beta is hit or miss)
+    return new GoogleGenerativeAI(config.gemini.apiKey, { apiVersion: 'v1' });
 };
 
 const safetySettings = [

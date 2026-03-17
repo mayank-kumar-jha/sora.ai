@@ -2,7 +2,6 @@
 
 const qrcode = require('qrcode');
 const logger = require('../config/logger');
-const { notifyUser } = require('./websocketService');
 const AppError = require('../utils/AppError');
 const path = require('path');
 const P = require('pino');
@@ -200,6 +199,7 @@ class WhatsAppManager {
                 this.reconnectAttempts = 0;
                 try {
                     this.currentQrCode = await qrcode.toDataURL(qr, { margin: 2, scale: 8 });
+                    const { notifyUser } = require('./websocketService');
                     notifyUser('system', 'WHATSAPP_QR', { qr: this.currentQrCode });
                     
                     // Persist to DB immediately
@@ -280,23 +280,19 @@ class WhatsAppManager {
         });
 
         // Messages Upsert
-        this.sock.ev.on('messages.upsert', (m) => {
-            const msg = m.messages[0];
+        this.sock.ev.on('messages.upsert', async ({ messages, type }) => {
+            if (type !== 'notify') return;
+            const msg = messages[0];
             if (!msg.message || msg.key.fromMe) return;
 
             const senderJid = msg.key.remoteJid;
-            const senderName = msg.pushName || this.contacts.get(senderJid) || senderJid;
+            const senderName = msg.pushName || senderJid.split('@')[0];
             const content = msg.message.conversation || msg.message.extendedTextMessage?.text || '[Media/Other]';
 
-            logger.info(`[WhatsApp] Msg from ${senderName}: ${content}`);
-
-            const chat = this.recentChats.get(senderJid) || { id: senderJid, name: senderName, unreadCount: 0 };
-            chat.unreadCount = (chat.unreadCount || 0) + 1;
-            this.recentChats.set(senderJid, chat);
-            this.saveStore();
-
+            logger.info(`[WhatsApp] Message from ${senderName}: ${content}`);
             this.lastReceivedMessage = { from: senderName, jid: senderJid, text: content, timestamp: Date.now() };
 
+            const { notifyUser } = require('./websocketService');
             notifyUser('system', 'WHATSAPP_MESSAGE', { from: senderName, jid: senderJid, text: content });
         });
     }
@@ -470,7 +466,10 @@ class WhatsAppManager {
     }
 
     async send(to, text) {
+        logger.info(`[WhatsApp] Attempting to send message to: ${to}`);
+        
         if (this.status !== WhatsAppStatus.CONNECTED || !this.sock) {
+            logger.error('[WhatsApp] Send failed: No active connection');
             throw new AppError('WhatsApp not connected', 503);
         }
         
@@ -483,10 +482,19 @@ class WhatsAppManager {
             if (contact) jid = contact[0];
         }
 
-        if (!jid) throw new AppError('Contact not found', 404);
+        if (!jid) {
+            logger.error(`[WhatsApp] Send failed: Contact or number "${to}" not found`);
+            throw new AppError('Contact not found. Please provide a full 10-digit number.', 404);
+        }
         
-        await this.sock.sendMessage(jid, { text });
-        return { to, jid, status: 'sent' };
+        try {
+            await this.sock.sendMessage(jid, { text });
+            logger.info(`[WhatsApp] Message successfully sent to ${jid}`);
+            return { to, jid, status: 'sent' };
+        } catch (err) {
+            logger.error(`[WhatsApp] Failed to send message to ${jid}: ${err.message}`);
+            throw err;
+        }
     }
 
     async requestPairingCode(phoneNumber) {
