@@ -106,7 +106,7 @@ const renderQrPage = asyncHandler(async (req, res) => {
                             <div class="stat-box"><div class="count">${status.chatsCount}</div><div class="label">Chats</div></div>
                         </div>
                         <p style="color: #666; font-size: 0.9rem; margin-top: 20px;">${status.syncing ? '🔄 Initializing history sync...' : '✨ Session is active and healthy.'}</p>
-                        <button onclick="location.reload()">Refresh Status</button>
+                        <button class="btn-reset">Hard Reset Session</button>
                     </div>
                 </body>
             </html>
@@ -138,17 +138,31 @@ const renderQrPage = asyncHandler(async (req, res) => {
                         ${qrCode ? `<img src="${qrCode}" width="300" height="300">` : `<div style="width:300px; height:300px; display:flex; align-items:center; justify-content:center; color:#000;">${status.status === 'INITIALIZING' ? 'Initializing Connection...' : 'Generating QR Code...'}</div>`}
                     </div>
                     <p>This code is unique to your session.</p>
-                    <button class="btn-reset" onclick="resetSession()">Hard Reset Session</button>
+                    <button class="btn-reset">Hard Reset Session</button>
                 </div>
                 <script>
-                    async function resetSession() {
-                        if(!confirm('Reset current session?')) return;
-                        const res = await fetch('/api/whatsapp/reset', {method: 'POST'});
-                        const data = await res.json();
-                        alert(data.message);
-                        location.reload();
-                    }
-                    setTimeout(() => { if(!window.manualRefresh) location.reload(); }, ${qrCode ? 30000 : 5000});
+                    (function() {
+                        const resetBtn = document.querySelector('.btn-reset');
+                        if (resetBtn) {
+                            resetBtn.addEventListener('click', async () => {
+                                if(!confirm('Reset current session? This will force a new QR code.')) return;
+                                try {
+                                    resetBtn.disabled = true;
+                                    resetBtn.innerText = 'Resetting...';
+                                    const res = await fetch('/api/whatsapp/reset', {method: 'POST'});
+                                    const data = await res.json();
+                                    alert(data.message);
+                                    window.manualRefresh = true;
+                                    location.reload();
+                                } catch (e) {
+                                    alert('Failed to reset: ' + e.message);
+                                    resetBtn.disabled = false;
+                                    resetBtn.innerText = 'Hard Reset Session';
+                                }
+                            });
+                        }
+                        setTimeout(() => { if(!window.manualRefresh) location.reload(); }, ${qrCode ? 30000 : 5000});
+                    })();
                 </script>
             </body>
         </html>
