@@ -63,9 +63,13 @@ app.set('trust proxy', 1);
 // ─── Request Logging ────────────────────────────────────────────────────────
 app.use(requestLogger);
 
-// ─── Health check (Moved above rate limiter to prevent Render 429s) ────────
+// ─── Health check (Handles GET and HEAD for Render) ────────────────────────
+app.all('/', (req, res) => {
+    res.json({ status: 'ok', message: 'Sora API is running (v1.2.8)' });
+});
+
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable (v1.2.6-whatsapp-sync-fix)' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable (v1.2.7-stability-fix)' });
 });
 
 // ─── Global Rate Limiting ───────────────────────────────────────────────────

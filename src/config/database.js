@@ -5,13 +5,14 @@ const logger = require('./logger');
 
 let databaseUrl = process.env.DATABASE_URL;
 
-// On Render/Supabase, the pooler often needs a specific connection limit in the URL.
-// If missing, we append a safe default (20) to prevent the "Timed out fetching a new connection" error.
-// If missing, we append safe defaults to prevent the "Timed out fetching a new connection" error.
-if (databaseUrl && !databaseUrl.includes('connection_limit')) {
+// On Render/Supabase, the pooler is very sensitive. We force a small limit.
+// We remove any existing connection_limit/pgbouncer and set our own optimized values.
+if (databaseUrl) {
+    databaseUrl = databaseUrl.replace(/[?&]connection_limit=\d+/, '');
+    databaseUrl = databaseUrl.replace(/[?&]pool_timeout=\d+/, '');
     const separator = databaseUrl.includes('?') ? '&' : '?';
-    databaseUrl += `${separator}connection_limit=20&pool_timeout=25`;
-    logger.info('[Prisma] Appended connection_limit=20 and pool_timeout=25 to DATABASE_URL');
+    databaseUrl += `${separator}connection_limit=3&pool_timeout=60`;
+    logger.info('[Prisma] Optimized connection settings for Supabase Pooler (limit=3)');
 }
 
 const prisma = new PrismaClient({
