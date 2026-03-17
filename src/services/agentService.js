@@ -1,7 +1,6 @@
 'use strict';
 
 const aiService = require('./aiService');
-const actionRouter = require('./actionRouter');
 const embeddingService = require('./embeddingService');
 const vectorDbService = require('./vectorDbService');
 const whatsappService = require('./whatsappService');
@@ -63,6 +62,7 @@ User: "Tell Anushka I'm on my way"
 Proactively use context. Keep reasoning ultra-brief.`;
 
 const processMessage = async (userId, userMessage, context = [], image = null) => {
+    const actionRouter = require('./actionRouter');
     // 1. Prep RAG and Context in parallel
     const getRagContext = async () => {
         try {

@@ -2,7 +2,6 @@
 
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
 const config = require('../config/env');
-const actionRouter = require('./actionRouter');
 const AppError = require('../utils/AppError');
 
 const getGenAI = () => {
@@ -218,17 +217,12 @@ CONSTRAINTS:
    Sentiments: [SENTIMENT:HAPPY], [SENTIMENT:THINKING], [SENTIMENT:ALERT], [SENTIMENT:SAD], [SENTIMENT:QUESTION].
    Example: "I've scheduled your meeting. [SENTIMENT:HAPPY]"`;
 
-// Model waterfall — using the latest models provided by the user
+// Model waterfall — focusing on real, high-quota models
 const GEMINI_MODELS = [
-    'gemini-3.1-flash-lite-preview', // Most cost-efficient for free tier
-    'gemini-3-flash-preview',      // High speed, high quota
-    'gemini-flash-latest',         // Alias to latest flash
-    'gemini-flash-lite-latest',    // Alias to latest lite
-    'gemini-2.0-flash',            // Second gen multimodal
-    'gemini-2.5-flash',            // Hybrid reasoning
-    'gemini-2.0-flash-lite',       // Scalable usage
-    'gemini-3.1-pro-preview',      // SOTA reasoning
-    'gemini-2.5-pro',              // Advanced reasoning
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-8b',
+    'gemini-1.5-pro',
 ];
 
 const isRetryableError = (error) => {
@@ -247,6 +241,7 @@ const isRetryableError = (error) => {
  * Returns the result, or throws if the model itself has a fatal error.
  */
 const runWithModel = async (ai, modelName, userId, userMessage, context, imageBase64, effectiveTools) => {
+    const actionRouter = require('./actionRouter');
     const model = ai.getGenerativeModel({
         model: modelName,
         tools: [effectiveTools],
@@ -346,6 +341,7 @@ const runWithModel = async (ai, modelName, userId, userMessage, context, imageBa
  * Process a user message using Gemini with Function Calling and return a stream.
  */
 const streamMessageWithTools = async (userId, userMessage, context = [], imageBase64 = null) => {
+    const actionRouter = require('./actionRouter');
     console.log(`[GeminiAgent] Starting stream for user ${userId}. Vision: ${!!imageBase64}`);
 
     const preferredModel = config.gemini.model;

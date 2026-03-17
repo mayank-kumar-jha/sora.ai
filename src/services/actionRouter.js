@@ -1,10 +1,7 @@
 'use strict';
 
-const googleController = require('../controllers/googleController'); // Using controllers as tool providers
-const googleService = require('./googleService');
 const prisma = require('../config/database');
 const AppError = require('../utils/AppError');
-const whatsappService = require('./whatsappService');
 
 /**
  * Parse a date/time string into a valid Date object.
@@ -26,6 +23,9 @@ const parseDateTime = (input) => {
  * Route structured AI actions to the appropriate services
  */
 const routeAction = async (userId, action, payload = {}) => {
+    const googleService = require('./googleService');
+    const whatsappService = require('./whatsappService');
+    
     payload = payload || {};
     switch (action) {
         case 'CREATE_CALENDAR_EVENT':
