@@ -168,6 +168,14 @@ class WhatsAppManager {
             this.lastError = err.message;
             this.currentQrCode = null; // Clear stale QR on failure
             logger.error('[WhatsApp] Global initialization failed:', err.message);
+            
+            // If we have a Buffer/WebSocket error, it means the stored data is corrupted.
+            // We wipe it automatically so the next retry shows a fresh QR.
+            if (err.message.includes('Buffer') || err.message.includes('WebSocket')) {
+                logger.warn('[WhatsApp] Corrupted session detected, wiping to force fresh QR...');
+                await this.wipeSession();
+            }
+            
             this.scheduleReconnect();
         }
     }

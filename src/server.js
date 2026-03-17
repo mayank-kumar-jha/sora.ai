@@ -37,7 +37,15 @@ require('./workers');
 const app = express();
 
 // ─── Security Middleware ────────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "script-src": ["'self'", "'unsafe-inline'"],
+            "img-src": ["'self'", "data:", "blob:"],
+        },
+    },
+}));
 
 app.use(
     cors({
@@ -46,7 +54,7 @@ app.use(
             : '*',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     })
 );
 
@@ -135,7 +143,7 @@ const startServer = async () => {
     initAiWebSocket(server);
 
     // Staggered initialization to prevent DB pool exhaustion
-    // We wait 5s for WhatsApp to give the DB breathing room
+    // We wait 7s for WhatsApp to give the DB breathing room after express startup
     setTimeout(async () => {
         try {
             // Initialize WhatsApp
@@ -154,8 +162,8 @@ const startServer = async () => {
             } catch (err) {
                 logger.warn('Initial scheduler scan failed - continuing anyway', { error: err.message });
             }
-        }, 10000); // 10s after WhatsApp starts
-    }, 5000);
+        }, 15000); // 15s after WhatsApp starts
+    }, 7000);
 
     // Setup Cron for Scheduler (every 1 minute)
     cron.schedule('* * * * *', async () => {
