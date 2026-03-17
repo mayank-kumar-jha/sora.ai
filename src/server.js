@@ -130,22 +130,27 @@ const startServer = async () => {
     // Initialize AI WebSocket
     initAiWebSocket(server);
 
-    // Initialize WhatsApp
-    const { initWhatsApp } = require('./services/whatsappService');
-    initWhatsApp().catch(err => {
-        logger.error('WhatsApp Initialization Failed', { error: err.message });
-    });
-
-    // Initial Scheduler Scan - Non-blocking and error-isolated
-    setImmediate(async () => {
+    // Staggered initialization to prevent DB pool exhaustion
+    setTimeout(async () => {
         try {
-            logger.info('Performing initial scheduler scan...');
-            await schedulePendingTasks();
-            await schedulePendingReminders();
+            // Initialize WhatsApp
+            const { initWhatsApp } = require('./services/whatsappService');
+            await initWhatsApp();
         } catch (err) {
-            logger.warn('Initial scheduler scan failed - continuing anyway', { error: err.message });
+            logger.error('WhatsApp Initialization Failed', { error: err.message });
         }
-    });
+
+        // Delay scheduler scan to separate it from WhatsApp DB load
+        setTimeout(async () => {
+            try {
+                logger.info('Performing initial scheduler scan...');
+                await schedulePendingTasks();
+                await schedulePendingReminders();
+            } catch (err) {
+                logger.warn('Initial scheduler scan failed - continuing anyway', { error: err.message });
+            }
+        }, 3000);
+    }, 2000);
 
     // Setup Cron for Scheduler (every 1 minute)
     cron.schedule('* * * * *', async () => {
