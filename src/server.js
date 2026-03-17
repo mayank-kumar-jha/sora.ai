@@ -143,7 +143,7 @@ const startServer = async () => {
     initAiWebSocket(server);
 
     // Staggered initialization to prevent DB pool exhaustion
-    // We wait 7s for WhatsApp to give the DB breathing room after express startup
+    // We wait 10s for WhatsApp to give the DB breathing room after express startup
     setTimeout(async () => {
         try {
             // Initialize WhatsApp
@@ -162,8 +162,8 @@ const startServer = async () => {
             } catch (err) {
                 logger.warn('Initial scheduler scan failed - continuing anyway', { error: err.message });
             }
-        }, 15000); // 15s after WhatsApp starts
-    }, 7000);
+        }, 20000); // 20s after WhatsApp starts
+    }, 10000);
 
     // Setup Cron for Scheduler (every 1 minute)
     cron.schedule('* * * * *', async () => {

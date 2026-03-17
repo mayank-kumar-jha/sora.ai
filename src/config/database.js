@@ -11,8 +11,8 @@ if (databaseUrl) {
     databaseUrl = databaseUrl.replace(/[?&]connection_limit=\d+/, '');
     databaseUrl = databaseUrl.replace(/[?&]pool_timeout=\d+/, '');
     const separator = databaseUrl.includes('?') ? '&' : '?';
-    databaseUrl += `${separator}connection_limit=2&pool_timeout=60`;
-    logger.info('[Prisma] Optimized connection settings for Supabase Pooler (limit=2)');
+    databaseUrl += `${separator}connection_limit=3&pool_timeout=60`;
+    logger.info('[Prisma] Optimized connection settings for Supabase Pooler (limit=3)');
 }
 
 const prisma = new PrismaClient({

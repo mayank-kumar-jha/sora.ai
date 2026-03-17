@@ -53,14 +53,21 @@ const sendMessage = asyncHandler(async (req, res) => {
  * POST /api/whatsapp/reset
  */
 const resetSession = asyncHandler(async (req, res) => {
-    await whatsappService.resetSession();
+    try {
+        await whatsappService.resetSession();
+    } catch (err) {
+        logger.warn('[WhatsApp] Reset encountered errors, but proceeding to restart anyway.', { error: err.message });
+    }
     
     // Auto-restart
     setTimeout(() => {
         whatsappService.initWhatsApp().catch(() => {});
     }, 2000);
 
-    sendSuccess(res, { message: 'WhatsApp session reset. Connection will restart in 2 seconds.' });
+    res.status(200).json({ 
+        success: true, 
+        message: 'WhatsApp session reset. Connection will restart in 2 seconds.' 
+    });
 });
 
 /**
