@@ -26,33 +26,49 @@ const loadBaileys = async () => {
 };
 
 /**
- * Robustly revives an object that may contain Buffers serialized in various formats
+ * Extremely robust Buffer revival for Baileys data types.
+ * Handles Buffer {type:'Buffer', data:...}, Uint8Arrays, and raw base64 strings for known keys.
  */
-const reviveBuffers = (obj) => {
-    if (!obj || typeof obj !== 'object') return obj;
-
-    if (obj.type === 'Buffer' && (typeof obj.data === 'string' || Array.isArray(obj.data))) {
-        return Buffer.from(obj.data, typeof obj.data === 'string' ? 'base64' : undefined);
+const universalRevive = (data) => {
+    if (!data || typeof data !== 'object') {
+        // Handle raw string case if it looks like base64 and might be a key
+        return data; 
     }
-
-    const revived = Array.isArray(obj) ? [] : {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (value && typeof value === 'object') {
-            revived[key] = reviveBuffers(value);
-        } else if (typeof value === 'string' && value.length > 20 && /^[A-Za-z0-9+/=]+$/.test(value)) {
-            // Heuristic for raw base64 strings that should have been Buffers
-            // Only apply if the key looks like one that should be a Buffer
-            const bufferKeys = ['noiseKey', 'signedPreKey', 'identityKey', 'advSecretKey', 'private', 'public', 'iv', 'key'];
-            if (bufferKeys.includes(key)) {
-                try { 
+    
+    // 1. Standard Buffer serialization
+    if (data.type === 'Buffer') {
+        if (Array.isArray(data.data)) return Buffer.from(data.data);
+        if (typeof data.data === 'string') return Buffer.from(data.data, 'base64');
+    }
+    
+    // 2. Handle Uint8Array
+    if (data instanceof Uint8Array) return Buffer.from(data);
+    
+    // 3. Handle Arrays recursively
+    if (Array.isArray(data)) return data.map(universalRevive);
+    
+    // 4. Handle Objects recursively
+    const revived = {};
+    for (const [key, value] of Object.entries(data)) {
+        // Fields that Baileys ABSOLUTELY expects to be Buffers in authentication state
+        const bufferKeys = [
+            'noiseKey', 'signedPreKey', 'identityKey', 'advSecretKey', 
+            'private', 'public', 'iv', 'key', 'encKey', 'macKey',
+            'tag', 'ciphertext', 'mediaKey', 'fileSha256', 'fileEncSha256',
+            'clientPayload', 'serverPublicKey', 'ephemeralKeyPair'
+        ];
+        
+        // If it's a known key and it's a base64 string, force revive it
+        if (bufferKeys.includes(key) && typeof value === 'string' && value.length > 10) {
+            try {
+                // Only revive if it looks like base64
+                if (/^[A-Za-z0-9+/=]+$/.test(value)) {
                     revived[key] = Buffer.from(value, 'base64');
                     continue;
-                } catch (e) {}
-            }
-            revived[key] = value;
-        } else {
-            revived[key] = value;
+                }
+            } catch (e) {}
         }
+        revived[key] = universalRevive(value);
     }
     return revived;
 };
@@ -150,6 +166,7 @@ class WhatsAppManager {
         } catch (err) {
             this.status = WhatsAppStatus.ERROR;
             this.lastError = err.message;
+            this.currentQrCode = null; // Clear stale QR on failure
             logger.error('[WhatsApp] Global initialization failed:', err.message);
             this.scheduleReconnect();
         }
@@ -182,7 +199,7 @@ class WhatsAppManager {
                         where: { id: 'singleton' },
                         update: { lastQrCode: this.currentQrCode },
                         create: { id: 'singleton', creds: {}, lastQrCode: this.currentQrCode }
-                    });
+                    }).catch(e => logger.warn('[WhatsApp] Failed to persist QR to DB:', e.message));
                     
                     logger.info('[WhatsApp] New QR code generated and persisted.');
                 } catch (err) {
@@ -294,31 +311,12 @@ class WhatsAppManager {
     async usePrismaAuthState() {
         const { initAuthCreds } = await import('@whiskeysockets/baileys');
 
-        // Robust recursive revival
-        const revive = (data) => {
-            if (!data || typeof data !== 'object') return data;
-            
-            if (data.type === 'Buffer' && data.data) {
-                return Buffer.from(data.data, typeof data.data === 'string' ? 'base64' : undefined);
-            }
-            
-            if (Array.isArray(data)) {
-                return data.map(revive);
-            }
-            
-            const revived = {};
-            for (const [key, value] of Object.entries(data)) {
-                revived[key] = revive(value);
-            }
-            return revived;
-        };
-
         const readData = async (type, id) => {
             try {
                 const key = await prisma.whatsAppKey.findUnique({ where: { id: `${type}-${id}` } });
                 if (!key) return null;
                 // key.data is already an object from Prisma, but contains "Buffer-masked" objects
-                return revive(key.data);
+                return universalRevive(key.data);
             } catch (err) {
                 logger.error(`[WhatsApp] Read error for ${type}-${id}: ${err.message}`);
                 return null;
@@ -346,7 +344,7 @@ class WhatsAppManager {
         };
 
         const credsRecord = await prisma.whatsAppSession.findUnique({ where: { id: 'singleton' } });
-        let creds = credsRecord?.creds ? revive(credsRecord.creds) : initAuthCreds();
+        let creds = credsRecord?.creds ? universalRevive(credsRecord.creds) : initAuthCreds();
 
         return {
             state: {
