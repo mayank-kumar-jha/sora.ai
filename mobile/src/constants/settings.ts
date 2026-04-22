@@ -6,8 +6,9 @@ export const STORAGE_KEYS = {
     SERVER_URL: 'sora_server_url',
 };
 
-export const DEFAULT_IP = '192.168.1.4';
+export const DEFAULT_IP = '192.168.1.6';
 export const DEFAULT_BASE_URL = 'https://sora-ai-md9h.onrender.com';
+// export const DEFAULT_BASE_URL = `http://${DEFAULT_IP}:3000`;
 
 export const THEMES = [
     { id: 'dark_blue', label: 'Deep Space', eyeColor: '#4a9eff', bg: '#020617', eyeBg: '#0f172a' },

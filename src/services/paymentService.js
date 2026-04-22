@@ -2,70 +2,72 @@
 
 const stripe = require('stripe');
 const config = require('../config/env');
-const AppError = require('../utils/AppError');
+const prisma = require('../config/database');
 const logger = require('../config/logger');
 
-let stripeClient;
-if (config.stripe.secretKey) {
-    stripeClient = stripe(config.stripe.secretKey);
-} else {
-    logger.warn('Stripe secret key is missing. Payment features will be disabled.');
-}
+const getStripe = () => {
+  if (!config.stripe.secretKey || config.stripe.secretKey.includes('placeholder')) {
+    return null;
+  }
+  return stripe(config.stripe.secretKey);
+};
 
 /**
- * Create a Stripe Checkout Session
+ * Create a Stripe Checkout session for a subscription plan.
  */
-const createCheckoutSession = async (userId, userEmail, plan) => {
-    if (!stripeClient) {
-        throw new AppError('Payment service is not configured', 503, 'SERVICE_UNAVAILABLE');
-    }
-    try {
-        const session = await stripeClient.checkout.sessions.create({
-            payment_method_types: ['card'],
-            customer_email: userEmail,
-            line_items: [
-                {
-                    price_data: {
-                        currency: 'usd',
-                        product_data: {
-                            name: `Super AI Assistant - ${plan} Plan`,
-                        },
-                        unit_amount: plan === 'PRO' ? 1999 : 0, // 19.99 for Pro
-                        recurring: { interval: 'month' }
-                    },
-                    quantity: 1,
-                },
-            ],
-            mode: 'subscription',
-            success_url: `${process.env.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
-            metadata: {
-                userId,
-                plan
-            }
+const createCheckoutSession = async (userId, plan, priceId) => {
+  const stripeClient = getStripe();
+  if (!stripeClient) {
+    throw new Error('Stripe is not configured. API key will be provided later.');
+  }
+
+  const session = await stripeClient.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/success`,
+    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/payment/cancel`,
+    metadata: { userId, plan },
+  });
+
+  // Record payment
+  await prisma.payment.create({
+    data: { userId, stripeSessionId: session.id, plan, status: 'pending' },
+  });
+
+  return { url: session.url, sessionId: session.id };
+};
+
+/**
+ * Handle Stripe webhook events.
+ */
+const handleWebhook = async (rawBody, signature) => {
+  const stripeClient = getStripe();
+  if (!stripeClient) return;
+
+  const event = stripeClient.webhooks.constructEvent(rawBody, signature, config.stripe.webhookSecret);
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object;
+      await prisma.payment.updateMany({
+        where: { stripeSessionId: session.id },
+        data: { status: 'completed', amount: session.amount_total || 0 },
+      });
+
+      // Upgrade user to PRO
+      if (session.metadata?.userId) {
+        await prisma.user.update({
+          where: { id: session.metadata.userId },
+          data: { role: 'PRO' },
         });
-
-        return session;
-    } catch (error) {
-        throw new AppError(`Stripe Error: ${error.message}`, 500, 'PAYMENT_ERROR');
+      }
+      logger.info(`[Payment] Checkout completed: ${session.id}`);
+      break;
     }
+    default:
+      logger.info(`[Payment] Unhandled event: ${event.type}`);
+  }
 };
 
-/**
- * Construct Stripe Webhook Event
- */
-const constructEvent = (payload, sig) => {
-    if (!stripeClient) {
-        throw new AppError('Payment service is not configured', 503, 'SERVICE_UNAVAILABLE');
-    }
-    try {
-        return stripeClient.webhooks.constructEvent(payload, sig, config.stripe.webhookSecret);
-    } catch (error) {
-        throw new AppError(`Webhook Error: ${error.message}`, 400, 'WEBHOOK_ERROR');
-    }
-};
-
-module.exports = {
-    createCheckoutSession,
-    constructEvent
-};
+module.exports = { createCheckoutSession, handleWebhook };

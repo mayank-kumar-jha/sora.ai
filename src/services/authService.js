@@ -1,150 +1,96 @@
 'use strict';
 
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+const config = require('../config/env');
 const prisma = require('../config/database');
-const { hashPassword, comparePassword } = require('../utils/hash');
-const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const AppError = require('../utils/AppError');
-const { getRedisClient } = require('../config/redis');
-const { jwt: jwtConfig } = require('../config/env');
 
-// Duration constants (seconds)
-const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+const generateTokens = (user) => {
+  const payload = { sub: user.id, email: user.email, role: user.role };
+  const accessToken = jwt.sign(payload, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
+  const refreshToken = jwt.sign(payload, config.jwt.refreshSecret, { expiresIn: config.jwt.refreshExpiresIn });
+  return { accessToken, refreshToken };
+};
 
-/**
- * Register a new user.
- */
 const register = async ({ name, email, password }) => {
-    // Check for duplicates explicitly to return a clear error message
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-        throw new AppError('An account with this email already exists.', 409, 'EMAIL_TAKEN');
-    }
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) throw new AppError('Email already registered', 409, 'EMAIL_EXISTS');
 
-    const passwordHash = await hashPassword(password);
+  const passwordHash = await bcrypt.hash(password, config.bcrypt.saltRounds);
+  const user = await prisma.user.create({
+    data: { name, email, passwordHash },
+  });
 
-    const user = await prisma.user.create({
-        data: { name, email, passwordHash },
-        select: { id: true, name: true, email: true, role: true, createdAt: true },
-    });
+  const { accessToken, refreshToken } = generateTokens(user);
 
-    return user;
+  // Save session
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshToken,
+      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  return {
+    user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    accessToken,
+    refreshToken,
+  };
 };
 
-/**
- * Login – validate credentials, generate tokens, persist session.
- */
 const login = async ({ email, password }) => {
-    // Select passwordHash only for this check
-    const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
 
-    if (!user) {
-        // Uniform error message to prevent email enumeration
-        throw new AppError('Invalid email or password.', 401, 'INVALID_CREDENTIALS');
-    }
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
 
-    const isValid = await comparePassword(password, user.passwordHash);
-    if (!isValid) {
-        throw new AppError('Invalid email or password.', 401, 'INVALID_CREDENTIALS');
-    }
+  const { accessToken, refreshToken } = generateTokens(user);
 
-    const tokenPayload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = generateAccessToken(tokenPayload);
-    const refreshToken = generateRefreshToken(tokenPayload);
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshToken,
+      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+    },
+  });
 
-    // Persist session record
-    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);
-    await prisma.session.create({
-        data: { userId: user.id, refreshToken, expiresAt },
-    });
-
-    // Cache session in Redis for fast lookup (Optional, falls back to DB)
-    if (!getRedisSuspended()) {
-        const redis = getRedisClient();
-        try {
-            await redis.setex(`session:${user.id}:${refreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
-        } catch (err) {
-            logger.warn('Redis: Failed to cache session', { error: err.message, userId: user.id });
-        }
-    }
-
-    return {
-        accessToken,
-        refreshToken,
-        user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    };
+  return {
+    user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    accessToken,
+    refreshToken,
+  };
 };
 
-/**
- * Refresh – exchange a valid refresh token for a new access token.
- */
-const refreshTokens = async ({ refreshToken }) => {
-    let decoded;
-    try {
-        decoded = verifyRefreshToken(refreshToken);
-    } catch {
-        throw new AppError('Invalid or expired refresh token.', 401, 'INVALID_REFRESH_TOKEN');
-    }
+const refreshTokens = async (oldRefreshToken) => {
+  const session = await prisma.session.findUnique({ where: { refreshToken: oldRefreshToken } });
+  if (!session || session.expiresAt < new Date()) {
+    throw new AppError('Invalid or expired refresh token', 401, 'INVALID_REFRESH');
+  }
 
-    // Verify the session still exists in DB (not revoked)
-    const session = await prisma.session.findFirst({
-        where: {
-            userId: decoded.sub,
-            refreshToken,
-            expiresAt: { gt: new Date() },
-        },
-    });
+  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  if (!user) throw new AppError('User not found', 404);
 
-    if (!session) {
-        throw new AppError('Session not found or expired. Please log in again.', 401, 'SESSION_NOT_FOUND');
-    }
+  const { accessToken, refreshToken } = generateTokens(user);
 
-    const user = await prisma.user.findUnique({
-        where: { id: decoded.sub },
-        select: { id: true, email: true, role: true },
-    });
+  // Rotate: delete old, create new
+  await prisma.session.delete({ where: { id: session.id } });
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshToken,
+      expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+    },
+  });
 
-    if (!user) {
-        throw new AppError('User not found.', 401, 'USER_NOT_FOUND');
-    }
-
-    const tokenPayload = { sub: user.id, email: user.email, role: user.role };
-    const newAccessToken = generateAccessToken(tokenPayload);
-    const newRefreshToken = generateRefreshToken(tokenPayload);
-
-    // Token rotation: delete old session, update cache
-    await prisma.session.deleteMany({ where: { id: session.id } });
-    
-    // Always persist new session to DB as primary source of truth
-    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);
-    await prisma.session.create({
-        data: { userId: user.id, refreshToken: newRefreshToken, expiresAt },
-    });
-
-    if (!getRedisSuspended()) {
-        const redis = getRedisClient();
-        try {
-            await redis.del(`session:${user.id}:${refreshToken}`);
-            await redis.setex(`session:${user.id}:${newRefreshToken}`, REFRESH_TOKEN_TTL_SECONDS, user.id);
-        } catch (err) {
-            logger.warn('Redis: cache update skipped during refresh', { error: err.message });
-        }
-    }
-
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  return { accessToken, refreshToken };
 };
 
-/**
- * Logout – revoke session from DB and Redis.
- */
-const logout = async ({ userId, refreshToken }) => {
-    await prisma.session.deleteMany({ where: { userId, refreshToken } });
-
-    const redis = getRedisClient();
-    try {
-        await redis.del(`session:${userId}:${refreshToken}`);
-    } catch (err) {
-        logger.warn('Redis: Failed to remove session from cache during logout', { error: err.message, userId });
-    }
+const logout = async (refreshToken) => {
+  await prisma.session.deleteMany({ where: { refreshToken } }).catch(() => {});
 };
 
 module.exports = { register, login, refreshTokens, logout };

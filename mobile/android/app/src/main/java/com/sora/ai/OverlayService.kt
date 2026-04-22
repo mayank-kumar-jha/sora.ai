@@ -7,6 +7,8 @@ import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
+import android.graphics.Paint
+import android.graphics.Canvas
 import android.util.Log
 import android.view.*
 import android.os.*
@@ -20,6 +22,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.widget.ImageView
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
@@ -33,6 +37,8 @@ import android.animation.ValueAnimator
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import android.media.MediaRecorder
+import android.media.AudioRecord
+import android.media.AudioFormat
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -49,7 +55,7 @@ import android.content.ComponentName
 class OverlayService : Service() {
 
     enum class OverlayState {
-        IDLE, LISTENING, THINKING, SPEAKING, CAPTURING
+        IDLE, LISTENING, THINKING, SPEAKING, CAPTURING, LIVE
     }
 
     enum class SoraSize {
@@ -61,6 +67,7 @@ class OverlayService : Service() {
         internal const val CHANNEL_ID = "sora_overlay_channel"
         internal const val NOTIFICATION_ID = 2001
         var instance: OverlayService? = null
+        var pendingImageBase64: String? = null
         
         // NUCLEAR PERSISTENCE: Maintain the projection session at the process level
         internal var persistentProjection: MediaProjection? = null
@@ -104,10 +111,21 @@ class OverlayService : Service() {
     private var captureHandler: android.os.Handler? = null
     private var captureWatchdog: Runnable? = null
     
-    // Native Recording
-    private var mediaRecorder: MediaRecorder? = null
-    private var currentAudioFile: File? = null
-    private var isRecording = false
+
+    
+    // Live Overlay State
+    private var liveOverlayContainer: FrameLayout? = null
+    private var liveGlowAnimator: ValueAnimator? = null
+
+    // PCM Streaming (Gemini Live)
+    private var pcmRecord: AudioRecord? = null
+    private var isStreamingPCM = false
+    private var pcmThread: Thread? = null
+
+    // Wake Word Streaming (moved here for Foreground Service rights)
+    private var wakeWordRecord: AudioRecord? = null
+    private var isStreamingWakeWord = false
+    private var wakeWordThread: Thread? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -139,16 +157,103 @@ class OverlayService : Service() {
             }
             "updateState" -> updateState(intent.getStringExtra("state"))
             "updateColor" -> updateColor(intent.getStringExtra("color"))
-            "addMessage" -> addMessage(intent.getStringExtra("message"), intent.getStringExtra("sender"))
+            "addMessage" -> {
+                val imgBase64 = pendingImageBase64
+                pendingImageBase64 = null
+                addMessage(intent.getStringExtra("message"), intent.getStringExtra("sender"), imgBase64)
+            }
             "hide" -> removeOverlay()
             "stop" -> shutdown()
+            "startPCM" -> startPCMStreaming()
+            "stopPCM" -> stopPCMStreaming()
         }
     }
+
+    // ─── Native PCM Streaming (Gemini Live) ─────────────────────────────
+    private fun startPCMStreaming() {
+        if (isStreamingPCM) return
+        
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "RECORD_AUDIO permission not granted for PCM Streaming!")
+            return
+        }
+
+        try {
+            val sampleRate = 16000
+            val channelConfig = AudioFormat.CHANNEL_IN_MONO
+            val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+            val minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+            val bufferSize = if (minBufSize > 2560) minBufSize else 2560
+
+            pcmRecord = AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                sampleRate,
+                channelConfig,
+                audioFormat,
+                bufferSize * 2
+            )
+
+            if (pcmRecord?.state != AudioRecord.STATE_INITIALIZED) {
+                Log.e(TAG, "PCM AudioRecord initialization failed")
+                return
+            }
+
+            isStreamingPCM = true
+            syncForegroundType() // Assert MICROPHONE permission immediately
+            
+            pcmRecord?.startRecording()
+
+            pcmThread = Thread {
+                val buffer = ByteArray(3200) // 100ms at 16kHz 16-bit mono
+                while (isStreamingPCM) {
+                    val read = pcmRecord?.read(buffer, 0, buffer.size) ?: 0
+                    if (read > 0) {
+                        val base64Data = Base64.encodeToString(buffer, 0, read, Base64.NO_WRAP)
+                        val map = Arguments.createMap()
+                        map.putString("audio", base64Data)
+                        OverlayModule.sendEventToJS("PCM_AUDIO_CHUNK", map)
+                    }
+                }
+            }
+            pcmThread?.start()
+            Log.i(TAG, "Native PCM streaming for Gemini Live started")
+        } catch (e: Exception) {
+            Log.e(TAG, "PCM streaming error", e)
+            isStreamingPCM = false
+            syncForegroundType()
+        }
+    }
+
+    private fun stopPCMStreaming() {
+        if (!isStreamingPCM) return
+        isStreamingPCM = false
+        Log.i(TAG, "Native PCM streaming for Gemini Live stopping...")
+        
+        try {
+            pcmThread?.join(1000)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error joining PCM thread", e)
+        }
+        
+        try {
+            pcmRecord?.stop()
+            pcmRecord?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping PCM AudioRecord", e)
+        }
+        
+        pcmRecord = null
+        pcmThread = null
+        syncForegroundType() // Release MICROPHONE permission
+        Log.i(TAG, "Native PCM streaming fully stopped")
+    }
+
+
 
     private fun startSafeForeground() {
         val notification = buildNotification("Sora is active")
         try {
-            // Android 14: Start with basic types, upgrade dynamically
+            // Android 14: Start with MEDIA_PLAYBACK and MEDIA_PROJECTION 
             val type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
             startForeground(OverlayService.NOTIFICATION_ID, notification, type)
         } catch (e: Exception) {
@@ -220,25 +325,67 @@ class OverlayService : Service() {
         wrap.addView(lp)
 
         val mc = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             visibility = View.GONE
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         }
         mainContent = mc
 
+        // 1. Header Array
+        val header = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+                setPadding((12 * density).toInt(), (12 * density).toInt(), (12 * density).toInt(), (6 * density).toInt())
+            }
+            
+            // Cyan Dot
+            addView(View(this@OverlayService).apply {
+                layoutParams = LinearLayout.LayoutParams((8 * density).toInt(), (8 * density).toInt()).apply { marginEnd = (6 * density).toInt() }
+                background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(Color.parseColor("#00ddff")) }
+            })
+            // Teal Dot
+            addView(View(this@OverlayService).apply {
+                layoutParams = LinearLayout.LayoutParams((8 * density).toInt(), (8 * density).toInt()).apply { marginEnd = (8 * density).toInt() }
+                background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(Color.parseColor("#00ffb3")) }
+            })
+            // Title
+            addView(TextView(this@OverlayService).apply {
+                text = "KAAYA AI"
+                setTextColor(Color.WHITE)
+                textSize = 14f
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                layoutParams = LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f)
+            })
+            
+            // Shrink to Capsule (Minus)
+            addView(createHeaderIcon("SHRINK_CAPSULE") { toggleExpansion() })
+            
+            // Minimize (Chat expansion drop)
+            maximizeBtn = createHeaderIcon("MINIMIZE") { toggleMaximize() }
+            maximizeIcon = (maximizeBtn as? FrameLayout)?.getChildAt(0)
+            addView(maximizeBtn)
+            
+            // Close (Cross)
+            addView(createHeaderIcon("CLOSE") { removeOverlay() })
+        }
+        mc.addView(header)
+
+        // 2. Chat Area
         bubblesContainer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-            setPadding((10 * density).toInt(), (10 * density).toInt(), 0, 0)
+            setPadding((12 * density).toInt(), (4 * density).toInt(), (12 * density).toInt(), (10 * density).toInt())
         }
         val scroller = ScrollView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(0, MATCH_PARENT, 1f)
+            layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f)
             isVerticalScrollBarEnabled = false
             isFillViewport = true
             addView(bubblesContainer)
         }
         mc.addView(scroller)
 
+        // 3. Bottom Controls
         val controls = createControlPanel(density)
         mc.addView(controls)
         
@@ -287,39 +434,151 @@ class OverlayService : Service() {
         }
     }
 
+    private fun createHeaderIcon(type: String, onClick: () -> Unit): View {
+        val density = resources.displayMetrics.density
+        val size = (28 * density).toInt()
+        val frame = android.widget.FrameLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(size, size).apply { marginStart = (4 * density).toInt() }
+            setOnClickListener { onClick() }
+        }
+        val icon = object : View(this) {
+            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                strokeWidth = 1.5f * density
+                strokeCap = android.graphics.Paint.Cap.ROUND
+                color = Color.parseColor("#888888")
+            }
+            override fun onDraw(c: android.graphics.Canvas) {
+                val cx = width / 2f; val cy = height / 2f
+                val s = 4 * density
+                if (type == "CLOSE") {
+                    c.drawLine(cx - s, cy - s, cx + s, cy + s, paint)
+                    c.drawLine(cx + s, cy - s, cx - s, cy + s, paint)
+                } else if (type == "MINIMIZE") {
+                    // Chevron down
+                    paint.style = android.graphics.Paint.Style.STROKE
+                    c.drawLine(cx - s, cy - s/2, cx, cy + s/2, paint)
+                    c.drawLine(cx, cy + s/2, cx + s, cy - s/2, paint)
+                } else if (type == "SHRINK_CAPSULE") {
+                    // Minus sign
+                    paint.style = android.graphics.Paint.Style.STROKE
+                    c.drawLine(cx - s, cy, cx + s, cy, paint)
+                }
+            }
+        }
+        frame.addView(icon)
+        return frame
+    }
+
     private fun createControlPanel(density: Float): View {
         return LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            layoutParams = LinearLayout.LayoutParams((60 * density).toInt(), MATCH_PARENT)
-            setPadding(0, (10 * density).toInt(), (5 * density).toInt(), (10 * density).toInt())
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+            setPadding((12 * density).toInt(), (8 * density).toInt(), (12 * density).toInt(), (12 * density).toInt())
 
-            addView(createIcon("OPEN", "#00ddff") { openApp() })
-            maximizeBtn = createIcon("MAXIMIZE", "#00ddff") { toggleMaximize() }
-            maximizeIcon = (maximizeBtn as? FrameLayout)?.getChildAt(0)
-            addView(maximizeBtn)
+            val visionBtn = createBottomIcon("EYE", disabled = false) { triggerVision() }
+            addView(visionBtn)
             
-            // Flexible spacer to separate Open and Mic
-            addView(View(this@OverlayService).apply { 
-                layoutParams = LinearLayout.LayoutParams(1, 0, 1f) 
-            })
+            // Fake Text Input Bubble
+            val fakeInput = android.widget.EditText(this@OverlayService).apply {
+                hint = "Type a command..."
+                setHintTextColor(Color.parseColor("#555555"))
+                setTextColor(Color.WHITE)
+                textSize = 14f
+                maxLines = 1
+                inputType = android.text.InputType.TYPE_CLASS_TEXT
+                imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEND
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding((14 * density).toInt(), 0, (14 * density).toInt(), 0)
+                layoutParams = LinearLayout.LayoutParams(0, (40 * density).toInt(), 1f).apply {
+                    marginStart = (8 * density).toInt()
+                    marginEnd = (8 * density).toInt()
+                }
+                background = GradientDrawable().apply {
+                    setColor(Color.argb(25, 255, 255, 255))
+                    cornerRadius = 20 * density
+                }
+                
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND) {
+                        val txt = text.toString()
+                        if (txt.isNotBlank()) {
+                            setText("")
+                            val map = Arguments.createMap().apply {
+                                putString("action", "sendText")
+                                putString("text", txt)
+                            }
+                            OverlayModule.sendEventToJS("OVERLAY_ACTION", map)
+                        }
+                        clearFocus()
+                        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                        imm.hideSoftInputFromWindow(windowToken, 0)
+                        true
+                    } else false
+                }
+                
+                setOnFocusChangeListener { _, hasFocus ->
+                    val overlayLp = this@OverlayService.layoutParams
+                    if (overlayLp != null) {
+                        if (hasFocus) {
+                            overlayLp.flags = overlayLp.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+                        } else {
+                            overlayLp.flags = overlayLp.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                            imm.hideSoftInputFromWindow(windowToken, 0)
+                        }
+                        windowManager?.updateViewLayout(container, overlayLp)
+                    }
+                }
+                
+                addTextChangedListener(object : android.text.TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        val hasText = s?.isNotBlank() == true
+                        val micSendContainer = this@apply.tag as? FrameLayout
+                        if (micSendContainer != null && micSendContainer.childCount >= 2) {
+                            micSendContainer.getChildAt(0).visibility = if (hasText) View.GONE else View.VISIBLE
+                            micSendContainer.getChildAt(1).visibility = if (hasText) View.VISIBLE else View.GONE
+                        }
+                    }
+                })
+            }
+            addView(fakeInput)
             
-            micBtn = createIcon("MIC", "#00ddff") { triggerMic() }
-            addView(micBtn)
+            val micSendContainer = FrameLayout(this@OverlayService).apply {
+                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+            }
+            fakeInput.tag = micSendContainer
+            
+            micBtn = createBottomIcon("MIC", disabled = false) { triggerMic() }
+            val sendBtn = createBottomIcon("SEND", disabled = false) { 
+                fakeInput.onEditorAction(android.view.inputmethod.EditorInfo.IME_ACTION_SEND) 
+            }.apply { visibility = View.GONE }
+            
+            micSendContainer.addView(micBtn)
+            micSendContainer.addView(sendBtn)
+            addView(micSendContainer)
         }
     }
 
-    private fun createIcon(type: String, baseColor: String, onClick: () -> Unit): View {
+    private fun createBottomIcon(type: String, disabled: Boolean, onClick: () -> Unit): View {
         val density = resources.displayMetrics.density
         val size = (40 * density).toInt()
         val frame = android.widget.FrameLayout(this).apply {
-            layoutParams = LinearLayout.LayoutParams(size, size).apply { bottomMargin = (10 * density).toInt() }
+            layoutParams = LinearLayout.LayoutParams(size, size)
             background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
-                setColor(Color.argb(128, 40, 40, 40)) // Translucent button bg
+                setColor(if (disabled) Color.argb(64, 40, 40, 40) else Color.argb(128, 40, 40, 40))
                 setStroke((1 * density).toInt(), Color.argb(25, 255, 255, 255))
             }
-            setOnClickListener { onClick() }
+            setOnClickListener { if (!disabled) onClick() }
+            if (type == "MIC") {
+                setOnLongClickListener {
+                    if (!disabled) triggerLiveMode()
+                    true
+                }
+            }
         }
 
         val icon = object : View(this) {
@@ -380,6 +639,18 @@ class OverlayService : Service() {
                         // Base
                         c.drawLine(cx - 3*d, cy + 7*d, cx + 3*d, cy + 7*d, paint)
                     }
+                    "SEND" -> {
+                        paint.style = android.graphics.Paint.Style.FILL
+                        paint.color = Color.parseColor("#ff4444") // Red
+                        val s = 6 * d
+                        val path = android.graphics.Path()
+                        path.moveTo(cx - s, cy - s)
+                        path.lineTo(cx + s, cy)
+                        path.lineTo(cx - s, cy + s)
+                        path.lineTo(cx - s/2, cy)
+                        path.close()
+                        c.drawPath(path, paint)
+                    }
                     "MAXIMIZE" -> {
                         paint.style = android.graphics.Paint.Style.STROKE
                         val s = 6 * d
@@ -412,6 +683,7 @@ class OverlayService : Service() {
             "thinking" -> OverlayState.THINKING
             "speaking" -> OverlayState.SPEAKING
             "capturing" -> OverlayState.CAPTURING
+            "live" -> OverlayState.LIVE
             else -> OverlayState.IDLE
         }
         mainHandler.post { applyState(state) }
@@ -448,17 +720,27 @@ class OverlayService : Service() {
             micBG?.setColor(Color.parseColor("#222222"))
         }
 
-        // 4. Manage Foreground Service Types (Android 14)
+        // 4. Toggle Live Mode overlay
+        if (state == OverlayState.LIVE) {
+            showLiveOverlay()
+        } else {
+            hideLiveOverlay()
+        }
+
+        // 5. Manage Foreground Service Types (Android 14)
         syncForegroundType()
     }
 
     private fun syncForegroundType() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
         
-        // Base types always required for a voice assistant
-        var type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK or 
-                   ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+        // Base types
+        var type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
                    
+        if (currentState == OverlayState.LISTENING || currentState == OverlayState.LIVE || isStreamingPCM) {
+            type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+        }
+        
         // DATA_SYNC is required for background networking on Android 14+ to avoid suspension
         if (currentState != OverlayState.IDLE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -468,7 +750,6 @@ class OverlayService : Service() {
         }
 
         // Nuclear R4: Media projection MUST be explicitly active for capture to work on A14
-        // check currentState, isProcessingCapture, and pendingScreenshot for maximum reliability
         if (currentState == OverlayState.CAPTURING || isProcessingCapture || pendingScreenshot) {
             type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
         }
@@ -483,114 +764,409 @@ class OverlayService : Service() {
     }
 
 
-    private fun triggerMic() {
-        if (isRecording) {
-            stopNativeRecording()
-        } else {
-            startNativeRecording()
+    // ─── Live Mode Overlay ─────────────────────────────────────────────────────
+    private fun showLiveOverlay() {
+        if (liveOverlayContainer != null) return // Already showing
+        
+        val density = resources.displayMetrics.density
+        
+        // Hide normal content 
+        contentWrap?.visibility = View.GONE
+        
+        // Expand overlay to half-screen for live mode
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+        
+        layoutParams?.width = screenWidth - (20 * density).toInt()
+        layoutParams?.height = (screenHeight * 0.55).toInt()
+        layoutParams?.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+        layoutParams?.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+        layoutParams?.y = (20 * density).toInt()
+        try { windowManager?.updateViewLayout(container, layoutParams) } catch (e: Exception) {}
+        
+        // Update container background to deep dark
+        container?.background = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(Color.parseColor("#060608"), Color.parseColor("#060608"))
+        ).apply {
+            cornerRadius = 24 * density
         }
+        
+        liveOverlayContainer = FrameLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            // Add a slight gradient overlay to match native
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(Color.argb(40, 0, 0, 0), Color.TRANSPARENT, Color.argb(60, 0, 0, 0))
+            )
+        }
+        
+        // Header: "✦ Live"
+        val headerText = TextView(this).apply {
+            text = "✦ Live"
+            setTextColor(Color.parseColor("#e4e4e7"))
+            textSize = 15f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            letterSpacing = 0.05f
+            setPadding((16 * density).toInt(), (14 * density).toInt(), 0, 0)
+            layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                gravity = Gravity.TOP or Gravity.START
+            }
+        }
+        liveOverlayContainer?.addView(headerText)
+        
+        // Glow Blobs (drawn as overlapping colored ovals with alpha animation)
+        val glowContainer = FrameLayout(this).apply {
+            layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, (180 * density).toInt()).apply {
+                gravity = Gravity.BOTTOM
+                bottomMargin = (60 * density).toInt()
+            }
+        }
+        
+        // Blue glow blob
+        val blueBlob = View(this).apply {
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.parseColor("#00b4d8"))
+            }
+            alpha = 0.5f
+            layoutParams = FrameLayout.LayoutParams((200 * density).toInt(), (80 * density).toInt()).apply {
+                gravity = Gravity.BOTTOM or Gravity.START
+                marginStart = (30 * density).toInt()
+                bottomMargin = (10 * density).toInt()
+            }
+        }
+        glowContainer.addView(blueBlob)
+        
+        // Purple glow blob
+        val purpleBlob = View(this).apply {
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.parseColor("#7b2ff7"))
+            }
+            alpha = 0.5f
+            layoutParams = FrameLayout.LayoutParams((180 * density).toInt(), (70 * density).toInt()).apply {
+                gravity = Gravity.BOTTOM or Gravity.END
+                marginEnd = (30 * density).toInt()
+                bottomMargin = (20 * density).toInt()
+            }
+        }
+        glowContainer.addView(purpleBlob)
+        
+        // Teal glow blob
+        val tealBlob = View(this).apply {
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.parseColor("#00ddff"))
+            }
+            alpha = 0.3f
+            layoutParams = FrameLayout.LayoutParams((120 * density).toInt(), (50 * density).toInt()).apply {
+                gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+            }
+        }
+        glowContainer.addView(tealBlob)
+        
+        liveOverlayContainer?.addView(glowContainer)
+        
+        // Animate the glow pulsing
+        liveGlowAnimator = ValueAnimator.ofFloat(0.3f, 0.8f).apply {
+            duration = 1800
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener {
+                val alpha = it.animatedValue as Float
+                blueBlob.alpha = alpha
+                purpleBlob.alpha = alpha
+                tealBlob.alpha = alpha * 0.6f
+                
+                val scale = 0.95f + (alpha - 0.3f) * 0.4f
+                blueBlob.scaleX = scale
+                blueBlob.scaleY = scale
+                purpleBlob.scaleX = scale
+                purpleBlob.scaleY = scale
+            }
+            start()
+        }
+        
+        // Bottom Controls: Hold + End
+        val controlsBar = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+                gravity = Gravity.BOTTOM
+                bottomMargin = (20 * density).toInt()
+            }
+        }
+        
+        // Hold Button
+        val holdWrapper = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                marginEnd = (25 * density).toInt()
+            }
+        }
+        val holdBtn = FrameLayout(this).apply {
+            val sz = (52 * density).toInt()
+            layoutParams = LinearLayout.LayoutParams(sz, sz)
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.argb(30, 255, 255, 255))
+            }
+        }
+        // Pause icon (two bars)
+        val pauseContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        }
+        for (i in 0..1) {
+            pauseContainer.addView(View(this).apply {
+                layoutParams = LinearLayout.LayoutParams((4 * density).toInt(), (16 * density).toInt()).apply {
+                    if (i == 0) marginEnd = (5 * density).toInt()
+                }
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 2 * density
+                    setColor(Color.WHITE)
+                }
+            })
+        }
+        holdBtn.addView(pauseContainer)
+        holdWrapper.addView(holdBtn)
+        holdWrapper.addView(TextView(this).apply {
+            text = "Hold"
+            setTextColor(Color.parseColor("#a1a1aa"))
+            textSize = 12f
+            gravity = Gravity.CENTER
+            setPadding(0, (10 * density).toInt(), 0, 0)
+        })
+        controlsBar.addView(holdWrapper)
+        
+        // End Button
+        val endWrapper = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                marginStart = (25 * density).toInt()
+            }
+        }
+        val endBtn = FrameLayout(this).apply {
+            val sz = (56 * density).toInt()
+            layoutParams = LinearLayout.LayoutParams(sz, sz)
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.parseColor("#ea4335"))
+            }
+            setOnClickListener {
+                // Trigger end of live mode — send event to JS
+                val event = Arguments.createMap()
+                event.putString("action", "END_LIVE")
+                OverlayModule.sendEventToJS("LIVE_END_REQUESTED", event)
+                applyState(OverlayState.IDLE)
+            }
+            
+            // Add X icon
+            addView(object : View(this@OverlayService) {
+                val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.WHITE
+                    strokeWidth = 2.5f * density
+                    strokeCap = android.graphics.Paint.Cap.ROUND
+                }
+                override fun onDraw(c: android.graphics.Canvas) {
+                    val cx = width / 2f; val cy = height / 2f
+                    val s = 7 * density
+                    c.drawLine(cx - s, cy - s, cx + s, cy + s, paint)
+                    c.drawLine(cx + s, cy - s, cx - s, cy + s, paint)
+                }
+            })
+        }
+        // X icon
+        val xIcon = object : View(this@OverlayService) {
+            val xPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                strokeWidth = 2.5f * density
+                strokeCap = Paint.Cap.ROUND
+            }
+            override fun onDraw(c: Canvas) {
+                val cx = width / 2f; val cy = height / 2f
+                val s = 8 * density
+                c.drawLine(cx - s, cy - s, cx + s, cy + s, xPaint)
+                c.drawLine(cx + s, cy - s, cx - s, cy + s, xPaint)
+            }
+        }
+        xIcon.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        endBtn.addView(xIcon)
+        endWrapper.addView(endBtn)
+        endWrapper.addView(TextView(this).apply {
+            text = "End"
+            setTextColor(Color.parseColor("#a1a1aa"))
+            textSize = 12f
+            gravity = Gravity.CENTER
+            setPadding(0, (10 * density).toInt(), 0, 0)
+        })
+        controlsBar.addView(endWrapper)
+        
+        liveOverlayContainer?.addView(controlsBar)
+        container?.addView(liveOverlayContainer)
+    }
+    
+    private fun hideLiveOverlay() {
+        if (liveOverlayContainer == null) return
+        
+        liveGlowAnimator?.cancel()
+        liveGlowAnimator = null
+        
+        container?.removeView(liveOverlayContainer)
+        liveOverlayContainer = null
+        
+        // Restore normal content
+        contentWrap?.visibility = View.VISIBLE
+        
+        // Restore normal overlay size
+        val density = resources.displayMetrics.density
+        container?.background = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(Color.argb(230, 24, 24, 28), Color.argb(245, 12, 12, 14))
+        ).apply {
+            cornerRadius = 24 * density
+            setStroke((1.2 * density).toInt(), Color.argb(45, 255, 255, 255))
+        }
+        
+        // Reset to compact size
+        layoutParams?.width = (100 * density).toInt()
+        layoutParams?.height = (40 * density).toInt()
+        layoutParams?.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        layoutParams?.y = (10 * density).toInt()
+        try { windowManager?.updateViewLayout(container, layoutParams) } catch (e: Exception) {}
     }
 
-    private fun startNativeRecording() {
-        Log.i(OverlayService.TAG, "startNativeRecording: Initializing MediaRecorder")
-        
-        // 1. Android 14 Guard: Check Permission first
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(OverlayService.TAG, "RECORD_AUDIO permission not granted!")
-            OverlayModule.sendEventToJS("RECORDING_ERROR", Arguments.createMap().apply { putString("error", "PERMISSION_DENIED") })
-            // Auto-launch app to request permission if needed
-            openApp()
+
+    // ─── Native MediaRecorder for Overlay Mic ─────────────────────────────
+    private var nativeRecorder: MediaRecorder? = null
+    private var isNativeRecording = false
+    private var nativeRecordingFile: File? = null
+    private var nativeRecordingTimeout: Runnable? = null
+
+    private fun triggerMic() {
+        if (isNativeRecording) {
+            // Second tap: stop recording
+            stopNativeRecording()
             return
         }
 
-        // 2. Android 14 Guard: Sync Foreground Service Type BEFORE starting recording
-        // We must transition to MICROPHONE type now to satisfy system enforcement
-        applyState(OverlayState.LISTENING)
-        
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "Sora_Recording_$timestamp.m4a"
-        currentAudioFile = File(externalCacheDir, fileName)
+        Log.i(TAG, "Mic button pressed: starting native recording")
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "RECORD_AUDIO permission not granted!")
+            OverlayModule.sendEventToJS("RECORDING_ERROR", Arguments.createMap().apply {
+                putString("error", "RECORD_AUDIO permission not granted")
+            })
+            return
+        }
 
         try {
-            mediaRecorder = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) MediaRecorder(this) else MediaRecorder()).apply {
+            // 1. Visual feedback immediately
+            applyState(OverlayState.LISTENING)
+
+            // 2. Create temp file
+            val cacheDir = File(cacheDir, "Audio")
+            if (!cacheDir.exists()) cacheDir.mkdirs()
+            nativeRecordingFile = File(cacheDir, "recording-${System.currentTimeMillis()}.m4a")
+
+            // 3. Setup MediaRecorder
+            nativeRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                MediaRecorder(this)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaRecorder()
+            }
+            nativeRecorder?.apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
                 setAudioSamplingRate(16000)
+                setAudioChannels(1)
                 setAudioEncodingBitRate(128000)
-                setOutputFile(currentAudioFile?.absolutePath)
+                setOutputFile(nativeRecordingFile!!.absolutePath)
                 prepare()
-                
-                // Final safety check before start
-                try {
-                    start()
-                } catch (se: SecurityException) {
-                    Log.e(OverlayService.TAG, "SecurityException: OS rejected mic access. Service type sync might have failed.", se)
-                    throw se
-                }
+                start()
             }
-            isRecording = true
-            Log.i(OverlayService.TAG, "Native recording started: ${currentAudioFile?.absolutePath}")
-            
-            // Auto-stop after 15 seconds to be safe
-            mainHandler.postDelayed({
-                if (isRecording) {
-                    Log.i(OverlayService.TAG, "Native recording auto-stop timeout reached")
+
+            isNativeRecording = true
+            Log.i(TAG, "Native recording started: ${nativeRecordingFile!!.absolutePath}")
+
+            // 4. Auto-stop after 10 seconds
+            nativeRecordingTimeout = Runnable {
+                if (isNativeRecording) {
+                    Log.i(TAG, "Native recording auto-stop (10s timeout)")
                     stopNativeRecording()
                 }
-            }, 15000)
-            
+            }
+            mainHandler.postDelayed(nativeRecordingTimeout!!, 10000)
+
         } catch (e: Exception) {
-            Log.e(OverlayService.TAG, "Failed to start native recording", e)
-            isRecording = false
+            Log.e(TAG, "Failed to start native recording", e)
+            isNativeRecording = false
             applyState(OverlayState.IDLE)
-            OverlayModule.sendEventToJS("RECORDING_ERROR", Arguments.createMap().apply { putString("error", "START_FAILED") })
+            OverlayModule.sendEventToJS("RECORDING_ERROR", Arguments.createMap().apply {
+                putString("error", e.message ?: "Unknown recording error")
+            })
         }
     }
 
     private fun stopNativeRecording() {
-        if (!isRecording) return
-        Log.i(OverlayService.TAG, "stopNativeRecording: Stopping...")
-        
+        if (!isNativeRecording) return
+        isNativeRecording = false
+
+        // Cancel auto-stop timer
+        nativeRecordingTimeout?.let { mainHandler.removeCallbacks(it) }
+        nativeRecordingTimeout = null
+
+        Log.i(TAG, "Stopping native recording...")
+        applyState(OverlayState.THINKING)
+
         try {
-            mediaRecorder?.apply {
-                stop()
-                release()
-            }
-            mediaRecorder = null
-            isRecording = false
-            applyState(OverlayState.THINKING)
-            
-            val filePath = currentAudioFile?.absolutePath
-            if (filePath != null) {
-                Log.i(OverlayService.TAG, "Native recording stopped. File: $filePath")
-                OverlayModule.sendEventToJS("RECORDING_FINISHED", Arguments.createMap().apply { 
-                    putString("uri", "file://$filePath")
-                })
-            }
+            nativeRecorder?.stop()
+            nativeRecorder?.release()
         } catch (e: Exception) {
-            Log.e(OverlayService.TAG, "Failed to stop native recording", e)
-            OverlayModule.sendEventToJS("RECORDING_ERROR", Arguments.createMap().apply { putString("error", "STOP_FAILED") })
-        } finally {
-            isRecording = false
-            if (currentState == OverlayState.LISTENING) applyState(OverlayState.IDLE)
+            Log.e(TAG, "Error stopping MediaRecorder", e)
+        }
+        nativeRecorder = null
+
+        val file = nativeRecordingFile
+        nativeRecordingFile = null
+
+        if (file != null && file.exists() && file.length() > 0) {
+            val uri = "file://${file.absolutePath}"
+            Log.i(TAG, "Native recording saved: $uri (${file.length()} bytes)")
+            val map = Arguments.createMap()
+            map.putString("uri", uri)
+            OverlayModule.sendEventToJS("RECORDING_FINISHED", map)
+        } else {
+            Log.e(TAG, "Native recording file is missing or empty")
+            applyState(OverlayState.IDLE)
+            OverlayModule.sendEventToJS("RECORDING_ERROR", Arguments.createMap().apply {
+                putString("error", "Recording file was empty")
+            })
         }
     }
 
     private fun triggerVision() {
         Log.i(OverlayService.TAG, "triggerVision: UI Vision button pressed or requested")
-        // Proactively upgrade FGS type to prepare for background capture
-        // Android 14 requires the type to be active BEFORE the activity result comes back
-        currentState = OverlayState.CAPTURING
-        syncForegroundType()
+        // Use the nuclear R1-R4 pipeline instead of just openApp
+        performCaptureWithBestPath(pendingVisionTranscript ?: "")
+    }
 
-        if (mediaProjection != null) {
-            takeScreenshot()
-        } else {
-            Log.i(OverlayService.TAG, "triggerVision: No MediaProjection session, launching permission app")
-            pendingScreenshot = true
-            openApp("vision")
-        }
+    private fun triggerLiveMode() {
+        Log.i(OverlayService.TAG, "triggerLiveMode: Requested from native UI")
+        val event = Arguments.createMap()
+        event.putString("action", "START_LIVE")
+        OverlayModule.sendEventToJS("LIVE_START_REQUESTED", event)
+        // Transition UI to live state locally for instant feedback
+        applyState(OverlayState.LIVE)
     }
 
     private fun openApp(action: String? = null) {
@@ -636,14 +1212,18 @@ class OverlayService : Service() {
         }
     }
 
-    fun addMessage(message: String?, sender: String?) {
-        if (message == null) return
+    fun addMessage(message: String?, sender: String?, imageBase64: String?) {
+        if (message == null && imageBase64 == null) return
         mainHandler.post {
             val density = resources.displayMetrics.density
-            val bubble = TextView(this).apply {
-                text = message
-                setTextColor(if (sender == "user") Color.parseColor("#eeeeee") else themeColor)
-                setPadding((14*density).toInt(), (10*density).toInt(), (14*density).toInt(), (10*density).toInt())
+            val screenWidth = resources.displayMetrics.widthPixels
+            val maxBubbleWidth = (screenWidth * 0.65).toInt()
+            val bubbleLayout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                    topMargin = (8 * density).toInt()
+                    gravity = if (sender == "user") Gravity.END else Gravity.START
+                }
                 background = GradientDrawable().apply {
                     val bgColor = if (sender == "user") Color.argb(64, 0, 122, 255) else Color.argb(102, 40, 40, 40)
                     val brdColor = if (sender == "user") Color.argb(102, 0, 122, 255) else Color.argb(38, Color.red(themeColor), Color.green(themeColor), Color.blue(themeColor))
@@ -651,13 +1231,190 @@ class OverlayService : Service() {
                     setStroke((1 * density).toInt(), brdColor)
                     cornerRadius = 18 * density
                 }
-                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-                    topMargin = (8 * density).toInt()
-                    gravity = if (sender == "user") Gravity.END else Gravity.START
+                setPadding((6*density).toInt(), (6*density).toInt(), (6*density).toInt(), (6*density).toInt())
+            }
+            bubbleLayout.post { if (bubbleLayout.width > maxBubbleWidth) { bubbleLayout.layoutParams.width = maxBubbleWidth; bubbleLayout.requestLayout() } }
+
+            if (imageBase64 != null) {
+                try {
+                    val cleanBase64 = if (imageBase64.contains(",")) imageBase64.substringAfter(",") else imageBase64
+                    val decodedString = Base64.decode(cleanBase64, Base64.DEFAULT)
+                    val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    val imageView = ImageView(this).apply {
+                        setImageBitmap(decodedByte)
+                        scaleType = ImageView.ScaleType.FIT_CENTER
+                        layoutParams = LinearLayout.LayoutParams((180 * density).toInt(), (180 * density).toInt()).apply {
+                            setMargins((4*density).toInt(), (4*density).toInt(), (4*density).toInt(), (4*density).toInt())
+                        }
+                    }
+                    bubbleLayout.addView(imageView)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to decode image in addMessage", e)
                 }
             }
-            bubblesContainer?.addView(bubble)
+
+            if (!message.isNullOrEmpty()) {
+                val textView = TextView(this).apply {
+                    text = message
+                    setTextColor(if (sender == "user") Color.parseColor("#eeeeee") else themeColor)
+                    setPadding((8*density).toInt(), (4*density).toInt(), (8*density).toInt(), (4*density).toInt())
+                }
+                bubbleLayout.addView(textView)
+            }
+
+            var lastClickTime = 0L
+            bubbleLayout.setOnClickListener {
+                val now = System.currentTimeMillis()
+                if (now - lastClickTime < 300) {
+                    if (!message.isNullOrEmpty()) {
+                        val clip = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                        clip.setPrimaryClip(android.content.ClipData.newPlainText("Kaaya Copied", message))
+                        android.widget.Toast.makeText(this@OverlayService, "Text copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+                    } else if (imageBase64 != null) {
+                        try {
+                            val cleanBase64 = if (imageBase64.contains(",")) imageBase64.substringAfter(",") else imageBase64
+                            val decodedBytes = Base64.decode(cleanBase64, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                            
+                            val contentValues = android.content.ContentValues().apply {
+                                put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "KaayaImage_${System.currentTimeMillis()}.jpg")
+                                put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_PICTURES + "/Kaaya")
+                                }
+                            }
+                            val uri = contentResolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                            if (uri != null) {
+                                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                                }
+                                android.widget.Toast.makeText(this@OverlayService, "Image saved directly to Gallery!", android.widget.Toast.LENGTH_SHORT).show()
+                            } else {
+                                android.widget.Toast.makeText(this@OverlayService, "Failed to save image to Gallery.", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error saving image to gallery", e)
+                            android.widget.Toast.makeText(this@OverlayService, "Error saving image.", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                lastClickTime = now
+            }
+
+            bubblesContainer?.addView(bubbleLayout)
+
+            // If typing indicator is showing, move it to the end so it stays below the new message
+            typingIndicatorView?.let { indicator ->
+                bubblesContainer?.removeView(indicator)
+                bubblesContainer?.addView(indicator)
+            }
+
             (bubblesContainer?.parent as? ScrollView)?.post { (bubblesContainer?.parent as? ScrollView)?.fullScroll(View.FOCUS_DOWN) }
+        }
+    }
+
+    // ─── Streaming Support for Background Overlay ────────────────────────────
+
+    private var typingIndicatorView: LinearLayout? = null
+    private var typingAnimators = mutableListOf<ValueAnimator>()
+
+    /**
+     * Update the text of the last AI message bubble in-place (for streaming tokens).
+     */
+    fun updateLastMessage(message: String?) {
+        if (message == null) return
+        mainHandler.post {
+            // Find the last AI bubble (LinearLayout with a TextView child)
+            val count = bubblesContainer?.childCount ?: 0
+            for (i in count - 1 downTo 0) {
+                val child = bubblesContainer?.getChildAt(i)
+                if (child is LinearLayout) {
+                    // Check if it's an AI bubble (left-aligned = ai)
+                    val lp = child.layoutParams as? LinearLayout.LayoutParams
+                    if (lp?.gravity == Gravity.START) {
+                        // Find the TextView inside
+                        for (j in 0 until child.childCount) {
+                            val tv = child.getChildAt(j)
+                            if (tv is TextView) {
+                                tv.text = message
+                                (bubblesContainer?.parent as? ScrollView)?.post {
+                                    (bubblesContainer?.parent as? ScrollView)?.fullScroll(View.FOCUS_DOWN)
+                                }
+                                return@post
+                            }
+                        }
+                        // If no TextView found (e.g. typing indicator dots), continue to previous sibling!
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Show animated typing indicator dots in the chat area.
+     */
+    fun showTypingIndicator() {
+        mainHandler.post {
+            if (typingIndicatorView != null) return@post // Already showing
+            val density = resources.displayMetrics.density
+
+            typingIndicatorView = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                    topMargin = (8 * density).toInt()
+                    gravity = Gravity.START
+                }
+                background = GradientDrawable().apply {
+                    setColor(Color.argb(102, 40, 40, 40))
+                    setStroke((1 * density).toInt(), Color.argb(38, 0, 221, 255))
+                    cornerRadius = 18 * density
+                }
+                setPadding((14 * density).toInt(), (10 * density).toInt(), (14 * density).toInt(), (10 * density).toInt())
+            }
+
+            // Create 3 animated dots
+            for (i in 0..2) {
+                val dot = View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams((7 * density).toInt(), (7 * density).toInt()).apply {
+                        marginEnd = (4 * density).toInt()
+                    }
+                    background = GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        setColor(Color.parseColor("#00ddff"))
+                    }
+                    alpha = 0.3f
+                }
+                typingIndicatorView?.addView(dot)
+
+                // Animate each dot with staggered delay
+                val animator = ValueAnimator.ofFloat(0.3f, 1f, 0.3f).apply {
+                    duration = 800
+                    startDelay = (i * 200).toLong()
+                    repeatCount = ValueAnimator.INFINITE
+                    interpolator = AccelerateDecelerateInterpolator()
+                    addUpdateListener { dot.alpha = it.animatedValue as Float }
+                }
+                typingAnimators.add(animator)
+                animator.start()
+            }
+
+            bubblesContainer?.addView(typingIndicatorView)
+            (bubblesContainer?.parent as? ScrollView)?.post {
+                (bubblesContainer?.parent as? ScrollView)?.fullScroll(View.FOCUS_DOWN)
+            }
+        }
+    }
+
+    /**
+     * Remove the typing indicator dots from the chat area.
+     */
+    fun hideTypingIndicator() {
+        mainHandler.post {
+            typingAnimators.forEach { it.cancel() }
+            typingAnimators.clear()
+            typingIndicatorView?.let { bubblesContainer?.removeView(it) }
+            typingIndicatorView = null
         }
     }
 
@@ -707,15 +1464,11 @@ class OverlayService : Service() {
                 override fun onAnimationStart(a: android.animation.Animator) {
                     if (targetSize != SoraSize.COMPACT) {
                         mainContent?.visibility = View.VISIBLE
-                        // Adjust eyes pos for expanded mode
-                        leftPanel?.apply {
-                            (layoutParams as? LinearLayout.LayoutParams)?.apply {
-                                leftMargin = (10 * density).toInt()
-                                topMargin = (20 * density).toInt()
-                            }
-                        }
+                        // Hide eyes completely to allow chat to span full width
+                        leftPanel?.visibility = View.GONE
                     } else {
-                        // Reset eyes for compact mode to ensure visibility
+                        // Reset eyes for compact mode
+                        leftPanel?.visibility = View.VISIBLE
                         leftPanel?.apply {
                             (layoutParams as? LinearLayout.LayoutParams)?.apply {
                                 leftMargin = 0
@@ -774,48 +1527,95 @@ class OverlayService : Service() {
 
     fun takeScreenshot() {
         if (isProcessingCapture) {
-            Log.w(OverlayService.TAG, "takeScreenshot: Busy")
+            Log.w(OverlayService.TAG, "takeScreenshot: Busy, ignoring duplicate")
             return
         }
         
-        Log.i(OverlayService.TAG, "Nuclear Vision R4: Initiate Capture")
+        Log.i(OverlayService.TAG, "Vision Capture: Initiate")
         isProcessingCapture = true
+        
+        // CRITICAL: Upgrade FGS type to MEDIA_PROJECTION BEFORE any capture attempt
+        // Android 14 requires this to be active before the projection is used
         applyState(OverlayState.CAPTURING)
         
         // Hide overlay so it's not in the shot
-        container?.alpha = 0f
+        mainHandler.post { container?.alpha = 0f }
 
-        // 1. Path A: Accessibility Service (Zero-latency, no UI)
+        // Delay to ensure FGS type upgrade is processed by the OS
+        captureHandler?.postDelayed({
+            performCaptureWithBestPath()
+        }, 200)
+    }
+
+    private fun performCaptureWithBestPath(transcript: String = "") {
+        if (transcript.isNotEmpty()) {
+            pendingVisionTranscript = transcript
+        }
+        
+        Log.i(OverlayService.TAG, "performCaptureWithBestPath: transcript='$transcript'")
+        // 1. Path A: Accessibility Service (Best — zero-latency, no UI, no extra permission)
         val acc = SoraAccessibilityService.instance
         if (acc != null) {
-            Log.i(OverlayService.TAG, "Path A: Accessibility (NUCLEAR)")
-            startCaptureWatchdog(5000) 
+            Log.i(OverlayService.TAG, "Capture Path A: Accessibility Service")
+            startCaptureWatchdog(8000) 
             acc.takeScreenshotQuick()
             return
         }
 
-        // 2. Path B: MediaProjection (Last fallback)
+        // 2. Path B: Existing MediaProjection session
         if (mediaProjection != null) {
-            Log.i(OverlayService.TAG, "Path B: Projection")
+            Log.i(OverlayService.TAG, "Capture Path B: Existing MediaProjection")
             performNativeCapture()
             return
         }
 
-        // 3. Path C: Atomic Recovery
+        // 3. Path C: Recover token from SharedPreferences and re-create projection
         if (OverlayService.lastResultCode != 0 && OverlayService.lastResultData != null) {
-            Log.i(OverlayService.TAG, "Path C: Token Recovery")
-            pendingScreenshot = true
-            startScreenCapture(OverlayService.lastResultCode, OverlayService.lastResultData!!)
-            return
+            Log.i(OverlayService.TAG, "Capture Path C: Token Recovery")
+            try {
+                val manager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
+                mediaProjection = manager.getMediaProjection(OverlayService.lastResultCode, OverlayService.lastResultData!!)
+                if (mediaProjection != null) {
+                    Log.i(OverlayService.TAG, "Path C: Token recovered, performing capture")
+                    performNativeCapture()
+                    return
+                }
+            } catch (e: Exception) {
+                Log.e(OverlayService.TAG, "Path C: Token recovery failed", e)
+                OverlayService.lastResultCode = 0
+                OverlayService.lastResultData = null
+            }
         }
 
-        // 4. Path D: Permission Fallback
-        Log.i(OverlayService.TAG, "Path D: Relaunch Needed")
+        // 4. Path D: Need fresh permission — launch transparent activity
+        Log.i(OverlayService.TAG, "Capture Path D: Need permission via transparent Activity")
         pendingScreenshot = true
-        container?.alpha = 1f
-        isProcessingCapture = false
-        applyState(OverlayState.IDLE)
-        OverlayModule.instance?.requestScreenCapturePermission()
+        mainHandler.post {
+            container?.alpha = 1f
+            isProcessingCapture = false
+            applyState(OverlayState.IDLE)
+        }
+        
+        try {
+            val intent = Intent(this, ScreenCapturePermissionActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(OverlayService.TAG, "Failed to launch ScreenCapturePermissionActivity", e)
+            handleCaptureError("PERMISSION_ACTIVITY_FAILED")
+        }
+    }
+
+    fun handleCapturePermissionResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            Log.i(OverlayService.TAG, "Screen capture permission GRANTED from Background Activity")
+            startScreenCapture(resultCode, data)
+        } else {
+            Log.e(OverlayService.TAG, "Screen capture permission DENIED (resultCode: $resultCode)")
+            clearPendingScreenshot()
+            OverlayModule.sendEventToJS("SCREENSHOT_ERROR", Arguments.createMap().apply { putString("error", "PERMISSION_DENIED_BY_USER") })
+        }
     }
 
     private fun performNativeCapture() {
@@ -826,14 +1626,18 @@ class OverlayService : Service() {
         }
         
         isProcessingCapture = true
-        container?.alpha = 0f
+        mainHandler.post { container?.alpha = 0f }
         applyState(OverlayState.CAPTURING)
-        startCaptureWatchdog(8000)
+        startCaptureWatchdog(10000)
 
         try {
             val metrics = resources.displayMetrics
-            // Always create a fresh ImageReader to avoid stale buffers
-            imageReader = ImageReader.newInstance(metrics.widthPixels, metrics.heightPixels, PixelFormat.RGBA_8888, 2)
+            
+            // Clean up any previous readers to avoid stale buffers
+            try { imageReader?.close() } catch (e: Exception) {}
+            try { virtualDisplay?.release() } catch (e: Exception) {}
+            
+            imageReader = ImageReader.newInstance(metrics.widthPixels, metrics.heightPixels, PixelFormat.RGBA_8888, 3)
             
             virtualDisplay = mediaProjection?.createVirtualDisplay(
                 "SoraCapture", metrics.widthPixels, metrics.heightPixels, metrics.densityDpi,
@@ -842,16 +1646,27 @@ class OverlayService : Service() {
 
             if (virtualDisplay == null) throw Exception("VirtualDisplay creation failed")
 
+            // CRITICAL FIX: Wait for the virtual display to render at least one frame
+            // Android needs time to mirror the display to our surface
+            var frameCount = 0
             imageReader?.setOnImageAvailableListener({ reader ->
+                frameCount++
+                // Skip the first frame (may be black/stale), capture the second
+                if (frameCount < 2) {
+                    try { reader.acquireLatestImage()?.close() } catch (e: Exception) {}
+                    return@setOnImageAvailableListener
+                }
+                
                 val img = try { reader.acquireLatestImage() } catch (e: Exception) { null }
                 if (img == null) return@setOnImageAvailableListener
                 
-                // Nuclear choice: Single shot.
+                // Single shot: stop listening
                 reader.setOnImageAvailableListener(null, null)
                 captureHandler?.post {
                     try {
                         val bitmap = processImage(img)
                         val base64 = encodeBitmap(bitmap)
+                        Log.i(OverlayService.TAG, "Screenshot captured, base64 length: ${base64.length}")
                         OverlayModule.sendEventToJS("SCREENSHOT_CAPTURED", Arguments.createMap().apply { putString("base64", base64) })
                     } catch (e: Exception) {
                         Log.e(OverlayService.TAG, "Capture encoding failed", e)
@@ -865,6 +1680,13 @@ class OverlayService : Service() {
             
         } catch (e: Exception) {
             Log.e(OverlayService.TAG, "Native capture setup failed", e)
+            // If projection is dead (SecurityException), clear the stale token
+            if (e is SecurityException) {
+                Log.w(OverlayService.TAG, "SecurityException — clearing stale projection")
+                mediaProjection = null
+                OverlayService.lastResultCode = 0
+                OverlayService.lastResultData = null
+            }
             handleCaptureError("SETUP_FAILED")
         }
     }
@@ -1055,6 +1877,4 @@ class OverlayService : Service() {
         }
     }
 
-    private val MATCH_PARENT = LinearLayout.LayoutParams.MATCH_PARENT
-    private val WRAP_CONTENT = LinearLayout.LayoutParams.WRAP_CONTENT
 }

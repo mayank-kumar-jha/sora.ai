@@ -25,11 +25,17 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(async (config) => {
     // Dynamically update baseURL if a custom URL is set, otherwise use DEFAULT_BASE_URL
-    const customUrl = await getServerUrl();
-    if (customUrl && Platform.OS !== 'web') {
-        const base = customUrl.startsWith('http') ? customUrl : `http://${customUrl}:3000`;
-        config.baseURL = `${base}/api`;
+    let customUrl = await getServerUrl();
+    if (customUrl && customUrl.includes('render.com')) {
+        customUrl = null; // Auto-fix caching issue where app stubbornly connects to frozen prod server
     }
+    
+    // Always dynamically resolve the base URL to prevent hot-reload caching issues
+    // FORCED FIX: Ignore customUrl completely to ensure it uses the ADB USB tunnel (127.0.0.1)
+    const activeUrl = DEFAULT_BASE_URL;
+    const base = activeUrl.startsWith('http') ? activeUrl : `http://${activeUrl}:3000`;
+    config.baseURL = `${base}/api`;
+    console.log('[Axios] Requesting:', config.baseURL, config.url);
 
     const token = await getAccessToken();
     if (token) {

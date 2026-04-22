@@ -1,55 +1,36 @@
 'use strict';
 
-const speechService = require('../services/speechService');
-const { sendSuccess } = require('../utils/response');
-const { asyncHandler } = require('../utils/asyncHandler');
-const AppError = require('../utils/AppError');
-const fs = require('fs');
-const path = require('path');
+const voiceService = require('../services/voiceService');
 
-/**
- * POST /api/voice/transcribe
- */
-const transcribe = asyncHandler(async (req, res) => {
-    if (!req.file) {
-        throw new AppError('Audio file is required.', 400, 'VALIDATION_ERROR');
-    }
+const synthesize = async (req, res, next) => {
+  try {
+    const { text, voiceId } = req.body;
+    if (!text) return res.status(400).json({ success: false, error: { message: 'text required' } });
 
-    const { path: filePath } = req.file;
-
-    try {
-        const transcript = await speechService.transcribeAudio(filePath);
-
-        // Clean up temporary file - use a slight delay on Windows if EBUSY occurs
-        try {
-            fs.unlinkSync(filePath);
-        } catch (unlinkError) {
-            if (unlinkError.code === 'EBUSY') {
-                setTimeout(() => {
-                    try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (e) { }
-                }, 1000);
-            }
-        }
-
-        sendSuccess(res, {
-            message: 'Transcription successful.',
-            data: { text: transcript }
-        });
-    } catch (error) {
-        // Ensure cleanup even on error
-        try {
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        } catch (e) {
-            if (e.code === 'EBUSY') {
-                setTimeout(() => {
-                    try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (err) { }
-                }, 1000);
-            }
-        }
-        throw error;
-    }
-});
-
-module.exports = {
-    transcribe
+    const audioBuffer = await voiceService.synthesize(text, voiceId);
+    res.set({ 'Content-Type': 'audio/mpeg', 'Content-Length': audioBuffer.length });
+    res.send(audioBuffer);
+  } catch (err) {
+    next(err);
+  }
 };
+
+const transcribe = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: { message: 'Audio file required' } });
+    }
+
+    const text = await voiceService.transcribe(req.file.path);
+    
+    // Clean up temp file
+    require('fs').unlink(req.file.path, () => {});
+
+    res.json({ success: true, data: { text } });
+  } catch (err) {
+    if (req.file?.path) require('fs').unlink(req.file.path, () => {});
+    next(err);
+  }
+};
+
+module.exports = { synthesize, transcribe };

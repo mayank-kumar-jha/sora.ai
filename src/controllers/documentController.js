@@ -1,67 +1,40 @@
 'use strict';
 
-const fileService = require('../services/fileService');
-const documentProcessor = require('../services/documentProcessor');
-const agentService = require('../services/agentService');
-const AppError = require('../utils/AppError');
-const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+const ragService = require('../services/ragService');
 
-/**
- * Handle document upload and processing
- */
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
 const uploadDocument = async (req, res, next) => {
-    try {
-        if (!req.file) {
-            throw new AppError('No file uploaded', 400);
-        }
+  try {
+    if (!req.file) return res.status(400).json({ success: false, error: { message: 'No file uploaded' } });
 
-        const userId = req.user.id;
-        const fileId = uuidv4();
-        const key = `documents/${userId}/${fileId}-${req.file.originalname}`;
-
-        // 1. Upload to S3
-        await fileService.uploadFile(key, req.file.buffer, req.file.mimetype);
-
-        // 2. Extract text and queue for embedding
-        await documentProcessor.processDocument(userId, fileId, req.file.buffer, req.file.mimetype);
-
-        res.status(201).json({
-            status: 'success',
-            data: {
-                id: fileId,
-                name: req.file.originalname,
-                key
-            }
-        });
-    } catch (error) {
-        next(error);
+    let text;
+    if (req.file.mimetype === 'application/pdf') {
+      text = await ragService.parsePdf(req.file.buffer);
+    } else {
+      text = req.file.buffer.toString('utf-8');
     }
+
+    if (!text) return res.status(400).json({ success: false, error: { message: 'Could not extract text from file' } });
+
+    const doc = await ragService.ingest(req.user.id, text, 'upload', req.file.originalname);
+    res.json({ success: true, data: doc });
+  } catch (err) {
+    next(err);
+  }
 };
 
-/**
- * Query documents using AI with RAG
- */
-const queryDocuments = async (req, res, next) => {
-    try {
-        const { query } = req.body;
-        const userId = req.user.id;
+const ingestText = async (req, res, next) => {
+  try {
+    const { text, source = 'manual' } = req.body;
+    if (!text) return res.status(400).json({ success: false, error: { message: 'text required' } });
 
-        // Use the existing agentService which now supports RAG
-        // It will automatically pull relevant document context if embeddings were successful
-        const response = await agentService.processMessage(userId, `CONTEXT_DOCUMENT_QUERY: ${query}`);
-
-        res.status(200).json({
-            status: 'success',
-            data: {
-                answer: response.message || response.result
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
+    const doc = await ragService.ingest(req.user.id, text, source, 'text-input');
+    res.json({ success: true, data: doc });
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports = {
-    uploadDocument,
-    queryDocuments
-};
+module.exports = { upload, uploadDocument, ingestText };

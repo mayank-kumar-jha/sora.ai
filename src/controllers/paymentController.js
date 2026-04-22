@@ -1,35 +1,27 @@
 'use strict';
 
 const paymentService = require('../services/paymentService');
-const AppError = require('../utils/AppError');
 
-/**
- * Handle subscription checkout
- */
-const checkout = async (req, res, next) => {
-    try {
-        const { plan } = req.body;
-        const userId = req.user.id;
-        const userEmail = req.user.email;
+const createCheckout = async (req, res, next) => {
+  try {
+    const { plan, priceId } = req.body;
+    if (!plan || !priceId) return res.status(400).json({ success: false, error: { message: 'plan and priceId required' } });
 
-        if (!['PRO', 'FREE'].includes(plan)) {
-            throw new AppError('Invalid plan selected', 400);
-        }
-
-        const session = await paymentService.createCheckoutSession(userId, userEmail, plan);
-
-        res.status(200).json({
-            status: 'success',
-            data: {
-                sessionId: session.id,
-                url: session.url
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
+    const result = await paymentService.createCheckoutSession(req.user.id, plan, priceId);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports = {
-    checkout
+const webhook = async (req, res, next) => {
+  try {
+    const sig = req.headers['stripe-signature'];
+    await paymentService.handleWebhook(req.body, sig);
+    res.json({ received: true });
+  } catch (err) {
+    next(err);
+  }
 };
+
+module.exports = { createCheckout, webhook };

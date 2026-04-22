@@ -1,212 +1,139 @@
 'use strict';
-// Redeploying to fix Deepgram Voice ID mapping mismatch (Eight legacy IDs mapped to Aura)
 
-// Must be first – validates & loads all env vars before anything else
 const config = require('./config/env');
 const logger = require('./config/logger');
 
-// Capture early crashes
+// Capture unhandled errors
 process.on('unhandledRejection', (reason) => {
-    logger.error('Unhandled Promise Rejection', { reason });
-    if (config.isProduction) process.exit(1);
+  logger.error('Unhandled Promise Rejection', { reason: reason?.message || reason });
 });
-
 process.on('uncaughtException', (err) => {
-    logger.error('Uncaught Exception', { error: err.message, stack: err.stack });
-    process.exit(1);
+  logger.error('Uncaught Exception', { error: err.message, stack: err.stack });
+  process.exit(1);
 });
 
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const { requestLogger } = require('./middleware/requestLogger');
-const { globalRateLimiter } = require('./middleware/rateLimiter');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { globalRateLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
 const prisma = require('./config/database');
-const { getRedisClient, disconnectRedis } = require('./config/redis');
-const { initAiWebSocket } = require('./services/websocketService');
-const { handleWebhook } = require('./controllers/webhookController');
-const bullBoardAdapter = require('./config/bullBoard');
-const { schedulePendingTasks, schedulePendingReminders } = require('./services/schedulerService');
-const cron = require('node-cron');
-
-// Start Workers
-require('./workers');
+const { initSocketIO } = require('./services/socketService');
 
 const app = express();
 
-// ─── Security Middleware ────────────────────────────────────────────────────
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "script-src": ["'self'", "'unsafe-inline'"],
-            "img-src": ["'self'", "data:", "blob:"],
-        },
-    },
-}));
+// ─── Security ───────────────────────────────────────────────────────────────
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: '*', credentials: true, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] }));
 
-app.use(
-    cors({
-        origin: config.isProduction
-            ? process.env.ALLOWED_ORIGINS?.split(',') ?? []
-            : '*',
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    })
-);
-
-// ─── Webhooks (Must be before body parsers for raw body) ───────────────────
-app.post('/api/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+// ─── Stripe Webhook (raw body, must be before JSON parser) ──────────────────
+app.post('/api/webhook', express.raw({ type: 'application/json' }), require('./controllers/paymentController').webhook);
 
 // ─── Body Parsing ───────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// ─── Trust Proxy (for accurate IPs behind reverse proxy) ───────────────────
 app.set('trust proxy', 1);
 
-// ─── Request Logging ────────────────────────────────────────────────────────
-app.use(requestLogger);
-
-// ─── Health check (Handles GET and HEAD for Render) ────────────────────────
-app.all('/', (req, res) => {
-    res.json({ status: 'ok', message: 'Sora API is running (v1.2.8)' });
-});
-
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), message: 'Sora Backend is reachable (v1.2.7-stability-fix)' });
-});
-
-// ─── Global Rate Limiting ───────────────────────────────────────────────────
+// ─── Rate Limiting ──────────────────────────────────────────────────────────
 app.use(globalRateLimiter);
 
-// ─── Routes ──────────────────────────────────────────────────────────────────
-// Bull Board Dashboard
-app.use('/admin/queues', bullBoardAdapter.getRouter());
+// ─── Health Check ───────────────────────────────────────────────────────────
+app.all('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Kaaya API v2.0.0', timestamp: new Date().toISOString() });
+});
 
+// ─── API Routes ─────────────────────────────────────────────────────────────
 app.use('/api', routes);
 
-// ─── 404 Handler ────────────────────────────────────────────────────────────
+// ─── Error Handling ─────────────────────────────────────────────────────────
 app.use(notFoundHandler);
-
-// ─── Global Error Handler ───────────────────────────────────────────────────
 app.use(errorHandler);
 
 // ─── Server Bootstrap ───────────────────────────────────────────────────────
 const startServer = async () => {
-    // Pre-flight: DB connection
-    prisma.$connect()
-        .then(() => logger.info('Database: Connected successfully'))
-        .catch((err) => {
-            logger.error('DATABASE CONNECTION FAILED - Server may be unstable', { error: err.message });
-        });
+  // Connect to database
+  await prisma.$connect().then(() => logger.info('✅ Database connected')).catch((err) => {
+    logger.error('❌ Database connection failed', { error: err.message });
+  });
 
-    // Pre-flight: Redis is optional and protected by circuit breaker
-    const { getRedisSuspended } = require('./config/redis');
-    if (getRedisSuspended()) {
-        logger.warn('Redis: CIRCUIT BREAKER ACTIVE - Skipping connection check');
-    } else {
-        const redis = getRedisClient();
-        if (redis) {
-            redis.ping()
-                .then(() => logger.info('Redis: Connected successfully'))
-                .catch((err) => {
-                    logger.warn('Redis: Unavailable at startup - proceeding with database only', { error: err.message });
-                });
-        }
+  const server = app.listen(config.port, '0.0.0.0', () => {
+    logger.info(`🚀 Kaaya Backend v2.0.0 running on port ${config.port} [${config.nodeEnv}]`);
+  });
+
+  // Initialize Socket.io
+  initSocketIO(server);
+
+  // Initialize Raw WebSockets for Native Android Overlay
+  const WebSocket = require('ws');
+  const wss = new WebSocket.Server({ noServer: true });
+
+  server.on('upgrade', (request, socket, head) => {
+    const pathname = request.url.split('?')[0];
+    if (pathname === '/api/live/raw') {
+      const urlParams = new URLSearchParams(request.url.split('?')[1] || '');
+      const token = urlParams.get('token');
+      if (!token) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+        socket.destroy();
+        return;
+      }
+      try {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, config.jwt.secret);
+        request.userId = decoded.sub || decoded.id;
+        wss.handleUpgrade(request, socket, head, (ws) => {
+          wss.emit('connection', ws, request);
+        });
+      } catch (err) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+        socket.destroy();
+      }
     }
+    // DO NOT handle else block. socket.io handles other upgrades automatically.
+  });
 
-    const server = app.listen(config.port, '0.0.0.0', () => {
-        logger.info(`Server started`, {
-            host: '0.0.0.0',
-            port: config.port,
-            environment: config.nodeEnv,
-            redis_set: !!process.env.REDIS_URL,
-            redis_len: (process.env.REDIS_URL || '').length,
-            pid: process.pid,
-        });
-    });
-
-    server.on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            logger.error(`Port ${config.port} is already in use. Exiting so nodemon can retry...`);
-            process.exit(1);
-        } else {
-            throw err;
+  wss.on('connection', (ws, request) => {
+    const userId = request.userId;
+    ws.on('message', (data) => {
+      if (Buffer.isBuffer(data)) {
+        // Route to Wake Word service!
+        const io = getIO();
+        if (io) {
+          io.emit('wake_word:audio', { audio: data.toString('base64') });
         }
+      }
     });
+  });
 
-    // Initialize AI WebSocket
-    initAiWebSocket(server);
+  // Initialize WhatsApp (delayed so DB pool isn't exhausted)
+  setTimeout(async () => {
+    try {
+      const { initWhatsApp } = require('./services/whatsappService');
+      await initWhatsApp();
+    } catch (err) {
+      logger.error('WhatsApp init failed', { error: err.message });
+    }
+  }, 5000);
 
-    // Staggered initialization to prevent DB pool exhaustion
-    // We wait 10s for WhatsApp to give the DB breathing room after express startup
-    setTimeout(async () => {
-        try {
-            // Initialize WhatsApp
-            const { initWhatsApp } = require('./services/whatsappService');
-            await initWhatsApp();
-        } catch (err) {
-            logger.error('WhatsApp Initialization Failed', { error: err.message });
-        }
-
-        // Delay scheduler scan significantly to separate it from WhatsApp DB load
-        setTimeout(async () => {
-            try {
-                logger.info('Performing initial scheduler scan...');
-                await schedulePendingTasks();
-                await schedulePendingReminders();
-            } catch (err) {
-                logger.warn('Initial scheduler scan failed - continuing anyway', { error: err.message });
-            }
-        }, 20000); // 20s after WhatsApp starts
-    }, 10000);
-
-    // Setup Cron for Scheduler (every 1 minute)
-    cron.schedule('* * * * *', async () => {
-        try {
-            logger.info('Running scheduled task scan...');
-            await schedulePendingTasks();
-            await schedulePendingReminders();
-        } catch (err) {
-            logger.error('Scheduled task scan failed', { error: err.message });
-        }
+  // ─── Graceful Shutdown ──────────────────────────────────────────────────
+  const shutdown = async (signal) => {
+    logger.info(`${signal} received. Shutting down...`);
+    server.close(async () => {
+      await prisma.$disconnect();
+      logger.info('Shutdown complete');
+      process.exit(0);
     });
+    setTimeout(() => process.exit(1), 15000);
+  };
 
-    // ─── Graceful Shutdown ────────────────────────────────────────────────────
-    const shutdown = async (signal) => {
-        logger.info(`${signal} received. Starting graceful shutdown...`);
-
-        server.close(async () => {
-            logger.info('HTTP server closed');
-
-            await prisma.$disconnect();
-            logger.info('Database: Disconnected');
-
-            await disconnectRedis();
-            logger.info('Redis: Disconnected');
-
-            logger.info('Graceful shutdown complete');
-            process.exit(0);
-        });
-
-        // Force exit if shutdown takes too long
-        setTimeout(() => {
-            logger.error('Graceful shutdown timed out. Forcing exit.');
-            process.exit(1);
-        }, 15_000);
-    };
-
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 };
 
 startServer().catch((err) => {
-    logger.error('Failed to start server', { error: err.message });
-    process.exit(1);
+  logger.error('Server startup failed', { error: err.message });
+  process.exit(1);
 });
 
-module.exports = app; // Export for testing
+module.exports = app;

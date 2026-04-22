@@ -1,13 +1,9 @@
 'use strict';
 
-const { Router } = require('express');
-const aiController = require('../controllers/aiController');
-const { requireAuth } = require('../middleware/auth');
-
-const router = Router();
-
-router.use(requireAuth);
-
-router.post('/message', aiController.sendMessage);
+const router = require('express').Router();
+const ai = require('../controllers/aiController');
+const { authenticate } = require('../middleware/auth');
+router.post('/chat', authenticate, ai.chat);
+router.get('/config', authenticate, ai.getConfig);
 
 module.exports = router;

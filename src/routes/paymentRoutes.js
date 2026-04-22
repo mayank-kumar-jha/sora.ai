@@ -1,19 +1,9 @@
 'use strict';
 
-const express = require('express');
-const paymentController = require('../controllers/paymentController');
-const { requireAuth } = require('../middleware/auth');
-const validateRequest = require('../middleware/validateRequest');
-const { z } = require('zod');
+const router = require('express').Router();
+const payment = require('../controllers/paymentController');
+const { authenticate } = require('../middleware/auth');
 
-const router = express.Router();
-
-const checkoutSchema = z.object({
-    plan: z.enum(['FREE', 'PRO'])
-});
-
-router.use(requireAuth);
-
-router.post('/checkout', validateRequest(checkoutSchema), paymentController.checkout);
+router.post('/checkout', authenticate, payment.createCheckout);
 
 module.exports = router;

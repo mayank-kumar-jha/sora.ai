@@ -1,160 +1,129 @@
 'use strict';
 
-const prisma = require('../config/database');
-const AppError = require('../utils/AppError');
+const logger = require('../config/logger');
+
+const crypto = require('crypto');
 
 /**
- * Parse a date/time string into a valid Date object.
- * Expects an ISO 8601 string from the AI.
+ * Routes AI function calls to the appropriate service.
+ * Each handler returns a result object that gets sent back to the AI.
  */
-const parseDateTime = (input) => {
-    if (!input) return null;
+const route = async (toolName, args, userId) => {
+  logger.info(`[ActionRouter] ${toolName}`, args);
 
-    const parsedDate = new Date(input);
-    if (!isNaN(parsedDate.getTime())) {
-        return parsedDate;
+  const actionId = crypto.randomUUID();
+
+  switch (toolName) {
+    case 'perform_web_search': {
+      const webSearch = require('./webSearchService');
+      return await webSearch.search(args.query);
     }
 
-    console.error(`Invalid date format provided for alarm: "${input}"`);
-    throw new AppError(`Could not parse the provided time: ${input}. Requires ISO 8601 formatting.`, 400, 'INVALID_DATE');
+    case 'query_knowledge_base': {
+      const ragService = require('./ragService');
+      return await ragService.query(args.query, userId);
+    }
+
+    case 'make_note': {
+      const ragService = require('./ragService');
+      const doc = await ragService.ingest(userId, args.note, 'note', args.topic || 'general');
+      return { success: true, message: 'Note saved successfully to memory.', vectorId: doc.vectorId };
+    }
+
+    case 'save_contact': {
+      const ragService = require('./ragService');
+      const contactNote = `Contact: ${args.name} — Phone: ${args.phoneNumber}`;
+      const doc = await ragService.ingest(userId, contactNote, 'note', 'contacts');
+      
+      try {
+        const whatsappService = require('./whatsappService');
+        if (whatsappService.registerContact) {
+          whatsappService.registerContact(args.name, args.phoneNumber);
+          logger.info(`[ActionRouter] Registered contact: ${args.name} → ${args.phoneNumber}`);
+        }
+      } catch (e) {
+        logger.warn(`[ActionRouter] Could not register contact in WhatsApp: ${e.message}`);
+      }
+      
+      return { success: true, message: `Contact saved! I'll remember that ${args.phoneNumber} is ${args.name}.` };
+    }
+
+    case 'send_whatsapp_message': {
+      const result = { actionId, clientAction: 'SEND_WHATSAPP', ...args, messageContent: args.message, message: `Sending WhatsApp message to ${args.to}` };
+      pushDeviceAction(userId, result);
+      return result;
+    }
+
+    case 'generate_image': {
+      const imageService = require('./imageService');
+      const res = await imageService.generateImage(args.prompt);
+      
+      const actionPayload = { actionId, clientAction: 'RENDER_IMAGE', payload: { ...res, prompt: args.prompt } };
+      pushDeviceAction(userId, actionPayload);
+      return actionPayload;
+    }
+
+    case 'edit_current_image': {
+      const imageService = require('./imageService');
+      
+      const lastImage = global.latestImageContext ? global.latestImageContext[userId] : null;
+      if (!lastImage) {
+          return { error: 'No recent image found in context. Please provide an image to edit.' };
+      }
+      
+      const res = await imageService.editImage(lastImage, args.prompt);
+      
+      if (res.image) {
+          const actionPayload = { actionId, clientAction: 'RENDER_IMAGE', payload: { ...res, prompt: args.prompt } };
+          pushDeviceAction(userId, actionPayload);
+          return actionPayload;
+      } else {
+          return res;
+      }
+    }
+
+    // ─── Device Actions (pushed to mobile app via Socket.io) ─────────────
+    case 'set_alarm': {
+      const result = { actionId, clientAction: 'SET_ALARM', ...args, message: `Alarm set for ${args.time}` };
+      pushDeviceAction(userId, result);
+      return result;
+    }
+
+    case 'make_call': {
+      const result = { actionId, clientAction: 'MAKE_CALL', ...args, message: `Calling ${args.contactName}` };
+      pushDeviceAction(userId, result);
+      return result;
+    }
+
+    case 'open_app': {
+      const result = { actionId, clientAction: 'OPEN_APP', ...args, message: `Opening ${args.appName}` };
+      pushDeviceAction(userId, result);
+      return result;
+    }
+
+    case 'play_music': {
+      const result = { actionId, clientAction: 'PLAY_MUSIC', ...args, message: `Playing ${args.songName}` };
+      pushDeviceAction(userId, result);
+      return result;
+    }
+
+    default:
+      return { error: `Unknown tool: ${toolName}` };
+  }
 };
 
 /**
- * Route structured AI actions to the appropriate services
+ * Push a device action to the user's mobile app via Socket.io.
+ * The mobile app listens for 'device:action' events and executes them natively.
  */
-const routeAction = async (userId, action, payload = {}) => {
-    const googleService = require('./googleService');
-    const whatsappService = require('./whatsappService');
-    
-    payload = payload || {};
-    switch (action) {
-        case 'CREATE_CALENDAR_EVENT':
-            return await googleService.createCalendarEvent(userId, {
-                summary: payload.summary,
-                description: payload.description,
-                start: { dateTime: payload.start, timeZone: 'UTC' },
-                end: { dateTime: payload.end, timeZone: 'UTC' }
-            });
-
-        case 'LIST_CALENDAR_EVENTS':
-            return await googleService.listCalendarEvents(userId, payload.maxResults);
-
-        case 'SEND_EMAIL':
-            return await googleService.sendEmail(userId, {
-                to: payload.to,
-                subject: payload.subject,
-                body: payload.body
-            });
-
-        case 'GET_INBOX':
-            return await googleService.readEmails(userId, payload.maxResults);
-
-        case 'UPLOAD_DRIVE_FILE':
-            return await googleService.uploadDriveFile(userId, {
-                name: payload.name,
-                mimeType: payload.mimeType,
-                body: payload.content
-            });
-
-        case 'GET_WHATSAPP_MESSAGES':
-            return await whatsappService.getRecentChats(payload.limit || 10);
-        case 'GET_WHATSAPP_CONTACTS':
-            return await whatsappService.getContacts(payload.limit || 20);
-        case 'CLEAR_WHATSAPP_CACHE':
-            return await whatsappService.clearCache();
-        case 'SEND_WHATSAPP':
-            return await whatsappService.sendWhatsAppMessage(payload.to, payload.message);
-        case 'SCHEDULE_WHATSAPP':
-            return await prisma.task.create({
-                data: {
-                    userId,
-                    title: 'SEND_WHATSAPP',
-                    description: JSON.stringify({ to: payload.to, message: payload.message }),
-                    type: 'ONE_TIME',
-                    status: 'PENDING',
-                    scheduledTime: parseDateTime(payload.time)
-                }
-            });
-
-        case 'LIST_DRIVE_FILES':
-            return await googleService.listDriveFiles(userId, payload.pageSize);
-
-        case 'WEB_SEARCH':
-            const webSearchService = require('./webSearchService');
-            return await webSearchService.performWebSearch(payload.query);
-
-        case 'CREATE_TASK':
-            return await prisma.task.create({
-                data: {
-                    userId,
-                    title: payload.title,
-                    scheduledTime: parseDateTime(payload.scheduledTime)
-                }
-            });
-
-        case 'CREATE_REMINDER':
-            return await prisma.reminder.create({
-                data: {
-                    userId,
-                    message: payload.message,
-                    reminderTime: parseDateTime(payload.reminderTime)
-                }
-            });
-
-        case 'MAKE_CALL':
-            // This is handled client-side on the phone
-            return {
-                clientAction: 'MAKE_CALL',
-                contactName: payload.contactName,
-                message: `Calling ${payload.contactName}...`
-            };
-
-
-        case 'OPEN_APP':
-            return {
-                clientAction: 'OPEN_APP',
-                appName: payload.appName,
-                message: `Opening ${payload.appName}...`
-            };
-
-        case 'OPEN_URL':
-            return {
-                clientAction: 'OPEN_URL',
-                url: payload.url,
-                message: `Opening ${payload.url}...`
-            };
-
-        case 'PLAY_MUSIC':
-            return {
-                clientAction: 'PLAY_MUSIC',
-                songName: payload.songName,
-                message: `Playing ${payload.songName}...`
-            };
-
-        case 'SET_ALARM':
-            const alarmTime = parseDateTime(payload.time);
-            // Persist alarm as a high-priority task for background execution
-            await prisma.task.create({
-                data: {
-                    userId,
-                    title: `ALARM: ${payload.label || 'Sora Alarm'}`,
-                    type: 'ONE_TIME',
-                    status: 'PENDING',
-                    scheduledTime: alarmTime
-                }
-            });
-            return {
-                clientAction: 'SET_ALARM',
-                time: alarmTime.toISOString(),
-                label: payload.label || 'Sora Alarm',
-                message: `Alarm set for ${alarmTime.toLocaleTimeString()}.`
-            };
-
-        default:
-            throw new AppError(`Unsupported action: ${action}`, 400, 'INVALID_ACTION');
-    }
+const pushDeviceAction = (userId, action) => {
+  try {
+    const { notifyUser } = require('./socketService');
+    notifyUser(userId, 'device:action', action);
+    logger.info(`[ActionRouter] Pushed device action to ${userId}: ${action.clientAction}`);
+  } catch (err) {
+    logger.warn(`[ActionRouter] Failed to push device action: ${err.message}`);
+  }
 };
 
-module.exports = {
-    routeAction,
-};
+module.exports = { route };

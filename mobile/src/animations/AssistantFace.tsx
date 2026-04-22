@@ -263,7 +263,7 @@ export default function AssistantFace({ state, scale = 1, eyeColor = '#0df' }: P
   useEffect(() => {
     if (state !== 'Idle') return;
 
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     const triggerBurst = () => {
       const burstType = Math.floor(Math.random() * 3); // 0: Squint, 1: Tilt, 2: Look Aside

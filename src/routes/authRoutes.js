@@ -1,25 +1,14 @@
 'use strict';
 
-const { Router } = require('express');
-const authController = require('../controllers/authController');
-const googleAuthController = require('../controllers/googleAuthController');
-const { requireAuth } = require('../middleware/auth');
-const { cacheMiddleware } = require('../middleware/cache');
+const router = require('express').Router();
+const auth = require('../controllers/authController');
+const { authenticate } = require('../middleware/auth');
 const { authRateLimiter } = require('../middleware/rateLimiter');
 
-const router = Router();
-
-// Public routes – apply strict rate limiting
-router.post('/register', authRateLimiter, authController.register);
-router.post('/login', authRateLimiter, authController.login);
-router.post('/refresh', authController.refreshToken);
-
-// Google OAuth routes
-router.get('/google', googleAuthController.redirectToGoogle);
-router.get('/google/callback', googleAuthController.handleGoogleCallback);
-
-// Protected routes
-router.post('/logout', requireAuth, authController.logout);
-router.get('/me', requireAuth, cacheMiddleware(300), authController.getMe);
+router.post('/register', authRateLimiter, auth.register);
+router.post('/login', authRateLimiter, auth.login);
+router.post('/refresh', auth.refresh);
+router.post('/logout', auth.logout);
+router.get('/me', authenticate, auth.me);
 
 module.exports = router;

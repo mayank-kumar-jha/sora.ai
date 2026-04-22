@@ -40,7 +40,7 @@ export const OverlayBridge = {
     if (!isAndroid || !SoraOverlay || !SoraOverlay.stopOverlay) return;
     SoraOverlay.stopOverlay();
   },
-  
+
   hideOverlay(): void {
     if (!isAndroid || !SoraOverlay || !SoraOverlay.hideOverlay) return;
     SoraOverlay.hideOverlay();
@@ -61,9 +61,19 @@ export const OverlayBridge = {
     SoraOverlay.updateLastMessage(message);
   },
 
-  addMessage(message: string, sender: 'user' | 'ai' = 'ai'): void {
+  showTypingIndicator(): void {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.showTypingIndicator) return;
+    SoraOverlay.showTypingIndicator();
+  },
+
+  hideTypingIndicator(): void {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.hideTypingIndicator) return;
+    SoraOverlay.hideTypingIndicator();
+  },
+
+  addMessage(message: string, sender: 'user' | 'ai' = 'ai', imageBase64?: string): void {
     if (!isAndroid || !SoraOverlay || !SoraOverlay.addMessage) return;
-    SoraOverlay.addMessage(message, sender);
+    SoraOverlay.addMessage(message, sender, imageBase64 || null);
   },
 
   /**
@@ -112,6 +122,31 @@ export const OverlayBridge = {
   resetVisionCapture(): void {
     if (!isAndroid || !SoraOverlay || !SoraOverlay.resetVisionCapture) return;
     SoraOverlay.resetVisionCapture();
+  },
+
+  startWakeWord(): void {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.startWakeWord) return;
+    SoraOverlay.startWakeWord();
+  },
+
+  stopWakeWord(): void {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.stopWakeWord) return;
+    SoraOverlay.stopWakeWord();
+  },
+
+  startPCMStreaming(): void {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.startPCM) return;
+    SoraOverlay.startPCM();
+  },
+
+  stopPCMStreaming(): void {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.stopPCM) return;
+    SoraOverlay.stopPCM();
+  },
+
+  async makeDirectCall(phoneNumber: string): Promise<boolean> {
+    if (!isAndroid || !SoraOverlay || !SoraOverlay.makeDirectCall) return false;
+    return SoraOverlay.makeDirectCall(phoneNumber);
   },
 
   // ─── JS-only session storage for background services ──────────────

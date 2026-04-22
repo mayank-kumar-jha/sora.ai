@@ -1,28 +1,17 @@
 'use strict';
 
-const { Router } = require('express');
-const healthRoutes = require('./healthRoutes');
-const authRoutes = require('./authRoutes');
-const googleRoutes = require('./googleRoutes');
-const voiceRoutes = require('./voiceRoutes');
-const aiRoutes = require('./aiRoutes');
-const documentRoutes = require('./documentRoutes');
-const paymentRoutes = require('./paymentRoutes');
-const taskRoutes = require('./taskRoutes');
-const whatsappRoutes = require('./whatsappRoutes');
+const router = require('express').Router();
 
-const router = Router();
-
-router.use('/health', healthRoutes);
-router.use('/auth', authRoutes);
-router.use('/google', googleRoutes);
-router.use('/voice', voiceRoutes);
-router.use('/ai', aiRoutes);
-router.use('/documents', documentRoutes);
-router.use('/payments', paymentRoutes);
-router.use('/tasks', taskRoutes);
-router.use('/whatsapp', whatsappRoutes);
-
-// More route namespaces will be added in subsequent phases
+router.use('/auth', require('./authRoutes'));
+router.use('/ai', require('./aiRoutes'));
+router.use('/whatsapp', require('./whatsappRoutes'));
+router.use('/documents', require('./documentRoutes'));
+router.use('/voice', require('./voiceRoutes'));
+router.use('/images', require('./imageRoutes'));
+router.use('/payments', require('./paymentRoutes'));
+// Health check
+router.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.0.0' });
+});
 
 module.exports = router;

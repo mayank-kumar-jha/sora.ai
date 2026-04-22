@@ -33,9 +33,20 @@ const getSettingsPrefix = async (): Promise<string> => {
     }
 };
 
+const executedActions = new Set<string>();
+
 // Handle client-side actions (call, open app)
-const handleClientAction = async (result: any) => {
+export const handleClientAction = async (result: any) => {
     if (!result?.clientAction) return;
+
+    // Prevent duplicate firing of native actions (e.g., from both REST and Socket events arriving simultaneously)
+    if (result.actionId) {
+        if (executedActions.has(result.actionId)) return;
+        executedActions.add(result.actionId);
+        
+        // Prevent memory leak over time
+        if (executedActions.size > 100) executedActions.clear();
+    }
 
     if (result.clientAction === 'MAKE_CALL') {
         const contactName = result.contactName;
@@ -43,7 +54,7 @@ const handleClientAction = async (result: any) => {
 
         try {
             const Contacts = require('expo-contacts');
-            const { status } = await Contacts.requestPermissionsAsync();
+            const { status } = await Contacts.getPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Permission needed', 'Contacts permission is required to make calls.');
                 return;
@@ -57,6 +68,19 @@ const handleClientAction = async (result: any) => {
             if (data.length > 0 && data[0].phoneNumbers && data[0].phoneNumbers.length > 0) {
                 const phoneNumber = data[0].phoneNumbers[0].number;
                 const cleanNumber = phoneNumber.replace(/[^0-9+]/g, '');
+                
+                // Use native ACTION_CALL for direct calling (no dialer screen)
+                if (Platform.OS === 'android') {
+                    const { NativeModules } = require('react-native');
+                    if (NativeModules.SoraOverlay?.makeDirectCall) {
+                        const success = await NativeModules.SoraOverlay.makeDirectCall(cleanNumber);
+                        if (success) {
+                            console.log(`[useAI] Direct call placed to ${cleanNumber}`);
+                            return;
+                        }
+                    }
+                }
+                // Fallback to dialer if native call fails
                 Linking.openURL(`tel:${cleanNumber}`);
             } else {
                 Alert.alert('Contact not found', `Could not find "${contactName}" in your contacts.`);
@@ -73,7 +97,7 @@ const handleClientAction = async (result: any) => {
         if (Platform.OS !== 'web') {
             try {
                 const Contacts = require('expo-contacts');
-                const { status } = await Contacts.requestPermissionsAsync();
+                const { status } = await Contacts.getPermissionsAsync();
                 if (status === 'granted') {
                     const { data } = await Contacts.getContactsAsync({
                         name: contactName,
@@ -99,7 +123,36 @@ const handleClientAction = async (result: any) => {
     }
 
     if (result.clientAction === 'OPEN_APP') {
-        const appName = result.appName?.toLowerCase();
+        const appName = result.appName?.toLowerCase() || '';
+        
+        if (Platform.OS === 'android') {
+            const androidPackages: Record<string, string> = {
+                'whatsapp': 'com.whatsapp',
+                'instagram': 'com.instagram.android',
+                'youtube': 'com.google.android.youtube',
+                'spotify': 'com.spotify.music',
+                'twitter': 'com.twitter.android',
+                'x': 'com.twitter.android',
+                'maps': 'com.google.android.apps.maps',
+                'gmail': 'com.google.android.gm',
+                'telegram': 'org.telegram.messenger',
+                'facebook': 'com.facebook.katana',
+                'snapchat': 'com.snapchat.android',
+                'chrome': 'com.android.chrome',
+            };
+
+            const pkg = androidPackages[appName];
+            const { NativeModules } = require('react-native');
+            if (pkg && NativeModules.SoraOverlay?.launchPackage) {
+                const success = await NativeModules.SoraOverlay.launchPackage(pkg);
+                if (success) {
+                    console.log(`[useAI] Successfully launched package ${pkg}`);
+                    return;
+                }
+            }
+        }
+
+        // Fallback to URL schemes for iOS or if native launch fails
         const appSchemes: Record<string, string> = {
             'whatsapp': 'whatsapp://',
             'instagram': 'instagram://',
@@ -257,7 +310,7 @@ export const useAI = (conversationId?: string) => {
         const success = sendWsMessage(payload);
         if (!success) {
             try {
-                const response = await apiClient.post('/ai/message', { 
+                const response = await apiClient.post('/ai/chat', { 
                     message: messageWithSettings, 
                     image,
                     conversationId

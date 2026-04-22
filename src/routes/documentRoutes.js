@@ -1,24 +1,10 @@
 'use strict';
 
-const express = require('express');
-const multer = require('multer');
-const documentController = require('../controllers/documentController');
-const { requireAuth } = require('../middleware/auth');
-const validateRequest = require('../middleware/validateRequest');
-const { z } = require('zod');
+const router = require('express').Router();
+const doc = require('../controllers/documentController');
+const { authenticate } = require('../middleware/auth');
 
-const router = express.Router();
-const upload = multer({
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB
-});
-
-const querySchema = z.object({
-    query: z.string().min(1)
-});
-
-router.use(requireAuth);
-
-router.post('/upload', upload.single('file'), documentController.uploadDocument);
-router.post('/query', validateRequest(querySchema), documentController.queryDocuments);
+router.post('/upload', authenticate, doc.upload.single('file'), doc.uploadDocument);
+router.post('/ingest', authenticate, doc.ingestText);
 
 module.exports = router;

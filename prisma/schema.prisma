@@ -1,14 +1,10 @@
-// This is your Prisma schema file.
-// Learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ─── Enums ─────────────────────────────────────────────────────────────────
@@ -24,26 +20,6 @@ enum ConversationRole {
   ASSISTANT
 }
 
-enum TaskStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  CANCELLED
-  IN_PROGRESS
-}
-
-enum TaskType {
-  ONE_TIME
-  RECURRING
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELLED
-  EXPIRED
-  TRIALING
-}
-
 // ─── Models ────────────────────────────────────────────────────────────────
 
 model User {
@@ -55,20 +31,10 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  sessions          Session[]
-  tasks             Task[]
-  reminders         Reminder[]
-  conversations     Conversation[]
-  embeddingMetadata EmbeddingMetadata[]
-  subscriptions     Subscription[]
-  googleTokens      GoogleToken[]
-  auditLogs         AuditLog[]
-
-  // Quotas
-  aiUsageCount      Int      @default(0) @map("ai_usage_count")
-  taskCount         Int      @default(0) @map("task_count")
-  storageUsageBytes BigInt   @default(0) @map("storage_usage_bytes")
+  sessions      Session[]
+  conversations Conversation[]
+  documents     Document[]
+  payments      Payment[]
 
   @@index([email])
   @@map("users")
@@ -88,58 +54,6 @@ model Session {
   @@map("sessions")
 }
 
-model Task {
-  id             String     @id @default(uuid()) @db.Uuid
-  userId         String     @map("user_id") @db.Uuid
-  title          String
-  description    String?    @db.Text
-  type           TaskType   @default(ONE_TIME)
-  status         TaskStatus @default(PENDING)
-  scheduledTime  DateTime?  @map("scheduled_time")
-  recurrenceRule String?    @map("recurrence_rule")
-  lastRunAt      DateTime?  @map("last_run_at")
-  createdAt      DateTime   @default(now()) @map("created_at")
-  updatedAt      DateTime   @updatedAt @map("updated_at")
-
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  executionLogs ExecutionLog[]
-
-  @@index([userId])
-  @@index([status])
-  @@map("tasks")
-}
-
-model ExecutionLog {
-  id         String     @id @default(uuid()) @db.Uuid
-  taskId     String     @map("task_id") @db.Uuid
-  userId     String     @map("user_id") @db.Uuid
-  status     TaskStatus
-  output     String?    @db.Text
-  error      String?    @db.Text
-  executedAt DateTime   @default(now()) @map("executed_at")
-
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  @@index([taskId])
-  @@index([userId])
-  @@map("execution_logs")
-}
-
-model Reminder {
-  id           String   @id @default(uuid()) @db.Uuid
-  userId       String   @map("user_id") @db.Uuid
-  message      String
-  reminderTime DateTime @map("reminder_time")
-  sent         Boolean  @default(false)
-  createdAt    DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([reminderTime])
-  @@map("reminders")
-}
-
 model Conversation {
   id             String           @id @default(uuid()) @db.Uuid
   userId         String           @map("user_id") @db.Uuid
@@ -156,80 +70,49 @@ model Conversation {
   @@map("conversations")
 }
 
-model EmbeddingMetadata {
+model Document {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @map("user_id") @db.Uuid
-  vectorId  String   @map("vector_id")
-  source    String
+  filename  String
+  source    String   @default("upload")
+  vectorId  String?  @map("vector_id")
+  content   String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([vectorId])
-  @@map("embedding_metadata")
+  @@map("documents")
 }
 
-model Subscription {
-  id         String             @id @default(uuid()) @db.Uuid
-  userId     String             @map("user_id") @db.Uuid
-  plan       String
-  status     SubscriptionStatus @default(TRIALING)
-  expiryDate DateTime?          @map("expiry_date")
-  createdAt  DateTime           @default(now()) @map("created_at")
-  updatedAt  DateTime           @updatedAt @map("updated_at")
+model Payment {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  stripeSessionId  String?  @unique @map("stripe_session_id")
+  amount           Int      @default(0)
+  currency         String   @default("usd")
+  status           String   @default("pending")
+  plan             String?
+  createdAt        DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([status])
-  @@map("subscriptions")
-}
-
-model GoogleToken {
-  id           String   @id @default(uuid()) @db.Uuid
-  userId       String   @unique @map("user_id") @db.Uuid
-  // NOTE: accessToken and refreshToken must be encrypted at the application
-  // layer before being stored. Encryption logic will be added in Phase 2.
-  accessToken  String   @map("access_token") @db.Text
-  refreshToken String   @map("refresh_token") @db.Text
-  expiry       DateTime
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("google_tokens")
-}
-
-model AuditLog {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String?  @map("user_id") @db.Uuid
-  action    String
-  resource  String?
-  metadata  Json?
-  ipAddress String?  @map("ip_address")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@index([action])
-  @@map("audit_logs")
+  @@map("payments")
 }
 
 model WhatsAppSession {
-  id        String   @id @default("singleton")
-  creds     Json
-  lastQrCode String? @db.Text @map("last_qr_code")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String   @id @default("singleton")
+  creds      Json
+  lastQrCode String?  @db.Text @map("last_qr_code")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@map("whatsapp_sessions")
 }
 
 model WhatsAppKey {
-  id    String @id
-  data  Json
-  
+  id   String @id
+  data Json
+
   @@map("whatsapp_keys")
 }

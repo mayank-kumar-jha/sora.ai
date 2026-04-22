@@ -60,12 +60,14 @@ const useNativeRecording = () => {
                 console.error('Audio permission denied');
                 return false;
             }
-            await Audio.setAudioModeAsync({
-                allowsRecordingIOS: true,
-                playsInSilentModeIOS: true,
-                staysActiveInBackground: true,
-                shouldDuckAndroid: true,
-            });
+            try {
+                await Audio.setAudioModeAsync({
+                    allowsRecordingIOS: true,
+                    playsInSilentModeIOS: true,
+                    staysActiveInBackground: true,
+                    shouldDuckAndroid: true,
+                });
+            } catch (modeErr) { }
             const { recording } = await Audio.Recording.createAsync(
                 Audio.RecordingOptionsPresets.HIGH_QUALITY
             );
@@ -110,7 +112,7 @@ export default function AudioRecorder({ onTranscription, onRecordingState, onAmp
     const isRecordingRef = useRef(false);
     useEffect(() => { isRecordingRef.current = isRecording; }, [isRecording]);
 
-    const handlePressRef = useRef<() => void>();
+    const handlePressRef = useRef<() => void>(undefined);
 
     useEffect(() => {
         const sub = DeviceEventEmitter.addListener('BLUETOOTH_TRIGGER_MIC', () => {
@@ -250,12 +252,14 @@ export default function AudioRecorder({ onTranscription, onRecordingState, onAmp
                     }
 
                     // Step 3: Set audio mode to RECORDING (overrides TTS mode)
-                    await Audio.setAudioModeAsync({
-                        allowsRecordingIOS: true,
-                        playsInSilentModeIOS: true,
-                        staysActiveInBackground: false,
-                        shouldDuckAndroid: true,
-                    });
+                    try {
+                        await Audio.setAudioModeAsync({
+                            allowsRecordingIOS: true,
+                            playsInSilentModeIOS: true,
+                            staysActiveInBackground: true,
+                            shouldDuckAndroid: true,
+                        });
+                    } catch (modeErr) {}
 
                     // Step 4: Create a fresh recorder
                     const { recording } = await Audio.Recording.createAsync(

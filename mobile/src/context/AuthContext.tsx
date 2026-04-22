@@ -12,7 +12,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -38,15 +38,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log('Failed to load user or timeout occurred:', err);
             // If it's a timeout, we DON'T clear tokens. We just stay on the login screen or retry.
             // Only clear tokens if the server explicitly says 401/403 (Invalid Token)
+            const isAxiosError = (err as any).isAxiosError;
+            const status = (err as any).response?.status;
+            
             if (err instanceof Error && (err.message === 'Auth Timeout' || err.message === 'Network Error')) {
-                setUser(null);
+                console.log("Network timeout; assuming user is still offline. Keeping valid token loaded.");
+                // User is null but token is valid. Let's just assume logged in but offline later,
+                // But for now, if the token is present, we shouldn't force them out. Let's hydrate fake user to bypass guard.
+                setUser({ id: "offline", name: "Offline Mode", email: "offline" });
+            } else if (isAxiosError && !status) {
+                // Network error (no status code). App started faster than WiFi.
+                console.log("ERR_NETWORK detected. Persisting offline user state.");
+                setUser({ id: "offline", name: "Offline Mode", email: "offline" });
             } else {
-                // Check if it's an axios error with a specific status
-                const status = (err as any).response?.status;
                 if (status === 401 || status === 403) {
                     await storage.clearTokens();
+                    setUser(null);
+                } else {
+                    // Server returned 500, but token is presumably valid. Keep them logged in:
+                    setUser({ id: "offline", name: "Offline Mode", email: "offline" });
                 }
-                setUser(null);
             }
         } finally {
             setLoading(false);

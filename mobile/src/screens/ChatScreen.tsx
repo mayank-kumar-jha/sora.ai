@@ -11,7 +11,7 @@ import PixelEyes, { EyeState } from '../components/PixelEyes';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeIn, Layout, SlideInDown } from 'react-native-reanimated';
 import { useSoraSettings } from '../context/SoraSettingsContext';
-import { setGlobalMuted, connectWs } from '../services/BackgroundService';
+import { connectWs } from '../services/BackgroundService';
 
 import { v4 as uuidv4 } from 'uuid';
 import 'react-native-get-random-values';
@@ -130,7 +130,6 @@ export default function ChatScreen() {
                     onPress={() => {
                         const newMuted = !isMuted;
                         setIsMuted(newMuted);
-                        setGlobalMuted(newMuted);
                     }}
                 >
                     {isMuted ? <VolumeX color="#f87171" size={20} /> : <Volume2 color="#94a3b8" size={20} />}
